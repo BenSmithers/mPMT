@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 2.8.10 FATAL_ERROR)
-project(WCTE_mPMT)
+project(WCTE_skPMT)
 
 if (CMAKE_COMPILER_IS_GNUCC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.4)
     message(STATUS "GCC version >= 4.4 required!")
     return()
 endif()
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR -D_LIBCPP_ENABLE_CXX14_REMOVED_FEATURES")
 
 find_package(Geant4 REQUIRED ui_all vis_all)
 find_package(ROOT REQUIRED)
@@ -52,8 +53,8 @@ file(GLOB MACRO_FILES
 )
 file(COPY ${MACRO_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 
-add_executable(mPMT mPMT.cc ${sources} ${headers} ${DICT_OUTPUT})
-target_link_libraries(mPMT ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Core RIO Hist Tree)
+add_executable(skPMT skPMT.cc ${sources} ${headers} ${DICT_OUTPUT})
+target_link_libraries(skPMT ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Core RIO Hist Tree)
 
-add_custom_target(WCTE_mPMT DEPENDS mPMT)
+add_custom_target(WCTE_skPMT DEPENDS skPMT)
 
