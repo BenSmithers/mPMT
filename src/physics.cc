@@ -11,9 +11,8 @@ MyPhysicsList::MyPhysicsList()
   SetVerboseLevel(1);
   RegisterPhysics(new G4EmStandardPhysics());
   RegisterPhysics(new G4RadioactiveDecayPhysics());
-  //RegisterPhysics(new G4OpticalPhysics());
-  RegisterPhysics(new WCSimOpticalPhysics());
-
+  RegisterPhysics(new G4OpticalPhysics());
+  //RegisterPhysics(new WCSimOpticalPhysics());
 
 }
 
@@ -47,7 +46,9 @@ void MyPhysicsList::ConstructProcess()
   G4bool isOpBoundaryAdded = false;
       // Create an instance of your custom optical boundary process                                                         
 
+  std::cout << " about to get process list" << std::endl;
   G4ProcessVector* processList = processManager->GetProcessList();
+  std::cout << "got it" << std::endl;
   G4int numProcesses = processList->size();
 
   // Loop over the processes and print their names                                                                         
@@ -66,7 +67,7 @@ void MyPhysicsList::ConstructProcess()
   if(!isOpBoundaryAdded)
     {
       
-      WCSimOpBoundaryProcess* opBoundaryProcess = new WCSimOpBoundaryProcess();
+      G4OpBoundaryProcess* opBoundaryProcess = new G4OpBoundaryProcess();
       opBoundaryProcess->SetVerboseLevel(0);
       // Print the process names                                                                                               
       G4cout << "Registering processes for gamma particles:" << G4endl;

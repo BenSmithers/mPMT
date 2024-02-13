@@ -43,36 +43,53 @@
 
 
 
-class ConstructThing : public G4VUserDetectorConstruction {
-public:
-  ConstructThing();
-  virtual ~ConstructThing();
-
-  
-
-private:
-  G4double a;
-  G4double density;
-};
-
-
 class myDetectorConstruction : public G4VUserDetectorConstruction{
     public: 
         myDetectorConstruction(G4int DetConfig, WCSimTuningParameters* WCSimTuningPars);
         ~myDetectorConstruction();
-        static myDetectorConstruction* GetInstance() {return instance;}
 
         G4VPhysicalVolume *Construct();
 
-        G4LogicalVolume* GetScoringVolume() const {return fScoringVolume;}
+        void DefineMaterials();
 
-    
+        G4LogicalVolume* GetScoringVolume() const {return fScoringVolume;}// or this... 
+        G4VPhysicalVolume* GetphysWorld()const {return physical_world;}
+        G4LogicalVolume* GetWorldVolume()const {return logicWorld; }
+        G4LogicalVolume* GetLogicmPMT() const {return fScoringVolume;} //TODO change this...
+
+
+        G4Material* Vacuum;
+        G4Material* Water;
+        G4Material* Air;
+        G4Material* Aluminum;
+        G4Material* SiO2;
+        G4Material* B2O3;
+        G4Material* Na2O;
+        G4Material* PMTGlass;
+        G4Material* Al2O3;
+        G4Material* absorberMaterial;
+
     private:
-        static myDetectorConstruction* instance;
+        const static G4int NUMSK = 6;
+        G4double ENERGY_COATED_SK[NUMSK], COATEDRINDEX_glasscath_SK[NUMSK], COATEDRINDEXIM_glasscath_SK[NUMSK];
+        G4double COATEDTHICKNESS_glasscath_SK, COATEDTHICKNESS_glasscath_KCsCb, COATEDTHICKNESS_glasscath_RbCsCb;
+        G4int COATEDFRUSTRATEDTRANSMISSION_glasscath;
+
+        const static G4int NUMWAV=23;
+        G4double ENERGY_COATED_WAV[NUMWAV], COATEDRINDEX_glasscath_KCsCb[NUMWAV], COATEDRINDEXIM_glasscath_KCsCb[NUMWAV], COATEDRINDEX_glasscath_RbCsCb[NUMWAV],COATEDRINDEXIM_glasscath_RbCsCb[NUMWAV];
+
         G4double density;
         G4double a;
 
+        G4VPhysicalVolume* DefineVolumes();
         G4LogicalVolume *fScoringVolume;
+
+        G4VPhysicalVolume* physical_world;
+        G4LogicalVolume* logicWorld;
+
+        
+
+        G4UserLimits fStepLimit; 
 
         WCSimTuningParameters* WCSimTuningParams;
         G4int myConfiguration;

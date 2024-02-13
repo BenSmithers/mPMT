@@ -1499,7 +1499,7 @@ void WCSimOpBoundaryProcess::CoatedDielectricDielectric_Model1()
 
   MPT = OpticalSurface->GetMaterialPropertiesTable();
   // thin film properties to be defined in WCSimConstructMaterials.cc
-  if((pp = MPT->GetProperty("COATEDRINDEX")))
+  if((pp = MPT->GetProperty("SCINTILLATIONCOMPONENT2")))
   {
     fCoatedRindex = pp->Value(thePhotonMomentum);
   }
@@ -1822,7 +1822,7 @@ void WCSimOpBoundaryProcess::CoatedDielectricDielectric_Model2()
   {
     fCoatedRindex = pp->Value(thePhotonMomentum);
   }
-  if((pp = MPT->GetProperty("COATEDRINDEXIM")))
+  if((pp = MPT->GetProperty("SCINTILLATIONCOMPONENT1")))
   {
     fCoatedRindexIm = pp->Value(thePhotonMomentum);
   }

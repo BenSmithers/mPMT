@@ -123,8 +123,8 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
       if (preVolume && postVolume && preVolume != postVolume)
 	//      if (postPoint->GetStepStatus() == fGeomBoundary)
 	{
-	  WCSimOpBoundaryProcessStatus boundaryStatus = Undefined;
-	  WCSimOpBoundaryProcess* opBoundary = NULL;
+	  G4OpBoundaryProcessStatus boundaryStatus = Undefined;
+	  G4OpBoundaryProcess* opBoundary = NULL;
 	  
 	  // Get the particle definition for the current track                                                      
 	  G4ParticleDefinition* particleDefinition = track->GetDefinition();
@@ -138,7 +138,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
 	  for (G4int i = 0; i < nProcesses; i++)
 	    {
 	      G4VProcess* process = (*processVector)[i];
-	      opBoundary = dynamic_cast<WCSimOpBoundaryProcess*>(process);
+	      opBoundary = dynamic_cast<G4OpBoundaryProcess*>(process);
 	      //	      G4cout<<"PROCESS NAMES == "<<process->GetProcessName()<<G4endl;
 	      
 	      if (process->GetProcessName() == "OpBoundary")

@@ -21,6 +21,7 @@ Author:   Mohit Gola 10th July 2023
 #include "construct_SK.h"
 
 #include "G4VPhysicalVolume.hh"
+#include "G4StepLimiterPhysics.hh"
 
 
 int main(int argc, char** argv)
@@ -29,27 +30,32 @@ int main(int argc, char** argv)
     //G4SteppingVerbose::SetInstance(new G4SteppingVerbose);
     runManager->SetVerboseLevel(1);
     WCSimTuningParameters* tuningpars = new WCSimTuningParameters();
+    auto physicsList = new MyPhysicsList();
+    physicsList->RegisterPhysics(new G4StepLimiterPhysics());
+    runManager->SetUserInitialization(physicsList);
+    //auto physics_list = new MyPhysicsList();
+
     //  G4VSteppingVerbose* steppingVerbose = new G4SteppingVerbose;
     //  G4VSteppingVerbose::SetInstance(steppingVerbose);
 
     enum DetConfiguration {wfm =1, fwm=2};
     G4int WCSimConfiguration = fwm;
 
+    std::cout << "Starting Detector Construction" << std::endl;
     myDetectorConstruction* myDetector = new myDetectorConstruction(WCSimConfiguration, tuningpars);
-    G4VPhysicalVolume* singlepmt = myDetector->Construct();
     //ConstructThing* singlepmt = new ConstructThing();
 
 
     runManager->SetUserInitialization(myDetector);
-    
-    runManager->SetUserInitialization(new MyPhysicsList());
+
     runManager->SetUserInitialization(new MyActionInitialization());
 
+
+    std::cout << "Starting Initialization" << std::endl;
     runManager->Initialize();
+    std::cout << "Finished initialization" << std::endl;
 
     G4UIExecutive *ui = 0;
-
-
     if(argc == 1)
     {
         ui =  new G4UIExecutive(argc, argv);
@@ -57,6 +63,8 @@ int main(int argc, char** argv)
 
     G4VisManager *visManager = new G4VisExecutive();
     visManager->Initialize();
+
+    
     G4UImanager *UImanager = G4UImanager::GetUIpointer();
 
     UImanager->ApplyCommand("/control/execute tuning_parameters.mac");

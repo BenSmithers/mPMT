@@ -13,7 +13,6 @@ Author:    Mohit Gola 10th July 2023
 #include "G4RunManager.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4Track.hh"
-#include "construction.hh"
 #include "event.hh"
 #include "G4OpticalPhoton.hh"
 #include "G4StepPoint.hh"
@@ -21,15 +20,18 @@ Author:    Mohit Gola 10th July 2023
 #include "G4LogicalSurface.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
-
+#include "construct_SK.h"
 
 //#include "tls.hh"
-#include "WCSimOpticalPhysics.hh"
-#include "WCSimOpBoundaryProcess.hh"
-#include "WCSimOpticalPhysicsMessenger.hh"
+//#include "WCSimOpticalPhysics.hh"
+//include "WCSimOpBoundaryProcess.hh"
+#include "G4OpticalPhysics.hh"
+
+#include "G4OpticalPhysicsMessenger.hh"
 #include <cmath>
 #include "G4SystemOfUnits.hh"
 #include "G4OpticalSurface.hh"
+#include "G4OpBoundaryProcess.hh"
 #include "event.hh"
 //#inlcude <CLHEP/Units/SystemOfUnits.h>
 

@@ -78,13 +78,13 @@ void MyPrimaryGenerator::GeneratePrimaries(G4Event *anEvent)
   //  G4double particleEnergy = 2.47999 * eV;
   //  G4double particleEnergy = 1.7968 * eV;
 
-  G4double discRadius = 38. * mm; 
+  G4double discRadius = 50. * mm; 
   //  G4ThreeVector discPosition(0.0,0.0,100.0*mm);
   G4double randomPhi = G4UniformRand() * 360.0 * deg;
 
   G4double xShift = (100.0 * mm) * std::tan(angleRadians);
   G4double yShift = 0.0;
-  G4double zShift = 100.0 * mm;
+  G4double zShift = 700.0 * mm;
 
   G4ThreeVector discPosition(xShift, yShift, zShift);
 
@@ -93,7 +93,7 @@ void MyPrimaryGenerator::GeneratePrimaries(G4Event *anEvent)
 
   //  G4ThreeVector direction = G4ThreeVector(std::sin(angleRadians) * std::cos(randomPhi), std::sin(angleRadians) * std::sin(randomPhi), - std::cos(angleRadians));
   //  G4ThreeVector newPosition(randomRadius * std::cos(randomPhi), randomRadius * std::sin(randomPhi), 100.0 * mm);
-  G4ThreeVector direction(0.0,0.0,-1.0);
+  G4ThreeVector direction(0.0,0.0,1.0);
   direction.rotateY(angleRadians);
   
   // Set particle properties                                                                                               

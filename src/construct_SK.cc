@@ -1,31 +1,88 @@
 #include "construct_SK.h"
 
-
-ConstructThing::ConstructThing() {}
-
-ConstructThing::~ConstructThing() {}
-
-myDetectorConstruction* myDetectorConstruction::instance = NULL;
-
 myDetectorConstruction::myDetectorConstruction(G4int DetConfig, WCSimTuningParameters* WCSimTuningPars) : WCSimTuningParams(WCSimTuningPars)
 {
   myConfiguration = DetConfig;
-  instance = this;
 }
 
 myDetectorConstruction::~myDetectorConstruction()
 {}
 
+void myDetectorConstruction::DefineMaterials(){
 
-G4VPhysicalVolume *myDetectorConstruction::Construct(){
+    G4double ENERGY_COATED_SK[NUMSK] =
+    {
+      1.000*eV, 2.786*eV, 3.061*eV, 3.306*eV, 3.679*eV, 9.000*eV
+    };
+    // Real refractive index of photocathode film                                                                             
+    G4double COATEDRINDEX_glasscath_SK[NUMSK] =
+        { 3.4, 3.4, 3.1, 2.8, 2.4, 2.4 };
+    // Imaginary refractive index of photocathode film                                                                        
+    G4double COATEDRINDEXIM_glasscath_SK[NUMSK] =
+        { 1.7, 1.7, 1.6, 1.5, 1.4, 1.4 };
+     
+    COATEDTHICKNESS_glasscath_SK = 11.5*nm;
+    COATEDTHICKNESS_glasscath_RbCsCb = 23.4*nm;
+
+    G4double ENERGY_COATED_WAV[NUMWAV] =
+    {
+      1.000*eV, 1.823*eV, 1.864*eV, 1.907*eV, 1.953*eV,
+      2.000*eV, 2.049*eV, 2.101*eV, 2.156*eV, 2.214*eV,
+      2.275*eV, 2.339*eV, 2.407*eV, 2.480*eV, 2.556*eV,
+      2.638*eV, 2.725*eV, 2.818*eV, 2.917*eV, 3.024*eV,
+      3.139*eV, 3.263*eV, 9.000*eV
+    };
+    G4double COATEDRINDEX_glasscath_KCsCb[NUMWAV] =
+    {
+      2.96, 2.96, 2.95, 2.95, 2.95,
+      2.96, 2.98, 3.01, 3.06, 3.12,
+       3.20, 3.26, 3.09, 3.00, 3.00,
+      3.00, 2.87, 2.70, 2.61, 2.38,
+      2.18, 1.92, 1.92
+    };
+    G4double COATEDRINDEXIM_glasscath_KCsCb[NUMWAV] =
+    {
+      0.33, 0.33, 0.34, 0.34, 0.35,
+      0.37, 0.38, 0.42, 0.46, 0.53,
+      0.63, 0.86, 1.05, 1.06, 1.11,
+      1.34, 1.44, 1.50, 1.53, 1.71,
+      1.69, 1.69, 1.69
+    };
+
+    G4double COATEDRINDEX_glasscath_RbCsCb[NUMWAV] = {
+      3.13, 3.13, 3.14, 3.14, 3.15,
+      3.18, 3.22, 3.28, 3.39, 3.32,
+      3.23, 3.21, 3.22, 3.16, 2.99,
+      2.81, 2.63, 2.50, 2.40, 2.30,
+      2.22, 2.07, 2.07
+    };
+    COATEDTHICKNESS_glasscath_KCsCb = 15.5*nm;
+    G4double COATEDRINDEXIM_glasscath_RbCsCb[NUMWAV] =
+    {
+       0.35, 0.35, 0.37, 0.37, 0.38,
+       0.40, 0.43, 0.46, 0.59, 0.76,
+       0.86, 0.90, 1.04, 1.21, 1.37,
+       1.41, 1.40, 1.35, 1.27, 1.21,
+       1.17, 1.22, 1.22
+     };
+
+}
+
+G4VPhysicalVolume* myDetectorConstruction::Construct(){
+    // maybe add a define materials? 
+    DefineMaterials();
+    return DefineVolumes();
+}
+
+G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     G4NistManager *nist = G4NistManager::Instance();
-    G4Material *Air = nist->FindOrBuildMaterial("G4_AIR");
+    Air = nist->FindOrBuildMaterial("G4_AIR");
 
     density     = universe_mean_density;              //from PhysicalConstants.h                                        
     G4double pressure    = 1.e-19*pascal;
     G4double temperature = 0.1*kelvin;
     a = 1.01*g/mole;
-    G4Material* Vacuum = new G4Material("Vacuum", 1., a, density,
+    Vacuum = new G4Material("Vacuum", 1., a, density,
                     kStateGas,temperature,pressure);   
 
     a = 1.01*g/mole;
@@ -37,8 +94,7 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
         = new G4Element("Oxygen","O", 8,a);
 
     density = 1.00*g/cm3;
-    G4Material* Water
-        = new G4Material("Water",density,2);
+    Water = new G4Material("Water",density,2);
     Water->AddElement(H, 2);
     Water->AddElement(O, 1);
 
@@ -48,15 +104,16 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
     G4Element* elAl = new G4Element("Aluminum", "Al", 13, a);
 
     density = 2.7*g/cm3;
-    G4Material* Aluminum
-        = new G4Material("Aluminum",density,1);
+    Aluminum = new G4Material("Aluminum",density,1);
     Aluminum->AddElement(elAl, 1);
 
 
     G4Element *elC = new G4Element("Carbon", "C", 6, 12.01*g/mole);
     G4Element *elH = new G4Element("Hydrogen", "H", 1, 1.01*g/mole);
-    G4Material *absorberMaterial = new G4Material("customAbsorber", density, 2);
-
+    absorberMaterial = new G4Material("customAbsorber", density, 2);
+    absorberMaterial->AddElement(elC, 1);
+    absorberMaterial->AddElement(elH, 4);   
+    
     G4double absorptionCoeff = 1.0e6 / cm;
     const G4int NUMENTRIES_ref = 501;
 
@@ -447,7 +504,7 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
 
     /////////PMT Glass Material///////////////  
     density = 2.20*g/cm3;
-    G4Material* SiO2 = new G4Material("SiO2", density, 2);
+    SiO2 = new G4Material("SiO2", density, 2);
     SiO2->AddElement(nist->FindOrBuildElement("Si"), 1);
     SiO2->AddElement(nist->FindOrBuildElement("O"), 2);
     
@@ -455,7 +512,7 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
     G4Element* B = new G4Element("Boron", "B", 5, a);
 
     density= 2.46*g/cm3;
-    G4Material* B2O3 = new G4Material("B2O3", density, 2);
+    B2O3 = new G4Material("B2O3", density, 2);
     B2O3->AddElement(nist->FindOrBuildElement("B"), 2);
     B2O3->AddElement(nist->FindOrBuildElement("O"), 3);
 
@@ -463,17 +520,17 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
     G4Element* Na = new G4Element("Sodium", "Na", 11, a);
 
     density= 2.47*g/cm3;
-    G4Material* Na2O = new G4Material("Na2O", density, 2);
+    Na2O = new G4Material("Na2O", density, 2);
     Na2O->AddElement(nist->FindOrBuildElement("Na"), 2);
     Na2O->AddElement(nist->FindOrBuildElement("O"), 1);
 
     density= 4.00*g/cm3;
-    G4Material* Al2O3 = new G4Material("Al2O3", density, 2);
+    Al2O3 = new G4Material("Al2O3", density, 2);
     Al2O3->AddElement(nist->FindOrBuildElement("Al"), 2);
     Al2O3->AddElement(nist->FindOrBuildElement("O"), 3);
 
     density = 2.23*g/cm3;
-    G4Material* PMTGlass = new G4Material("PMTGlass", density, 4);
+    PMTGlass = new G4Material("PMTGlass", density, 4);
     PMTGlass->AddMaterial(SiO2, 80.6*perCent);
     PMTGlass->AddMaterial(B2O3, 13.0*perCent);
     PMTGlass->AddMaterial(Na2O, 4.0*perCent);
@@ -489,15 +546,91 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
     myMPT5->AddProperty("ABSLENGTH",ENERGY_glass, ABSORPTION_glass2, 45);
     PMTGlass->SetMaterialPropertiesTable(myMPT5);
 
-    G4double glassThickness = 2.0*mm;
-    G4double bulbSemiMajorAxis = 259.0*mm; 
-    G4double bulbSemiMinorAxis = 190.0*mm;
-    G4double cathodeRadius = 460.0/2*mm;
-    G4double curve_depth_total = 210*mm;
-    G4double tube_length = 65*mm;
+    G4OpticalSurface* OpGlassCathodeSurface =  new G4OpticalSurface("GlassCathodeSurface");
+    OpGlassCathodeSurface->SetType(dielectric_dielectric);
+    OpGlassCathodeSurface->SetModel(unified);
+    OpGlassCathodeSurface->SetFinish(polished);
+
+
+    G4OpticalSurface* OpCathodeAirSurface =  new G4OpticalSurface("CathodeAirSurface");
+    OpCathodeAirSurface->SetType(dielectric_dielectric);
+    OpCathodeAirSurface->SetModel(unified);
+    OpCathodeAirSurface->SetFinish(polished);
+
+    //Glass to Cathode surface inside PMTs
+    G4double RGCFF = 0.32;
+    const G4int NUM = 2;
+    G4double RINDEX_cathode[NUM] = { 1.0, 1.0 };
+    G4double REFLECTIVITY_glasscath[NUM] = { 1.0*RGCFF, 1.0*RGCFF };
+    G4double EFFICIENCY_glasscath[NUM] = { 0.0, 0.0 };
+    G4double PP[NUM] = { 1.4E-9*GeV,6.2E-9*GeV};
+
+    G4MaterialPropertiesTable *myST2 = new G4MaterialPropertiesTable();
+    myST2->AddProperty("RINDEX", PP, RINDEX_cathode, NUM);
+    myST2->AddProperty("REFLECTIVITY", PP, REFLECTIVITY_glasscath, NUM);
+    myST2->AddProperty("EFFICIENCY", PP, EFFICIENCY_glasscath, NUM);
+    G4int pmtsurftype = WCSimTuningParams->GetPMTSurfType(); // Choose one of the two models, see WCSimOpBoundaryProcess for model details                                                                                                                
+    G4cout<<"PMT SURFACE == "<<pmtsurftype<<G4endl; 
+
+    if (pmtsurftype==1){
+        OpGlassCathodeSurface->SetType(G4SurfaceType(101));
+    }else if (pmtsurftype==2){
+        OpGlassCathodeSurface->SetType(G4SurfaceType(102));
+    }else if (pmtsurftype!=0){
+        printf("Invalid PMT photocathode surface optical model choice: %i, use the default dielectric model\n",pmtsurftype);
+        pmtsurftype = 0;
+    }
+   
+    if (pmtsurftype!=0)
+        {
+        G4int cathodepara = WCSimTuningParams->GetCathodePara(); // Choose predefined set of optical parameters           
+        G4cout<<"CATHODE PARAMETER == "<<cathodepara<<G4endl;
+        if (cathodepara==0){
+            printf("Use SK cathode optical parameters\n");
+            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_SK, COATEDRINDEX_glasscath_SK, NUMSK);
+            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_SK, COATEDRINDEXIM_glasscath_SK, NUMSK);
+            myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_SK);
+            myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
+        }else if (cathodepara==1){
+            printf("Use KCsCb cathode optical parameters\n");
+            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_WAV, COATEDRINDEX_glasscath_KCsCb, NUMWAV);
+            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_WAV, COATEDRINDEXIM_glasscath_KCsCb, NUMWAV);
+            myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_KCsCb);
+            myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
+        }else if (cathodepara==2){
+            printf("Use RbCsCb cathode optical parameters\n");
+            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_WAV, COATEDRINDEX_glasscath_RbCsCb, NUMWAV);
+            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_WAV, COATEDRINDEXIM_glasscath_RbCsCb, NUMWAV);
+            myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_RbCsCb);
+            myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
+        }else{
+            printf("Invalid PMT photocathode surface parameters choice: %i, use the default SK model\n",pmtsurftype);
+            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_SK, COATEDRINDEX_glasscath_SK, NUMSK);
+            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_SK, COATEDRINDEXIM_glasscath_SK, NUMSK);
+            myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_SK);
+            myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
+        }
+        }
     
-    // this can also be determined from solving an ugly equation with those above... but this looks nicer
-    G4double bulbLowerCut = 113.80823232728075*mm; // chosen to get a slope of -1.0
+
+    OpGlassCathodeSurface->SetMaterialPropertiesTable(myST2);
+    OpCathodeAirSurface->SetMaterialPropertiesTable(myST2);
+        
+
+
+    G4double glassThickness = 2.0*mm;
+    G4double cathodeThickness = 11.5*nm;
+    G4double bulbSemiMajorAxis = 260.0*mm; 
+    G4double bulbSemiMinorAxis = 175.0*mm;
+    G4double cathodeRadius = 230.0*mm;
+    G4double curve_depth_total = (400-175)*mm;
+    G4double tube_length = (470-400)*mm;
+    G4double cathode_cut = (bulbSemiMinorAxis-glassThickness)*pow( 1-pow(cathodeRadius/(bulbSemiMajorAxis-glassThickness), 2) ,0.5);
+    std::cout << "cathode cut is "<<cathode_cut <<std::endl;
+    G4double absorberThickness = 1.0*mm;
+    G4double absorberHeight = 0.5*absorberThickness;
+    
+    G4double bulbLowerCut = pow( 1/( pow(bulbSemiMajorAxis/pow(bulbSemiMinorAxis,2), 2) + pow(bulbSemiMinorAxis, -2) ), 0.5); // chosen to get a slope of -1.0
     G4double cylinder_radius = 127*mm; 
 
     double _inner_radius_of_curvature = 20.0; // little assumption! 
@@ -505,31 +638,31 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
     double _cord_hypotenuse = sin(pi/4)*_inner_radius_of_curvature/sin(3*pi/8); 
     G4double circular_z = sin(pi/8)*_cord_hypotenuse*mm; 
     
-    G4double cone_depth = 80*mm; // same as cone height too! The cone is at a 1-1 slope 
+    G4double hypo_depth = cos(pi/8)*_cord_hypotenuse*mm;
+    G4double cone_depth = curve_depth_total - hypo_depth - bulbLowerCut; // same as cone height too! The cone is at a 1-1 slope 
     G4double cone_minimum = cylinder_radius + circular_z;
-    G4double cone_maximum = cylinder_radius + cone_depth; 
-    G4double hypo_depth = curve_depth_total - cone_depth - bulbLowerCut; // total curvy bit minus cone part minus ellipse part
+    G4double cone_maximum = bulbSemiMajorAxis*pow(1.0- pow(bulbLowerCut/bulbSemiMinorAxis, 2), 0.5);
 
 
-    G4Box *solidWorld = new G4Box("solidWorld", 0.5*m, 0.5*m, 0.5*m);
+    G4Box *solidWorld = new G4Box("solidWorld", 2*m, 2*m, 2*m);
   
-    G4LogicalVolume *logicWorld = new G4LogicalVolume(solidWorld, 
-                                Water,
+    logicWorld = new G4LogicalVolume(solidWorld, 
+                                Vacuum,
                                 "logicWorld");
 
     G4Ellipsoid* bulb_solid_ellipse = new G4Ellipsoid( "bulb_solid_ellipse",
         bulbSemiMajorAxis,
         bulbSemiMajorAxis,
         bulbSemiMinorAxis,
-        bulbLowerCut, 
+        -bulbLowerCut, 
         bulbSemiMinorAxis);
 
     G4Ellipsoid* bulb_internal_ellipse = new G4Ellipsoid( "bulb_internal_ellipse",
         bulbSemiMajorAxis-glassThickness,
         bulbSemiMajorAxis-glassThickness,
         bulbSemiMinorAxis-glassThickness,
-        bulbLowerCut, 
-        bulbSemiMinorAxis);
+        -bulbLowerCut, 
+        2*bulbSemiMinorAxis);
 
     // This creates an ellipsoidal shell of thickness 2mm
     G4SubtractionSolid* bulb_internal = new G4SubtractionSolid(
@@ -538,90 +671,76 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
         bulb_internal_ellipse
     );
 
+    G4Ellipsoid* cathode_external_ellipse = new G4Ellipsoid("cathode_external_ellipse",
+        bulbSemiMajorAxis-glassThickness,
+        bulbSemiMajorAxis-glassThickness,
+        bulbSemiMinorAxis-glassThickness,
+        cathode_cut, 
+        bulbSemiMinorAxis-glassThickness);
+
+    G4Ellipsoid* cathode_internal_ellipse = new G4Ellipsoid("cathode_internal_ellipse",
+        bulbSemiMajorAxis-glassThickness-absorberThickness,
+        bulbSemiMajorAxis-glassThickness-absorberThickness,
+        bulbSemiMinorAxis-glassThickness-absorberThickness,
+        cathode_cut, 
+        2*bulbSemiMinorAxis);
+
+    G4SubtractionSolid* cathode_solid = new G4SubtractionSolid(
+        "cathode_solid",
+        cathode_external_ellipse, 
+        cathode_internal_ellipse
+    );
+
+    fScoringVolume = new G4LogicalVolume(
+        cathode_solid, 
+        absorberMaterial,
+        "cathode_logical"
+    );
+
     G4Cons* bulb_neck = new G4Cons(
         "bulb_neck",
-        cone_minimum-glassThickness,
-        cone_minimum,
+        cylinder_radius,
+        cylinder_radius+glassThickness,
         cone_maximum-glassThickness,
         cone_maximum,
-        cone_depth*0.5,
+        (curve_depth_total - bulbLowerCut)*0.5,
         0,
         2*pi
     );
-
-    // we only want the upper half of this hyperbolic shape
-    G4Torus* bulb_curl = new G4Torus(
-        "bulb_curl",
-        _inner_radius_of_curvature*mm-glassThickness, 
-        _inner_radius_of_curvature*mm,
-        cylinder_radius+_inner_radius_of_curvature*mm,
-        0,
-        2*pi
-    );
-
-    // so we make a cutting box, well the first one 
-    G4Box* cutting_box = new G4Box(
-        "cutting_box",
-        200,
-        200,
-        hypo_depth
-    );
-    G4Tubs* cutting_cylinder = new G4Tubs(
-        "cutting_cylinder",
-        cylinder_radius+circular_z,
-        cylinder_radius+circular_z + glassThickness, 
-        hypo_depth, 
-        0,
-        2*pi
-    );
-
-    // and then cut the bottom off 
-    G4SubtractionSolid* bulb_curl_cut_one = new G4SubtractionSolid(
-        "bulb_curl_cut_one",
-        bulb_curl,
-        cutting_box,
-        0, 
-        G4ThreeVector(0,0,-hypo_depth)
-    );
-    G4SubtractionSolid* bulb_curl_cut = new G4SubtractionSolid(
-        "bulb_curl_cur",
-        bulb_curl_cut_one, 
-        cutting_cylinder,
-        0,
-        G4ThreeVector(0,0,0)
-    );
-
-
-    // okay now let's make the cylinder 
 
     G4Tubs* tube_part = new G4Tubs(
         "tube_part", 
-        cylinder_radius-glassThickness,
-        cylinder_radius, 
+        cylinder_radius,
+        cylinder_radius+glassThickness, 
         tube_length*0.5,
         0.0,
         2*pi
     );
+    // okay now let's make the cylinder 
+
+    //G4LogicalBorderSurface("GlassCathode",bulb_internal, 
 
     G4RotationMatrix rotm  = G4RotationMatrix();
     G4MultiUnion *whole_bulb = new G4MultiUnion("full_glass_tube");
-    whole_bulb->AddNode(bulb_internal,G4Transform3D(rotm, G4ThreeVector(0, 0, curve_depth_total+0.5*tube_length) ));
-    whole_bulb->AddNode(bulb_neck, G4Transform3D(rotm, G4ThreeVector(0, 0,  tube_length + cone_depth*0.5)));
-    whole_bulb->AddNode(bulb_curl_cut, G4Transform3D(rotm, G4ThreeVector(0, 0, 0.0)));
-    whole_bulb->AddNode(tube_part, G4Transform3D(rotm, G4ThreeVector(0, 0, -hypo_depth-0.5*tube_length)));
+    whole_bulb->AddNode(bulb_internal,G4Transform3D(rotm, G4ThreeVector(0, 0, 0.5*tube_length + curve_depth_total )));
+    whole_bulb->AddNode(bulb_neck, G4Transform3D(rotm, G4ThreeVector(0, 0,  0.5*tube_length+ (curve_depth_total -bulbLowerCut)*0.5  )));
+    //whole_bulb->AddNode(bulb_curl_cut, G4Transform3D(rotm, G4ThreeVector(0, 0, 0.5*tube_length-0.5*hypo_depth)));
+    whole_bulb->AddNode(tube_part, G4Transform3D(rotm, G4ThreeVector(0, 0, 0)));
+    whole_bulb->Voxelize();
 
-    G4LogicalVolume *fScoringVolume = new G4LogicalVolume(
+    G4LogicalVolume *physical_bulb = new G4LogicalVolume(
         whole_bulb, 
         PMTGlass,
         "whole_glass_bulb"
     );
 
+    //fScoringVolume
 
 
-    G4VPhysicalVolume *glass_bulb = new G4PVPlacement(
+    physical_world = new G4PVPlacement(
         0,
         G4ThreeVector(0,0,0),
-        fScoringVolume, 
+        physical_bulb, 
         "glass_bulb", 
         logicWorld,
         false,
@@ -629,6 +748,16 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
         true
     )   ;
 
+    G4VPhysicalVolume* phisCath = new G4PVPlacement(
+        0,
+        G4ThreeVector(0, 0,  0.5*tube_length + curve_depth_total ),
+        fScoringVolume, 
+        "phisCath",
+        logicWorld,
+        false, 
+        0, 
+        true
+    );
 
     WCSimTuningParameters* tuningpars = new WCSimTuningParameters();
     enum DetConfiguration {wfm =1, fwm=2};
@@ -638,6 +767,6 @@ G4VPhysicalVolume *myDetectorConstruction::Construct(){
     myDetectorConstruction myDetector(WCSimConfiguration, tuningpars);
 
 
-    return glass_bulb;
+    return physical_world;
 
 }
