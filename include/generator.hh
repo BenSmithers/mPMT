@@ -17,7 +17,7 @@ Author:    Mohit Gola 10th July 2023
 #include "Randomize.hh"
 #include "G4Event.hh"
 #include "G4OpticalPhoton.hh"
-#include "g4root.hh"
+#include <G4AnalysisManager.hh>
 #include "G4DynamicParticle.hh"
 
 class MyPrimaryGeneratorMessenger;

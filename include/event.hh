@@ -12,7 +12,7 @@ Author:    Mohit Gola 10th July 2023
 //#include "G4AnalysisManager.hh"
 #include "G4UIcommand.hh"
 
-#include "g4root.hh"
+#include <G4AnalysisManager.hh>
 #include <cmath>
 #include <map>
 

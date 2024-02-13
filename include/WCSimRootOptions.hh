@@ -13,8 +13,8 @@
 // This class contains run option information
 //////////////////////////////////////////////////////////////////////////
 
-#include "/home/mgola/Root/root/install/include/TObject.h"
-#include "/home/mgola/Root/root/install/include/TClonesArray.h"
+#include <TObject.h>
+#include <TClonesArray.h>
 #include <string>
 
 #include "WCSimEnumerations.hh"

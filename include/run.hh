@@ -8,7 +8,7 @@ Author:    Mohit Gola 10th July 2023
 
 #include "G4UserRunAction.hh"
 #include "G4Run.hh"
-#include "g4root.hh"
+#include <G4AnalysisManager.hh>
 #include "G4RunManager.hh"
 
 #include "event.hh"

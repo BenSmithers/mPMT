@@ -4,7 +4,6 @@ Modified:    Mohit Gola 10th July 2023
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "/home/mgola/Root/root/install/include/TObject.h"
 #include <iostream>
 
 #include "WCSimRootOptions.hh"
