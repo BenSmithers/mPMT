@@ -1,4 +1,4 @@
-/vis/open OGL
+/vis/open
 /vis/drawVolume
 /vis/viewer/set/autoRefresh true
 /vis/scene/add/trajectories smooth
@@ -6,5 +6,4 @@
 /vis/scene/add/volume
 /vis/sceneHandler/attach
 /vis/scene/endOfEventAction accumulate
-
   
