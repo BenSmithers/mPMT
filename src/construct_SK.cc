@@ -70,11 +70,12 @@ void myDetectorConstruction::DefineMaterials(){
 
 G4VPhysicalVolume* myDetectorConstruction::Construct(){
     // maybe add a define materials? 
-    DefineMaterials();
+    
     return DefineVolumes();
 }
 
 G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
+    DefineMaterials();
     G4NistManager *nist = G4NistManager::Instance();
     Air = nist->FindOrBuildMaterial("G4_AIR");
 
@@ -586,19 +587,19 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
         G4int cathodepara = WCSimTuningParams->GetCathodePara(); // Choose predefined set of optical parameters           
         G4cout<<"CATHODE PARAMETER == "<<cathodepara<<G4endl;
         if (cathodepara==0){
-            printf("Use SK cathode optical parameters\n");
+            printf("Using SK cathode optical parameters\n");
             myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_SK, COATEDRINDEX_glasscath_SK, NUMSK);
             myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_SK, COATEDRINDEXIM_glasscath_SK, NUMSK);
             myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_SK);
             myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
         }else if (cathodepara==1){
-            printf("Use KCsCb cathode optical parameters\n");
+            printf("Using KCsCb cathode optical parameters\n");
             myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_WAV, COATEDRINDEX_glasscath_KCsCb, NUMWAV);
             myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_WAV, COATEDRINDEXIM_glasscath_KCsCb, NUMWAV);
             myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_KCsCb);
             myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
         }else if (cathodepara==2){
-            printf("Use RbCsCb cathode optical parameters\n");
+            printf("Using RbCsCb cathode optical parameters\n");
             myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_WAV, COATEDRINDEX_glasscath_RbCsCb, NUMWAV);
             myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_WAV, COATEDRINDEXIM_glasscath_RbCsCb, NUMWAV);
             myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_RbCsCb);
@@ -613,11 +614,6 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
         }
     
 
-    OpGlassCathodeSurface->SetMaterialPropertiesTable(myST2);
-    OpCathodeAirSurface->SetMaterialPropertiesTable(myST2);
-        
-
-
     G4double glassThickness = 2.0*mm;
     G4double cathodeThickness = 11.5*nm;
     G4double bulbSemiMajorAxis = 260.0*mm; 
@@ -627,7 +623,7 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     G4double tube_length = (470-400)*mm;
     G4double cathode_cut = (bulbSemiMinorAxis-glassThickness)*pow( 1-pow(cathodeRadius/(bulbSemiMajorAxis-glassThickness), 2) ,0.5);
     std::cout << "cathode cut is "<<cathode_cut <<std::endl;
-    G4double absorberThickness = 1.0*mm;
+    G4double absorberThickness = 20*mm;
     G4double absorberHeight = 0.5*absorberThickness;
     
     G4double bulbLowerCut = pow( 1/( pow(bulbSemiMajorAxis/pow(bulbSemiMinorAxis,2), 2) + pow(bulbSemiMinorAxis, -2) ), 0.5); // chosen to get a slope of -1.0
@@ -644,11 +640,9 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     G4double cone_maximum = bulbSemiMajorAxis*pow(1.0- pow(bulbLowerCut/bulbSemiMinorAxis, 2), 0.5);
 
 
-    G4Box *solidWorld = new G4Box("solidWorld", 2*m, 2*m, 2*m);
+    G4Box *solidWorld = new G4Box("solidWorld", 3*m, 3*m, 3*m);
   
-    logicWorld = new G4LogicalVolume(solidWorld, 
-                                Vacuum,
-                                "logicWorld");
+    
 
     G4Ellipsoid* bulb_solid_ellipse = new G4Ellipsoid( "bulb_solid_ellipse",
         bulbSemiMajorAxis,
@@ -661,7 +655,7 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
         bulbSemiMajorAxis-glassThickness,
         bulbSemiMajorAxis-glassThickness,
         bulbSemiMinorAxis-glassThickness,
-        -bulbLowerCut, 
+        -2*bulbSemiMinorAxis, 
         2*bulbSemiMinorAxis);
 
     // This creates an ellipsoidal shell of thickness 2mm
@@ -676,13 +670,13 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
         bulbSemiMajorAxis-glassThickness,
         bulbSemiMinorAxis-glassThickness,
         cathode_cut, 
-        bulbSemiMinorAxis-glassThickness);
+        2*bulbSemiMinorAxis);
 
     G4Ellipsoid* cathode_internal_ellipse = new G4Ellipsoid("cathode_internal_ellipse",
         bulbSemiMajorAxis-glassThickness-absorberThickness,
         bulbSemiMajorAxis-glassThickness-absorberThickness,
         bulbSemiMinorAxis-glassThickness-absorberThickness,
-        cathode_cut, 
+        0, 
         2*bulbSemiMinorAxis);
 
     G4SubtractionSolid* cathode_solid = new G4SubtractionSolid(
@@ -691,11 +685,6 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
         cathode_internal_ellipse
     );
 
-    fScoringVolume = new G4LogicalVolume(
-        cathode_solid, 
-        absorberMaterial,
-        "cathode_logical"
-    );
 
     G4Cons* bulb_neck = new G4Cons(
         "bulb_neck",
@@ -728,36 +717,65 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     whole_bulb->AddNode(tube_part, G4Transform3D(rotm, G4ThreeVector(0, 0, 0)));
     whole_bulb->Voxelize();
 
-    G4LogicalVolume *physical_bulb = new G4LogicalVolume(
+    physical_bulb = new G4LogicalVolume(
         whole_bulb, 
         PMTGlass,
         "whole_glass_bulb"
     );
 
+    fScoringVolume = new G4LogicalVolume(
+        cathode_solid, 
+        absorberMaterial,
+        "cathode_logical"
+    );
+
     //fScoringVolume
 
+    logicWorld = new G4LogicalVolume(solidWorld, 
+                                Air,
+                                "logicWorld");
+
+    
+    OpGlassCathodeSurface->SetMaterialPropertiesTable(myST2);
+    OpCathodeAirSurface->SetMaterialPropertiesTable(myST2);
+        
+    G4VisAttributes* invisible = new G4VisAttributes(false);
+    logicWorld->SetVisAttributes(invisible);
+    logicWorld->SetSensitiveDetector(NULL);
 
     physical_world = new G4PVPlacement(
+        nullptr,
+        G4ThreeVector(0,0 ,0),
+        logicWorld,
+        "phys_world",
+        0, 
+        false,
         0,
+        true);
+
+    G4VPhysicalVolume *bulb = new G4PVPlacement(
+        nullptr,
         G4ThreeVector(0,0,0),
         physical_bulb, 
         "glass_bulb", 
         logicWorld,
         false,
-        0,
-        true
-    )   ;
+        0
+    );
 
     G4VPhysicalVolume* phisCath = new G4PVPlacement(
-        0,
-        G4ThreeVector(0, 0,  0.5*tube_length + curve_depth_total ),
+        nullptr,
+        G4ThreeVector(0,0, 0.5*tube_length + curve_depth_total ),
         fScoringVolume, 
         "phisCath",
         logicWorld,
         false, 
-        0, 
-        true
+        0
     );
+
+    G4LogicalBorderSurface* GlassCathodeSurface = new G4LogicalBorderSurface("GlassCathodeSurface", bulb, phisCath, OpGlassCathodeSurface);
+    G4LogicalBorderSurface* CathodeAirSurface = new G4LogicalBorderSurface("GlassCathodeSurface", phisCath, physical_world, OpCathodeAirSurface);
+
 
     WCSimTuningParameters* tuningpars = new WCSimTuningParameters();
     enum DetConfiguration {wfm =1, fwm=2};

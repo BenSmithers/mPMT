@@ -9,7 +9,7 @@ Author:    Mohit Gola 10th July 2023
 #include "G4VUserPhysicsList.hh"
 #include "G4EmStandardPhysics.hh"
 #include "G4OpticalPhysics.hh"
-#include "G4OpBoundaryProcess.hh"
+// #include "G4OpBoundaryProcess.hh"
 //#include "G4DecayPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4ParticleTable.hh"
@@ -23,7 +23,7 @@ Author:    Mohit Gola 10th July 2023
 #include "G4OpticalPhoton.hh"
 
 //#include "WCSimOpticalPhysics.hh"
-//#include "WCSimOpBoundaryProcess.hh"
+#include "WCSimOpBoundaryProcess.hh"
 #include "WCSimOpticalPhysicsMessenger.hh"
 
 class MyPhysicsList : public G4VModularPhysicsList

@@ -69,6 +69,7 @@ double MySteppingAction::calculateIncidenceAngle(const G4ThreeVector& Momentum, 
   
 void MySteppingAction::UserSteppingAction(const G4Step *step)
 {
+
   G4LogicalVolume* currentVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetLogicalVolume();
   //  G4cout<<"CURRENT VOLUME == "<< currentVolume->GetName()<<G4endl;
   G4String volume = currentVolume->GetName();
@@ -120,61 +121,63 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
       G4VPhysicalVolume* postVolume = postPoint->GetPhysicalVolume();
       
       // Check if the photon is interacting with an optical boundary                                               
-      if (preVolume && postVolume && preVolume != postVolume)
-	//      if (postPoint->GetStepStatus() == fGeomBoundary)
-	{
-	  G4OpBoundaryProcessStatus boundaryStatus = Undefined;
-	  G4OpBoundaryProcess* opBoundary = NULL;
-	  
-	  // Get the particle definition for the current track                                                      
-	  G4ParticleDefinition* particleDefinition = track->GetDefinition();
-		      
-	  // Get the process manager for the particle definition                                                   
-	  G4ProcessManager* processManager = particleDefinition->GetProcessManager();
-	  // Get the boundary process for the current track                                                        
-	  G4int nProcesses = processManager->GetProcessListLength();
-	  //	  G4cout<<"NUMBER OF PROCESSES == "<<nProcesses<<G4endl;
-	  G4ProcessVector* processVector = processManager->GetProcessList();
-	  for (G4int i = 0; i < nProcesses; i++)
-	    {
-	      G4VProcess* process = (*processVector)[i];
-	      opBoundary = dynamic_cast<G4OpBoundaryProcess*>(process);
-	      //	      G4cout<<"PROCESS NAMES == "<<process->GetProcessName()<<G4endl;
-	      
-	      if (process->GetProcessName() == "OpBoundary")
-		//		  if (opBoundary)
-		{
-		  //		      G4cout<<"BOUNDARY PROCESS NAME == "<<opBoundary->GetProcessName()<<G4endl;
-		  boundaryStatus = opBoundary->GetStatus();
-		  
-		  G4cout<<"BOUNDARY PROCESS STATUS == "<<boundaryStatus<<G4endl;
-		  
-		  
-		  if(boundaryStatus == 10)// && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
-		    {
-		      fEventAction->IncrementNumAbsorbed();
-		    }
-		  
-		  else if((boundaryStatus == 2 || boundaryStatus == 42 || boundaryStatus == 43))// && (volume == "pmtGlassLogic"|| volume == "pmtInnerGlassLogic"))
-		    {
-		      fEventAction->IncrementNumTransmitted();
-		    }
+      if (preVolume && postVolume && preVolume != postVolume){
+        WCSimOpBoundaryProcessStatus boundaryStatus = Undefined;
+        WCSimOpBoundaryProcess* opBoundary = NULL;
+        
+        // Get the particle definition for the current track                                                      
+        G4ParticleDefinition* particleDefinition = track->GetDefinition();
+        // Get the process manager for the particle definition                                                   
+        G4ProcessManager* processManager = particleDefinition->GetProcessManager();
+        // Get the boundary process for the current track                                                        
+        G4int nProcesses = processManager->GetProcessListLength();
+        //	  G4cout<<"NUMBER OF PROCESSES == "<<nProcesses<<G4endl;
+        G4ProcessVector* processVector = processManager->GetProcessList();
+        for (G4int i = 0; i < nProcesses; i++)
+          {
+            G4VProcess* process = (*processVector)[i];
+            
+            //	      G4cout<<"PROCESS NAMES == "<<process->GetProcessName()<<G4endl;
+            if (process->GetProcessName() == "OpBoundary")
+              {
+                opBoundary = static_cast<WCSimOpBoundaryProcess*>(process);
+                //		      G4cout<<"BOUNDARY PROCESS NAME == "<<opBoundary->GetProcessName()<<G4endl;
+                if (opBoundary==nullptr){
+                  std::cerr << "BOUDARY IS NULL POINTER" <<std::endl;
+                }
+                boundaryStatus = opBoundary->GetStatus();
+                
+                G4cout<<"BOUNDARY PROCESS STATUS == "<< static_cast<int>(boundaryStatus)<<G4endl;
+                
+                
+                if(boundaryStatus == 10)// && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
+                  {
+                    fEventAction->IncrementNumAbsorbed();
+                  }
+                
+                else if((boundaryStatus == 2 || boundaryStatus == 42 || boundaryStatus == 43))// && (volume == "pmtGlassLogic"|| volume == "pmtInnerGlassLogic"))
+                  {
+                    fEventAction->IncrementNumTransmitted();
+                  }
 
-		  else if((boundaryStatus == 9 || boundaryStatus == 4 || boundaryStatus == 5 || boundaryStatus == 6 || boundaryStatus == 7 || boundaryStatus == 8 || boundaryStatus == 41))// && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
-		    {
-		      fEventAction->IncrementNumReflected();
-		    }
-		  
-		  else if(boundaryStatus == 11 && volume == "pmtGlassLogic")
-		    {
-		      fEventAction->IncrementNumDetected();
-		      //			  trackStatus[trackID] = "Detected";
-		    }
-		  
-		}
-	    }
+                else if((boundaryStatus == 9 || boundaryStatus == 4 || boundaryStatus == 5 || boundaryStatus == 6 || boundaryStatus == 7 || boundaryStatus == 8 || boundaryStatus == 41))// && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
+                  {
+                    fEventAction->IncrementNumReflected();
+                  }
+                
+                else if(boundaryStatus == 11 && volume == "pmtGlassLogic")
+                  {
+                    fEventAction->IncrementNumDetected();
+                    //			  trackStatus[trackID] = "Detected";
+                  }
+                
+              }
+          }     
 	}
     }
+  else{
+    std::cout << track->GetDefinition()->GetParticleName();
+  }
   //    }
   //	}
       

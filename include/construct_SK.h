@@ -55,7 +55,7 @@ class myDetectorConstruction : public G4VUserDetectorConstruction{
         G4LogicalVolume* GetScoringVolume() const {return fScoringVolume;}// or this... 
         G4VPhysicalVolume* GetphysWorld()const {return physical_world;}
         G4LogicalVolume* GetWorldVolume()const {return logicWorld; }
-        G4LogicalVolume* GetLogicmPMT() const {return fScoringVolume;} //TODO change this...
+        G4LogicalVolume* GetLogicmPMT() const {return physical_bulb;} 
 
 
         G4Material* Vacuum;
@@ -82,11 +82,11 @@ class myDetectorConstruction : public G4VUserDetectorConstruction{
         G4double a;
 
         G4VPhysicalVolume* DefineVolumes();
-        G4LogicalVolume *fScoringVolume;
+        G4LogicalVolume *fScoringVolume; //what we use for scoring. Things that are absorbed here should bre counted 
 
-        G4VPhysicalVolume* physical_world;
+        G4VPhysicalVolume* physical_world; // mother volume of all volumes
         G4LogicalVolume* logicWorld;
-
+        G4LogicalVolume* physical_bulb;
         
 
         G4UserLimits fStepLimit; 

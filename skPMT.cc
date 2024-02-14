@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     runManager->SetVerboseLevel(1);
     WCSimTuningParameters* tuningpars = new WCSimTuningParameters();
     auto physicsList = new MyPhysicsList();
-    physicsList->RegisterPhysics(new G4StepLimiterPhysics());
+    // physicsList->RegisterPhysics(new G4StepLimiterPhysics());
     runManager->SetUserInitialization(physicsList);
     //auto physics_list = new MyPhysicsList();
 

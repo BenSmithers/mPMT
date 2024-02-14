@@ -24,14 +24,14 @@ Author:    Mohit Gola 10th July 2023
 
 //#include "tls.hh"
 //#include "WCSimOpticalPhysics.hh"
-//include "WCSimOpBoundaryProcess.hh"
 #include "G4OpticalPhysics.hh"
 
 #include "G4OpticalPhysicsMessenger.hh"
 #include <cmath>
 #include "G4SystemOfUnits.hh"
 #include "G4OpticalSurface.hh"
-#include "G4OpBoundaryProcess.hh"
+// #include "G4OpBoundaryProcess.hh"
+#include "WCSimOpBoundaryProcess.hh"
 #include "event.hh"
 //#inlcude <CLHEP/Units/SystemOfUnits.h>
 
