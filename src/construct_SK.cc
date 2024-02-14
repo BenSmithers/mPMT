@@ -623,7 +623,7 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     G4double tube_length = (470-400)*mm;
     G4double cathode_cut = (bulbSemiMinorAxis-glassThickness)*pow( 1-pow(cathodeRadius/(bulbSemiMajorAxis-glassThickness), 2) ,0.5);
     std::cout << "cathode cut is "<<cathode_cut <<std::endl;
-    G4double absorberThickness = 20*mm;
+    G4double absorberThickness = 1000*nm;
     G4double absorberHeight = 0.5*absorberThickness;
     
     G4double bulbLowerCut = pow( 1/( pow(bulbSemiMajorAxis/pow(bulbSemiMinorAxis,2), 2) + pow(bulbSemiMinorAxis, -2) ), 0.5); // chosen to get a slope of -1.0
@@ -705,7 +705,31 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
         0.0,
         2*pi
     );
-    // okay now let's make the cylinder 
+
+    G4double s_bend_length = 70*mm;
+    G4double s_bend_inner_radius = 41*mm; 
+    // part of the S-bend. seep it in
+    G4Hype* s_bend_full = new G4Hype(
+        "s_bend_full",
+        s_bend_inner_radius-glassThickness, 
+        s_bend_inner_radius,
+        0.7, 
+        0.7, 
+        s_bend_length
+    );
+    G4Box* s_bend_cutting_box = new G4Box(
+        "s_bend_slice",
+        300,
+        300,
+        s_bend_length
+    );
+
+    G4SubtractionSolid* s_bend = new G4SubtractionSolid(
+        "s_bend",
+        s_bend_full,
+        s_bend_cutting_box,
+        G4Transform3D(G4RotationMatrix(), G4ThreeVector(.0, 0.0, -s_bend_length))
+    );
 
     //G4LogicalBorderSurface("GlassCathode",bulb_internal, 
 
@@ -715,17 +739,96 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     whole_bulb->AddNode(bulb_neck, G4Transform3D(rotm, G4ThreeVector(0, 0,  0.5*tube_length+ (curve_depth_total -bulbLowerCut)*0.5  )));
     //whole_bulb->AddNode(bulb_curl_cut, G4Transform3D(rotm, G4ThreeVector(0, 0, 0.5*tube_length-0.5*hypo_depth)));
     whole_bulb->AddNode(tube_part, G4Transform3D(rotm, G4ThreeVector(0, 0, 0)));
+    //whole_bulb->AddNode(s_bend, G4Transform3D(rotm, G4ThreeVector(0, 0, -2*s_bend_length)) );
     whole_bulb->Voxelize();
+
+    G4double back_box_width = 220*mm;
+    G4double back_box_height = 30*mm;
+    G4double shell_thickness = 2*mm;
+    G4double shell_height = 105*mm;
+    G4double shell_width = 143*mm; 
+    G4double reflector_plate_width = 220*mm;
+    G4double reflector_plate_hole_width = 80*mm; 
+
+    G4Box* back_box = new G4Box(
+        "back_box",
+        back_box_width/2, 
+        back_box_width/2,
+        back_box_height/2
+    );
+
+    G4Box* dynode_box_outer_shell = new G4Box(
+        "box_dynode_outer_shell",
+        shell_width/2,
+        shell_width/2,
+        shell_height/2
+    );
+
+    G4Box* dynode_box_inner_shell = new G4Box(
+        "box_dynode_outer_shell",
+        shell_width/2-shell_thickness,
+        shell_width/2-shell_thickness,
+        shell_height/2
+    );
+    G4SubtractionSolid* dynode_box = new G4SubtractionSolid(
+        "dynode_box",
+        dynode_box_outer_shell, 
+        dynode_box_inner_shell,
+        G4Transform3D(G4RotationMatrix(), G4ThreeVector(.0, 0.0, shell_thickness))
+    );
+
+    G4Box* dynode_face_plate_full = new G4Box(
+        "dynode_face_plate_full",
+        reflector_plate_width/2,
+        reflector_plate_width/2, 
+        shell_thickness/2
+    );
+    G4Box* dynode_face_plate_hole = new G4Box(
+        "dynode_face_plate_hole",
+        reflector_plate_hole_width/2,
+        reflector_plate_hole_width/2,
+        shell_thickness
+    );
+    G4SubtractionSolid* dynode_face_plate = new G4SubtractionSolid(
+        "dynode_face_plate",
+        dynode_face_plate_full,
+        dynode_face_plate_hole
+    );
+
+    G4LogicalVolume* logical_back_box = new G4LogicalVolume(
+        back_box,
+        Aluminum, 
+        "physical_back_box"
+    );
+    G4LogicalVolume* logical_dynode_box = new G4LogicalVolume(
+        dynode_box,
+        Aluminum, 
+        "physical_dynode_box"
+    );
+    G4LogicalVolume* logical_faceplate = new G4LogicalVolume(
+        dynode_face_plate,
+        Aluminum, 
+        "physical_faceplate"
+    );
+
 
     physical_bulb = new G4LogicalVolume(
         whole_bulb, 
         PMTGlass,
         "whole_glass_bulb"
     );
+    G4VisAttributes* invisible = new G4VisAttributes(false);
+    G4VisAttributes* glassy = new G4VisAttributes();
+    glassy->SetVisibility(true);
+    glassy->SetColor(G4Color(114/255, 218/255,232/255, 0.5 ));
+
+
+    //physical_bulb->SetVisAttributes(glassy);
+     
 
     fScoringVolume = new G4LogicalVolume(
         cathode_solid, 
-        absorberMaterial,
+        PMTGlass,
         "cathode_logical"
     );
 
@@ -739,9 +842,8 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     OpGlassCathodeSurface->SetMaterialPropertiesTable(myST2);
     OpCathodeAirSurface->SetMaterialPropertiesTable(myST2);
         
-    G4VisAttributes* invisible = new G4VisAttributes(false);
     logicWorld->SetVisAttributes(invisible);
-    logicWorld->SetSensitiveDetector(NULL);
+ //   logicWorld->SetSensitiveDetector(NULL);
 
     physical_world = new G4PVPlacement(
         nullptr,
@@ -770,6 +872,36 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
         "phisCath",
         logicWorld,
         false, 
+        0
+    );
+
+    G4double back_box_shift = 65*mm;
+    G4VPhysicalVolume* physical_back_box = new G4PVPlacement(
+        nullptr,
+        G4ThreeVector(0,0, 0.5*tube_length + back_box_shift + back_box_height/2),
+        logical_back_box,
+        "physical_back_box",
+        logicWorld,
+        false,
+        0
+    );
+    G4VPhysicalVolume* physical_dynode_box = new G4PVPlacement(
+        nullptr, 
+        G4ThreeVector(0, 0, 0.5*tube_length + back_box_shift + back_box_height + shell_height/2),
+        logical_dynode_box, 
+        "phyiscal_dynode_box",
+        logicWorld, 
+        false,
+        0
+    );
+
+    G4VPhysicalVolume* physical_face_plate = new G4PVPlacement(
+        nullptr,
+        G4ThreeVector(0, 0, 0.5*tube_length + back_box_shift + back_box_height + shell_height+shell_thickness/2),
+        logical_faceplate,
+        "physical_faceplate",
+        logicWorld, 
+        false,
         0
     );
 

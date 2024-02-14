@@ -29,7 +29,7 @@ void MyPrimaryGenerator::GeneratePrimaries(G4Event *anEvent)
   
   std::cout << "generating photon" << std::endl;
 
-  G4double discRadius = 50. * mm; 
+  G4double discRadius = 250. * mm; 
   //  G4ThreeVector discPosition(0.0,0.0,100.0*mm);
   G4double randomPhi = G4UniformRand() * 360.0 * deg;
 
