@@ -62,7 +62,7 @@ int main(int argc, char** argv)
   MyPrimaryGenerator* generator = new MyPrimaryGenerator();
   //  runManager->SetUserAction(generator);
 
-  MyPrimaryGeneratorMessenger* generatorMessenger = new MyPrimaryGeneratorMessenger(generator);
+  MyPrimaryGeneratorMessenger<MyPrimaryGenerator>* generatorMessenger = new MyPrimaryGeneratorMessenger<MyPrimaryGenerator>(generator);
   //  runManager->SetUserAction(generatorMessenger);
 
   if(ui)

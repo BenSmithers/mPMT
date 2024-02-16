@@ -42,7 +42,7 @@ int main(int argc, char** argv)
     G4int WCSimConfiguration = fwm;
 
     std::cout << "Starting Detector Construction" << std::endl;
-    myDetectorConstruction* myDetector = new myDetectorConstruction(WCSimConfiguration, tuningpars);
+    skDetCon* myDetector = new skDetCon(WCSimConfiguration, tuningpars);
     //ConstructThing* singlepmt = new ConstructThing();
 
 
@@ -71,10 +71,10 @@ int main(int argc, char** argv)
     UImanager->ApplyCommand("/gui/addMenu true");
     UImanager->ApplyCommand("/tracking/verbose 1");  
 
-    MyPrimaryGenerator* generator = new MyPrimaryGenerator();
+    NewGenerator* generator = new NewGenerator();
     //  runManager->SetUserAction(generator);
 
-    MyPrimaryGeneratorMessenger* generatorMessenger = new MyPrimaryGeneratorMessenger(generator);
+    MyPrimaryGeneratorMessenger<NewGenerator>* generatorMessenger = new MyPrimaryGeneratorMessenger<NewGenerator>(generator);
     //  runManager->SetUserAction(generatorMessenger);
 
     if(ui)

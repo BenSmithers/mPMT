@@ -21,6 +21,7 @@ Author:    Mohit Gola 10th July 2023
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
 #include "construct_SK.h"
+#include "construction.hh"
 
 //#include "tls.hh"
 //#include "WCSimOpticalPhysics.hh"

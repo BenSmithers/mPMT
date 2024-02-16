@@ -1,14 +1,14 @@
 #include "construct_SK.h"
 
-myDetectorConstruction::myDetectorConstruction(G4int DetConfig, WCSimTuningParameters* WCSimTuningPars) : WCSimTuningParams(WCSimTuningPars)
+skDetCon::skDetCon(G4int DetConfig, WCSimTuningParameters* WCSimTuningPars) : WCSimTuningParams(WCSimTuningPars)
 {
   myConfiguration = DetConfig;
 }
 
-myDetectorConstruction::~myDetectorConstruction()
+skDetCon::~skDetCon()
 {}
 
-void myDetectorConstruction::DefineMaterials(){
+void skDetCon::DefineMaterials(){
 
     G4double ENERGY_COATED_SK[NUMSK] =
     {
@@ -68,13 +68,13 @@ void myDetectorConstruction::DefineMaterials(){
 
 }
 
-G4VPhysicalVolume* myDetectorConstruction::Construct(){
+G4VPhysicalVolume* skDetCon::Construct(){
     // maybe add a define materials? 
     
     return DefineVolumes();
 }
 
-G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
+G4VPhysicalVolume *skDetCon::DefineVolumes(){
     DefineMaterials();
     G4NistManager *nist = G4NistManager::Instance();
     Air = nist->FindOrBuildMaterial("G4_AIR");
@@ -823,7 +823,7 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     glassy->SetColor(G4Color(114/255, 218/255,232/255, 0.5 ));
 
 
-    //physical_bulb->SetVisAttributes(glassy);
+    physical_bulb->SetVisAttributes(glassy);
      
 
     fScoringVolume = new G4LogicalVolume(
@@ -914,7 +914,7 @@ G4VPhysicalVolume *myDetectorConstruction::DefineVolumes(){
     G4int WCSimConfiguration = fwm;
     
     
-    myDetectorConstruction myDetector(WCSimConfiguration, tuningpars);
+    skDetCon myDetector(WCSimConfiguration, tuningpars);
 
 
     return physical_world;

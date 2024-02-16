@@ -71,14 +71,8 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
 {
 
   G4LogicalVolume* currentVolume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetLogicalVolume();
-  //  G4cout<<"CURRENT VOLUME == "<< currentVolume->GetName()<<G4endl;
   G4String volume = currentVolume->GetName();
-  /*
-  const myDetectorConstruction* PMTConstruction = myDetectorConstruction::GetInstance();
-  G4LogicalVolume* PMTVolume = PMTConstruction->GetScoringPMTVolume();
-  G4cout<<" SCORING CURRENT VOLUME == "<< PMTVolume<<G4endl;
-  */
-  
+
   G4Track* track = step->GetTrack();
   G4int trackID = track->GetTrackID();
   /////////////////////////////////////////////////////////////////
@@ -185,9 +179,11 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
   
   ////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////Photon Absorption/////////////////////////////////
-  const myDetectorConstruction *detectorConstruction = static_cast<const myDetectorConstruction*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+  const skDetCon *detectorConstruction = static_cast<const skDetCon*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+  const myDetectorConstruction *pmtDetCon = static_cast<const myDetectorConstruction*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+
   
-  G4LogicalVolume *fScoringVolume = detectorConstruction->GetScoringVolume();
+  G4LogicalVolume *fScoringVolume = pmtDetCon->GetScoringVolume();
   
   if(currentVolume == fScoringVolume)
     {

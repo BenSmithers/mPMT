@@ -510,6 +510,9 @@ G4double ABSORPTION_water[NUMENTRIES_water] =
   PMTGlass->AddMaterial(Al2O3, 2.4*perCent);
 
   G4MaterialPropertiesTable *myMPT5 = new G4MaterialPropertiesTable();
+  std::reverse(std::begin(ENERGY_glass), std::end(ENERGY_glass));
+  std::reverse(std::begin(RINDEX_glass2), std::end(RINDEX_glass2));
+  std::reverse(std::begin(ABSORPTION_glass2), std::end(ABSORPTION_glass2));
   myMPT5->AddProperty("RINDEX", ENERGY_glass, RINDEX_glass2, 45);
   myMPT5->AddProperty("ABSLENGTH",ENERGY_glass, ABSORPTION_glass2, 45);
   PMTGlass->SetMaterialPropertiesTable(myMPT5);

@@ -43,10 +43,10 @@
 
 
 
-class myDetectorConstruction : public G4VUserDetectorConstruction{
+class skDetCon : public G4VUserDetectorConstruction{
     public: 
-        myDetectorConstruction(G4int DetConfig, WCSimTuningParameters* WCSimTuningPars);
-        ~myDetectorConstruction();
+        skDetCon(G4int DetConfig, WCSimTuningParameters* WCSimTuningPars);
+        ~skDetCon();
 
         G4VPhysicalVolume *Construct();
 
