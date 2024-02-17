@@ -35,11 +35,13 @@ int main(int argc, char** argv)
 
   myDetectorConstruction* myDetector = new myDetectorConstruction(WCSimConfiguration, tuningpars);
   ConstructMultiPMT* multiPMT = new ConstructMultiPMT();
+  NewGenerator* generator = new NewGenerator();
+  MyActionInitialization<NewGenerator>* actionman = new MyActionInitialization<NewGenerator>(generator);
 
   runManager->SetUserInitialization(myDetector);
   runManager->SetUserInitialization(multiPMT); 
   runManager->SetUserInitialization(new MyPhysicsList());
-  runManager->SetUserInitialization(new MyActionInitialization());
+  runManager->SetUserInitialization(actionman);
 
   runManager->Initialize();
 
@@ -59,10 +61,10 @@ int main(int argc, char** argv)
   UImanager->ApplyCommand("/gui/addMenu true");
   UImanager->ApplyCommand("/tracking/verbose 1");  
 
-  MyPrimaryGenerator* generator = new MyPrimaryGenerator();
+  
   //  runManager->SetUserAction(generator);
 
-  MyPrimaryGeneratorMessenger<MyPrimaryGenerator>* generatorMessenger = new MyPrimaryGeneratorMessenger<MyPrimaryGenerator>(generator);
+  MyPrimaryGeneratorMessenger<NewGenerator>* generatorMessenger = new MyPrimaryGeneratorMessenger<NewGenerator>(generator);
   //  runManager->SetUserAction(generatorMessenger);
 
   if(ui)

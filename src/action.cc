@@ -5,15 +5,14 @@ Author:    Mohit Gola 10th July 2023
 #include "action.hh"
 
 
-MyActionInitialization::MyActionInitialization()
-{}
+template<class gentype>
+MyActionInitialization<gentype>::MyActionInitialization(gentype* _gengen){
+  generator = _gengen;
+}
 
-MyActionInitialization::~MyActionInitialization()
-{}
-
-void MyActionInitialization::Build() const
+template<class gentype>
+void MyActionInitialization<gentype>::Build() const
 {
-  MyPrimaryGenerator *generator = new MyPrimaryGenerator();
   SetUserAction(generator);
 
   MyEventAction *eventAction = new MyEventAction();
@@ -31,3 +30,10 @@ void MyActionInitialization::Build() const
   MyRunAction *runAction = new MyRunAction();
   SetUserAction(runAction);
 }
+
+
+template MyActionInitialization<NewGenerator>::MyActionInitialization(NewGenerator*);
+template void MyActionInitialization<NewGenerator>::Build() const;
+
+template MyActionInitialization<MyPrimaryGenerator>::MyActionInitialization(MyPrimaryGenerator*);
+template void MyActionInitialization<MyPrimaryGenerator>::Build() const;

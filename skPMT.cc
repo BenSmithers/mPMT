@@ -31,6 +31,7 @@ int main(int argc, char** argv)
     runManager->SetVerboseLevel(1);
     WCSimTuningParameters* tuningpars = new WCSimTuningParameters();
     auto physicsList = new MyPhysicsList();
+
     // physicsList->RegisterPhysics(new G4StepLimiterPhysics());
     runManager->SetUserInitialization(physicsList);
     //auto physics_list = new MyPhysicsList();
@@ -45,10 +46,12 @@ int main(int argc, char** argv)
     skDetCon* myDetector = new skDetCon(WCSimConfiguration, tuningpars);
     //ConstructThing* singlepmt = new ConstructThing();
 
+    NewGenerator* primary_gen = new NewGenerator();
+
+    MyActionInitialization<NewGenerator>* actionman = new MyActionInitialization<NewGenerator>(primary_gen);
 
     runManager->SetUserInitialization(myDetector);
-
-    runManager->SetUserInitialization(new MyActionInitialization());
+    runManager->SetUserInitialization(actionman);
 
 
     std::cout << "Starting Initialization" << std::endl;
@@ -71,10 +74,9 @@ int main(int argc, char** argv)
     UImanager->ApplyCommand("/gui/addMenu true");
     UImanager->ApplyCommand("/tracking/verbose 1");  
 
-    NewGenerator* generator = new NewGenerator();
     //  runManager->SetUserAction(generator);
 
-    MyPrimaryGeneratorMessenger<NewGenerator>* generatorMessenger = new MyPrimaryGeneratorMessenger<NewGenerator>(generator);
+    MyPrimaryGeneratorMessenger<NewGenerator>* generatorMessenger = new MyPrimaryGeneratorMessenger<NewGenerator>(primary_gen);
     //  runManager->SetUserAction(generatorMessenger);
 
     if(ui)

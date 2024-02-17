@@ -13,15 +13,19 @@ Author:    Mohit Gola 10th July 2023
 #include "event.hh"
 #include "run.hh"
 
+template<class gentype>
 class MyActionInitialization : public G4VUserActionInitialization
 {
-public:
-  MyActionInitialization();
-  virtual ~MyActionInitialization();
+  public:
 
-  virtual void Build() const;
-private:
-  //  UserSteppingAction* fSteppingAction;
+    MyActionInitialization(gentype* _gengen);
+    void Build() const;
+  
+  private:
+    gentype* generator; 
+
+    //  UserSteppingAction* fSteppingAction;
 };
+
 
 #endif
