@@ -32,9 +32,9 @@ void MyPrimaryGenerator::GeneratePrimaries(G4Event *anEvent)
   //  G4ThreeVector discPosition(0.0,0.0,100.0*mm);
   G4double randomPhi = G4UniformRand() * 360.0 * deg;
 
-  G4double xShift = 100*mm * std::tan(angleRadians);
+  G4double xShift = 1.0*m * std::tan(angleRadians);
   G4double yShift = 0.0;
-  G4double zShift = 100*mm;
+  G4double zShift = 1*m;
 
   G4ThreeVector discPosition(xShift, yShift, zShift);
 
@@ -100,28 +100,32 @@ void NewGenerator::GeneratePrimaries(G4Event *anEvent)
   
   std::cout << "generating photon" << std::endl;
 
+  G4double target = 250*mm;
+  G4double distance = 2.5*m;
+
   //  G4ThreeVector discPosition(0.0,0.0,100.0*mm);
+  G4double alpha = asin(sin(angleRadians)*target/distance);
+  G4double beta = angleRadians - alpha;
+
   G4double randomPhi = G4UniformRand() * 360.0 * deg;
   G4double uniform = G4UniformRand() + G4UniformRand();
   G4double rad = (uniform>1.?2.-uniform:uniform)*discRadius;
 
-  G4ThreeVector position(rad*cos(randomPhi), rad*sin(randomPhi), 0.0);
   //position.rotateY(angleRadians);
 
-  G4double xShift = 0.0;
+  G4double xShift = distance*sin(beta); // * std::tan(beta);
   G4double yShift = 0.0;
-  G4double zShift = 1.0*m + 200*mm;
-
-
+  G4double zShift = distance*cos(beta);
 
   G4ThreeVector discPosition(xShift, yShift, zShift);
 
+  G4ThreeVector position(rad*cos(randomPhi), rad*sin(randomPhi), 0.0);
+  position.rotateY(angleRadians);
 
-
-  G4double randomRadius = std::sqrt(G4UniformRand()) * discRadius;
   //G4ThreeVector newPosition(discPosition.x() + randomRadius * std::cos(randomPhi), discPosition.y() +  randomRadius * std::sin(randomPhi), discPosition.z());
   G4ThreeVector newPosition = discPosition + position;
-  newPosition.rotateY(angleRadians);
+
+  //newPosition.rotateY(angleRadians);
 
   //  G4ThreeVector direction = G4ThreeVector(std::sin(angleRadians) * std::cos(randomPhi), std::sin(angleRadians) * std::sin(randomPhi), - std::cos(angleRadians));
   //G4ThreeVector direction(randomRadius * std::cos(randomPhi), randomRadius * std::sin(randomPhi), 100.0 * mm);
