@@ -1,5 +1,5 @@
-/*                                                                                                                        
-Author:    Mohit Gola 10th July 2023                                                                                      
+/*
+Author:    Mohit Gola 10th July 2023
 */
 
 #ifndef ACTION_HH
@@ -13,19 +13,19 @@ Author:    Mohit Gola 10th July 2023
 #include "event.hh"
 #include "run.hh"
 
-template<class gentype>
+template <class gentype>
 class MyActionInitialization : public G4VUserActionInitialization
 {
-  public:
+public:
+  MyActionInitialization(gentype *_gengen);
+  MyActionInitialization(gentype *_gengen, std::string _name_template);
+  void Build() const;
 
-    MyActionInitialization(gentype* _gengen);
-    void Build() const;
-  
-  private:
-    gentype* generator; 
+private:
+  gentype *generator;
+  std::string name_template = "output";
 
-    //  UserSteppingAction* fSteppingAction;
+  //  UserSteppingAction* fSteppingAction;
 };
-
 
 #endif

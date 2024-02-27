@@ -1,5 +1,5 @@
-/*                                                                                                                        
-Author:    Mohit Gola 10th July 2023                                                                                      
+/*
+Author:    Mohit Gola 10th July 2023
 */
 
 #include "run.hh"
@@ -7,8 +7,6 @@ Author:    Mohit Gola 10th July 2023
 MyRunAction::MyRunAction()
 {
   G4AnalysisManager *man = G4AnalysisManager::Instance();
-
-
 
   //  G4AnalysisManager *man1 = G4AnalysisManager::Instance();
   /*
@@ -27,14 +25,14 @@ MyRunAction::MyRunAction()
 }
 
 MyRunAction::~MyRunAction()
-{}
-
-void MyRunAction::BeginOfRunAction(const G4Run* run)
 {
-  TotalNumAbsorbed=0;
-  TotalNumReflected=0;
-  TotalNumTransmitted=0;
+}
 
+void MyRunAction::BeginOfRunAction(const G4Run *run)
+{
+  TotalNumAbsorbed = 0;
+  TotalNumReflected = 0;
+  TotalNumTransmitted = 0;
 
   G4AnalysisManager *man = G4AnalysisManager::Instance();
 
@@ -44,25 +42,24 @@ void MyRunAction::BeginOfRunAction(const G4Run* run)
   std::stringstream strRunID;
   strRunID << runID;
 
-  man->OpenFile("output"+strRunID.str()+".root");
-  
+  man->OpenFile(name_template + strRunID.str() + ".root");
 }
 
-void MyRunAction::EndOfRunAction(const G4Run*)
+void MyRunAction::EndOfRunAction(const G4Run *)
 {
   G4AnalysisManager *man = G4AnalysisManager::Instance();
 
   man->Write();
   man->CloseFile();
 
-  G4RunManager* runManager = G4RunManager::GetRunManager();
-  const G4UserEventAction* eventAction = runManager->GetUserEventAction();
-  if (eventAction) {
-    MyEventAction* myEventAction = dynamic_cast<MyEventAction*>(const_cast<G4UserEventAction*>(eventAction));
-    if (myEventAction) {
+  G4RunManager *runManager = G4RunManager::GetRunManager();
+  const G4UserEventAction *eventAction = runManager->GetUserEventAction();
+  if (eventAction)
+  {
+    MyEventAction *myEventAction = dynamic_cast<MyEventAction *>(const_cast<G4UserEventAction *>(eventAction));
+    if (myEventAction)
+    {
       myEventAction->ResetCounters();
     }
   }
-
-
 }
