@@ -1,5 +1,5 @@
-/*                                                                                                                        
-Author:    Mohit Gola 10th July 2023                                                                                      
+/*
+Author:    Mohit Gola 10th July 2023
 */
 
 #ifndef MYPRIMGENMESS_H
@@ -9,22 +9,20 @@ Author:    Mohit Gola 10th July 2023
 #include "G4UIcommand.hh"
 #include "G4UIdirectory.hh"
 
-template<class gentype>
+template <class gentype>
 class MyPrimaryGeneratorMessenger : public G4UImessenger
 {
 public:
-  MyPrimaryGeneratorMessenger(gentype* generator);
+  MyPrimaryGeneratorMessenger(gentype *generator);
 
-  void SetNewValue(G4UIcommand* command, G4String newValue);
+  void SetNewValue(G4UIcommand *command, G4String newValue);
 
 private:
-  G4UIdirectory* fGeneratorDir;
-  G4UIcommand* fSetAngleCmd;
-  G4UIcommand* fSetEnergyCmd;
-  G4UIcommand* fSetDiscCmd;
-  gentype* fGenerator;
+  G4UIdirectory *fGeneratorDir;
+  G4UIcommand *fSetAngleCmd;
+  G4UIcommand *fSetEnergyCmd;
+  G4UIcommand *fSetDiscCmd;
+  gentype *fGenerator;
 };
-
-
 
 #endif
