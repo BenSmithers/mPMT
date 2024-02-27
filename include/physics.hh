@@ -1,5 +1,5 @@
-/*                                                                                                                         
-Author:    Mohit Gola 10th July 2023                                                                                       
+/*
+Author:    Mohit Gola 10th July 2023
 */
 
 #ifndef PHYSICS_HH
@@ -8,9 +8,9 @@ Author:    Mohit Gola 10th July 2023
 #include "G4VModularPhysicsList.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4EmStandardPhysics.hh"
-#include "G4OpticalPhysics.hh"
-// #include "G4OpBoundaryProcess.hh"
-//#include "G4DecayPhysics.hh"
+//  #include "G4OpticalPhysics.hh"
+//   #include "G4OpBoundaryProcess.hh"
+//   #include "G4DecayPhysics.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4ParticleTable.hh"
 #include "G4ProductionCutsTable.hh"
@@ -22,7 +22,7 @@ Author:    Mohit Gola 10th July 2023
 #include "G4GammaConversion.hh"
 #include "G4OpticalPhoton.hh"
 
-//#include "WCSimOpticalPhysics.hh"
+#include "WCSimOpticalPhysics.hh"
 #include "WCSimOpBoundaryProcess.hh"
 #include "WCSimOpticalPhysicsMessenger.hh"
 
@@ -35,9 +35,6 @@ public:
   //  virtual void ConstructPhysics();
   //  virtual void ConstructParticle();
   virtual void ConstructProcess();
-
-
 };
-
 
 #endif

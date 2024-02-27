@@ -1,5 +1,5 @@
-/*                                                                                                                        
-Author:    Mohit Gola 10th July 2023                                                                                     
+/*
+Author:    Mohit Gola 10th July 2023
 */
 
 #ifndef MYSTEPPINGACTION_HH
@@ -23,18 +23,18 @@ Author:    Mohit Gola 10th July 2023
 #include "construct_SK.h"
 #include "construction.hh"
 
-//#include "tls.hh"
-//#include "WCSimOpticalPhysics.hh"
+// #include "tls.hh"
+// #include "WCSimOpticalPhysics.hh"
 #include "G4OpticalPhysics.hh"
 
-#include "G4OpticalPhysicsMessenger.hh"
+#include "WCSimOpticalPhysicsMessenger.hh"
 #include <cmath>
 #include "G4SystemOfUnits.hh"
 #include "G4OpticalSurface.hh"
 // #include "G4OpBoundaryProcess.hh"
 #include "WCSimOpBoundaryProcess.hh"
 #include "event.hh"
-//#inlcude <CLHEP/Units/SystemOfUnits.h>
+// #inlcude <CLHEP/Units/SystemOfUnits.h>
 
 class MyEventAction;
 
@@ -44,16 +44,17 @@ public:
   MySteppingAction();
   ~MySteppingAction();
 
-  virtual void UserSteppingAction(const G4Step* step);
+  virtual void UserSteppingAction(const G4Step *step);
   G4bool IsTrackCounted(G4int trackID);
-  
-  double calculateIncidenceAngle(const G4ThreeVector& Momentum, const G4ThreeVector& Normal);
-  const std::vector<G4ThreeVector>& GetPhotonPositions() const;
-  void SetEventAction(MyEventAction* eventAction);
+
+  double calculateIncidenceAngle(const G4ThreeVector &Momentum, const G4ThreeVector &Normal);
+  const std::vector<G4ThreeVector> &GetPhotonPositions() const;
+  void SetEventAction(MyEventAction *eventAction);
+
 private:
   MyEventAction *fEventAction;
   std::map<G4int, std::string> trackStatus;
-  G4OpticalSurface* OpticalSurface;
+  G4OpticalSurface *OpticalSurface;
   std::vector<G4ThreeVector> photonPositions;
 };
 
