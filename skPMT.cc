@@ -23,6 +23,8 @@ Author:   Mohit Gola 10th July 2023
 #include "G4VPhysicalVolume.hh"
 #include "G4StepLimiterPhysics.hh"
 
+using genmech = NewGenerator;
+
 int main(int argc, char **argv)
 {
     G4RunManager *runManager = new G4RunManager();
@@ -49,9 +51,9 @@ int main(int argc, char **argv)
     skDetCon *myDetector = new skDetCon(WCSimConfiguration, tuningpars);
     // ConstructThing* singlepmt = new ConstructThing();
 
-    NewGenerator *primary_gen = new NewGenerator();
+    genmech *primary_gen = new genmech();
 
-    MyActionInitialization<NewGenerator> *actionman = new MyActionInitialization<NewGenerator>(
+    MyActionInitialization<genmech> *actionman = new MyActionInitialization<genmech>(
         primary_gen,
         "output_sk");
 
@@ -79,7 +81,7 @@ int main(int argc, char **argv)
 
     //  runManager->SetUserAction(generator);
 
-    MyPrimaryGeneratorMessenger<NewGenerator> *generatorMessenger = new MyPrimaryGeneratorMessenger<NewGenerator>(primary_gen);
+    MyPrimaryGeneratorMessenger<genmech> *generatorMessenger = new MyPrimaryGeneratorMessenger<genmech>(primary_gen);
     //  runManager->SetUserAction(generatorMessenger);
 
     if (ui)
