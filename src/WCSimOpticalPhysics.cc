@@ -222,7 +222,7 @@ void WCSimOpticalPhysics::ConstructProcess()
     return;
   }
 
-  for (G4int i = kAbsorption; i <= kWLS; i++)
+  for (G4int i = kAbsorption; i <= kWLS2; i++)
   {
     if (fProcessUse[i])
     {
