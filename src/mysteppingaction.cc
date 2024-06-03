@@ -88,7 +88,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
 
   G4ThreeVector position = step->GetPreStepPoint()->GetPosition();
   //  G4cout<<"PHOTON POSITON == "<<position<<G4endl;
-  photonPositions.push_back(position);
+
   //////////////////////////incident angle//////////////////////////////////////
 
   G4ThreeVector momentum = step->GetTrack()->GetMomentumDirection();
@@ -145,29 +145,25 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
             std::cerr << "BOUDARY IS NULL POINTER" << std::endl;
           }
           boundaryStatus = opBoundary->GetStatus();
-          G4cout << "BOUNDARY PROCESS STATUS == " << boundaryStatus << G4endl;
 
-          if (boundaryStatus == Absorption) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
+          BoundaryMeta status = meta_status(boundaryStatus);
+
+          if (status == BAbsorption) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
           {
             fEventAction->IncrementNumAbsorbed();
+            photonPositions.push_back(position);
             is_absorbed = true;
           }
-
-          else if ((boundaryStatus == Transmission || boundaryStatus == CoatedDielectricRefraction || boundaryStatus == CoatedDielectricFrustratedTransmission)) // && (volume == "pmtGlassLogic"|| volume == "pmtInnerGlassLogic"))
+          else if (status == BTransmission) // && (volume == "pmtGlassLogic"|| volume == "pmtInnerGlassLogic"))
           {
             fEventAction->IncrementNumTransmitted();
+            // track->SetTrackStatus(fStopAndKill);
           }
 
-          else if ((boundaryStatus == BackScattering || boundaryStatus == FresnelReflection || boundaryStatus == TotalInternalReflection || boundaryStatus == LambertianReflection || boundaryStatus == LobeReflection || boundaryStatus == SpikeReflection || boundaryStatus == CoatedDielectricReflection)) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
+          else if (status == BReflection) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
           {
             fEventAction->IncrementNumReflected();
-          }
-
-          else if (boundaryStatus == Detection)
-          {
-            is_absorbed = true;
-            fEventAction->IncrementNumDetected();
-            //			  trackStatus[trackID] = "Detected";
+            // track->SetTrackStatus(fStopAndKill);
           }
         }
       }
@@ -193,7 +189,8 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
     //      G4cout<<"STEP IS WITHIN THE TARGET LOGICAL VOLUME!!!"<<G4endl;
     //  G4Track* track = step->GetTrack();
     // is_absorbed
-    if (true)
+
+    if (is_absorbed)
     {
       track->SetTrackStatus(fStopAndKill);
     }

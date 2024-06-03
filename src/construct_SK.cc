@@ -1,4 +1,5 @@
 #include "construct_SK.h"
+#include "sk_geometry.hh"
 
 skDetCon::skDetCon(G4int DetConfig, WCSimTuningParameters *WCSimTuningPars) : WCSimTuningParams(WCSimTuningPars)
 {
@@ -383,6 +384,21 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
             64820 * cm * ABWFF, 61635 * cm * ABWFF, 57176.2 * cm * ABWFF, 52012.1 * cm * ABWFF, 46595.7 * cm * ABWFF,
             41242.1 * cm * ABWFF, 36146.3 * cm * ABWFF, 31415.4 * cm * ABWFF, 27097.8 * cm * ABWFF, 23205.7 * cm * ABWFF,
             19730.3 * cm * ABWFF, 16651.6 * cm * ABWFF, 13943.6 * cm * ABWFF, 11578.1 * cm * ABWFF, 9526.13 * cm * ABWFF};
+    G4double PHOTON_KILLER_CONSTANT = 0.00;
+    G4double PHOTON_KILLER[NUMENTRIES_water] =
+        {
+            16.1419 * cm * PHOTON_KILLER_CONSTANT, 18.278 * cm * PHOTON_KILLER_CONSTANT, 21.0657 * cm * PHOTON_KILLER_CONSTANT, 24.8568 * cm * PHOTON_KILLER_CONSTANT, 30.3117 * cm * PHOTON_KILLER_CONSTANT,
+            38.8341 * cm * PHOTON_KILLER_CONSTANT, 54.0231 * cm * PHOTON_KILLER_CONSTANT, 81.2306 * cm * PHOTON_KILLER_CONSTANT, 120.909 * cm * PHOTON_KILLER_CONSTANT, 160.238 * cm * PHOTON_KILLER_CONSTANT,
+            193.771 * cm * PHOTON_KILLER_CONSTANT, 215.017 * cm * PHOTON_KILLER_CONSTANT, 227.747 * cm * PHOTON_KILLER_CONSTANT, 243.85 * cm * PHOTON_KILLER_CONSTANT, 294.036 * cm * PHOTON_KILLER_CONSTANT,
+            321.647 * cm * PHOTON_KILLER_CONSTANT, 342.81 * cm * PHOTON_KILLER_CONSTANT, 362.827 * cm * PHOTON_KILLER_CONSTANT, 378.041 * cm * PHOTON_KILLER_CONSTANT, 449.378 * cm * PHOTON_KILLER_CONSTANT,
+            739.434 * cm * PHOTON_KILLER_CONSTANT, 1114.23 * cm * PHOTON_KILLER_CONSTANT, 1435.56 * cm * PHOTON_KILLER_CONSTANT, 1611.06 * cm * PHOTON_KILLER_CONSTANT, 1764.18 * cm * PHOTON_KILLER_CONSTANT,
+            2100.95 * cm * PHOTON_KILLER_CONSTANT, 2292.9 * cm * PHOTON_KILLER_CONSTANT, 2431.33 * cm * PHOTON_KILLER_CONSTANT, 3053.6 * cm * PHOTON_KILLER_CONSTANT, 4838.23 * cm * PHOTON_KILLER_CONSTANT,
+            6539.65 * cm * PHOTON_KILLER_CONSTANT, 7682.63 * cm * PHOTON_KILLER_CONSTANT, 9137.28 * cm * PHOTON_KILLER_CONSTANT, 12220.9 * cm * PHOTON_KILLER_CONSTANT, 15270.7 * cm * PHOTON_KILLER_CONSTANT,
+            19051.5 * cm * PHOTON_KILLER_CONSTANT, 23671.3 * cm * PHOTON_KILLER_CONSTANT, 29191.1 * cm * PHOTON_KILLER_CONSTANT, 35567.9 * cm * PHOTON_KILLER_CONSTANT, 42583 * cm * PHOTON_KILLER_CONSTANT,
+            49779.6 * cm * PHOTON_KILLER_CONSTANT, 56465.3 * cm * PHOTON_KILLER_CONSTANT, 61830 * cm * PHOTON_KILLER_CONSTANT, 65174.6 * cm * PHOTON_KILLER_CONSTANT, 66143.7 * cm * PHOTON_KILLER_CONSTANT,
+            64820 * cm * PHOTON_KILLER_CONSTANT, 61635 * cm * PHOTON_KILLER_CONSTANT, 57176.2 * cm * PHOTON_KILLER_CONSTANT, 52012.1 * cm * PHOTON_KILLER_CONSTANT, 46595.7 * cm * PHOTON_KILLER_CONSTANT,
+            41242.1 * cm * PHOTON_KILLER_CONSTANT, 36146.3 * cm * PHOTON_KILLER_CONSTANT, 31415.4 * cm * PHOTON_KILLER_CONSTANT, 27097.8 * cm * PHOTON_KILLER_CONSTANT, 23205.7 * cm * PHOTON_KILLER_CONSTANT,
+            19730.3 * cm * PHOTON_KILLER_CONSTANT, 16651.6 * cm * PHOTON_KILLER_CONSTANT, 13943.6 * cm * PHOTON_KILLER_CONSTANT, 11578.1 * cm * PHOTON_KILLER_CONSTANT, 9526.13 * cm * PHOTON_KILLER_CONSTANT};
 
     G4double RAYFF = 0.75;
 
@@ -473,7 +489,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
 
     G4MaterialPropertiesTable *water_mat_properties = new G4MaterialPropertiesTable();
     water_mat_properties->AddProperty("RINDEX", ENERGY_water, RINDEX1, NUMENTRIES_water);
-    water_mat_properties->AddProperty("ABSLENGTH", ENERGY_water, ABSORPTION_water, NUMENTRIES_water);
+    water_mat_properties->AddProperty("ABSLENGTH", ENERGY_water, PHOTON_KILLER, NUMENTRIES_water);
     water_mat_properties->AddProperty("RAYLEIGH", ENERGY_water, RAYLEIGH_water, NUMENTRIES_water);
 
     Vacuum->SetMaterialPropertiesTable(vacuum_mat_properties);
@@ -598,180 +614,48 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         }
     }
 
-    G4double glassThickness = 3.0 * mm;
-    G4double cathodeThickness = 11.5 * nm;
-    G4double bulbSemiMajorAxis = 260.0 * mm;
-    G4double bulbSemiMinorAxis = 175.0 * mm;
-    G4double cathodeRadius = 230.0 * mm;
-    G4double tube_length = (470 - 400) * mm;
-    G4double slope = 1.2;
-    G4double backend_minor_axis = (550 - 490) * mm;
-    G4double plug_radius = 41 * mm;
-    G4double plug_protrusion = 0.5 * backend_minor_axis;
-    G4double plug_depth = plug_protrusion + (720 - 610) * mm;
+    /*
+            These parameters were all determined and written out in a separate script... there's probably a better way
+            to load these in, but I'm lazy
+    */
 
-    G4double cathode_cut = (bulbSemiMinorAxis - glassThickness) * pow(1 - pow(cathodeRadius / (bulbSemiMajorAxis - glassThickness), 2), 0.5);
-    std::cout << "cathode cut is " << cathode_cut << std::endl;
-    G4double length_to_end_of_tube = 490 * mm;
-    G4double curve_depth_total = length_to_end_of_tube - bulbSemiMinorAxis - cathode_cut - tube_length;
-    std::cout << "curved part length" << std::endl;
-
-    G4double bulbLowerCut = pow(slope / (pow(bulbSemiMajorAxis / pow(bulbSemiMinorAxis, 2), 2) + slope * pow(bulbSemiMinorAxis, -2)), 0.5); // chosen to get a slope of -1.0
-    G4double cylinder_radius = 127 * mm;
-
-    G4double cone_maximum = bulbSemiMajorAxis * pow(1.0 - pow(bulbLowerCut / bulbSemiMinorAxis, 2), 0.5);
-    G4double cone_maximum_internal = (bulbSemiMajorAxis - glassThickness) * pow(1.0 - pow(bulbLowerCut / (bulbSemiMinorAxis - glassThickness), 2), 0.5);
-    std::cout << "cone!" << cone_maximum << ", " << cone_maximum_internal << std::endl;
+    G4Polycone *cathode_solid = new G4Polycone(
+        "cathode_solid",
+        0.0, 2 * pi,
+        cathode_layer,
+        cathode_z,
+        cathode_inner,
+        cathode_outer);
+    G4Polycone *glass1_solid = new G4Polycone(
+        "glass1_solid",
+        0.0, 2 * pi,
+        glass_1_layers,
+        glass1_z,
+        glass1_inner,
+        glass1_outer);
+    G4Polycone *aluminum_solid = new G4Polycone(
+        "aluminum_solid",
+        0.0, 2 * pi,
+        aluminum_layer,
+        alum_z,
+        alum_inner,
+        alum_outer);
+    G4Polycone *glass2_solid = new G4Polycone(
+        "glass2_solid",
+        0.0, 2 * pi,
+        glass_2_layers,
+        glass2_z,
+        glass2_inner,
+        glass2_outer);
+    G4Polycone *plug_solid = new G4Polycone(
+        "plug_solid",
+        0.0, 2 * pi,
+        plug_layers,
+        plug_z,
+        plug_inner,
+        plug_outer);
 
     G4Box *solidWorld = new G4Box("solidWorld", 3 * m, 3 * m, 3 * m);
-    G4Box *waterWorld = new G4Box("waterWorld", 2.5 * m, 2.5 * m, 2.5 * m);
-    G4RotationMatrix rotm = G4RotationMatrix();
-
-    G4Ellipsoid *bulb_solid_ellipse = new G4Ellipsoid("bulb_solid_ellipse",
-                                                      bulbSemiMajorAxis,
-                                                      bulbSemiMajorAxis,
-                                                      bulbSemiMinorAxis,
-                                                      -bulbLowerCut,
-                                                      bulbSemiMinorAxis * 2);
-
-    G4SubtractionSolid *water_minus_bulb = new G4SubtractionSolid(
-        "water_minus_bulb",
-        waterWorld,
-        bulb_solid_ellipse,
-        G4Transform3D(rotm, G4ThreeVector(0, 0, 0.5 * tube_length + curve_depth_total)));
-
-    G4Ellipsoid *bulb_internal_ellipse = new G4Ellipsoid("bulb_internal_ellipse",
-                                                         bulbSemiMajorAxis - glassThickness,
-                                                         bulbSemiMajorAxis - glassThickness,
-                                                         bulbSemiMinorAxis - glassThickness,
-                                                         -2 * bulbSemiMinorAxis,
-                                                         2 * bulbSemiMinorAxis);
-
-    // This creates an ellipsoidal shell of thickness 2mm
-    G4SubtractionSolid *bulb_internal_full = new G4SubtractionSolid(
-        "bulb_internal_full",
-        bulb_solid_ellipse,
-        bulb_internal_ellipse);
-
-    G4Box *cathode_box_cut = new G4Box(
-        "cathode_box_cut",
-        1 * m,
-        1 * m,
-        500 * mm);
-
-    G4SubtractionSolid *bulb_internal = new G4SubtractionSolid(
-        "bulb_internal",
-        bulb_internal_full,
-        cathode_box_cut,
-        G4Transform3D(G4RotationMatrix(), G4ThreeVector(.0, 0.0, 500 * mm + cathode_cut)));
-
-    G4IntersectionSolid *cathode_solid = new G4IntersectionSolid(
-        "cathode_solid",
-        bulb_internal_full,
-        cathode_box_cut,
-        G4Transform3D(G4RotationMatrix(), G4ThreeVector(.0, 0.0, 500 * mm + cathode_cut)));
-
-    G4Cons *bulb_neck = new G4Cons(
-        "bulb_neck",
-        cylinder_radius - glassThickness,
-        cylinder_radius,
-        cone_maximum_internal,
-        cone_maximum,
-        (curve_depth_total - bulbLowerCut) * 0.5,
-        0,
-        2 * pi);
-
-    G4Cons *neck_full = new G4Cons(
-        "bulb_full",
-        0,
-        cylinder_radius - glassThickness,
-        0,
-        cone_maximum,
-        (curve_depth_total - bulbLowerCut) * 0.5,
-        0,
-        2 * pi);
-
-    G4SubtractionSolid *water_minus_neck = new G4SubtractionSolid(
-        "water_minus_neck",
-        water_minus_bulb,
-        neck_full,
-        G4Transform3D(rotm, G4ThreeVector(0, 0, 0.5 * tube_length + (curve_depth_total - bulbLowerCut) * 0.5)));
-
-    G4Tubs *tube_part = new G4Tubs(
-        "tube_part",
-        cylinder_radius - glassThickness,
-        cylinder_radius,
-        tube_length * 0.5,
-        0.0,
-        2 * pi);
-    G4Tubs *tube_full = new G4Tubs(
-        "tube_part",
-        0.0,
-        cylinder_radius,
-        tube_length * 0.5,
-        0.0,
-        2 * pi);
-    G4SubtractionSolid *water_minus_tube = new G4SubtractionSolid(
-        "water_minus_neck",
-        water_minus_neck,
-        tube_full,
-        G4Transform3D(rotm, G4ThreeVector(0, 0, 0)));
-
-    G4Ellipsoid *backend_outer = new G4Ellipsoid(
-        "backend_outer",
-        cylinder_radius,
-        cylinder_radius,
-        backend_minor_axis,
-        -2 * backend_minor_axis,
-        0.0);
-    G4Ellipsoid *backend_inner = new G4Ellipsoid(
-        "backend_inner",
-        cylinder_radius - glassThickness,
-        cylinder_radius - glassThickness,
-        backend_minor_axis - glassThickness,
-        -2 * backend_minor_axis,
-        2 * backend_minor_axis);
-    G4SubtractionSolid *backend_precut = new G4SubtractionSolid(
-        "backend",
-        backend_outer,
-        backend_inner,
-        G4Transform3D());
-
-    G4SubtractionSolid *water_minus_back_end = new G4SubtractionSolid(
-        "water_minus_backend",
-        water_minus_tube,
-        backend_outer,
-        G4Transform3D(rotm, G4ThreeVector(0, 0, -0.5 * tube_length)));
-
-    G4Cons *plug_shape = new G4Cons(
-        "plug_shape",
-        0,
-        plug_radius,
-        0,
-        plug_radius,
-        plug_depth * 0.5,
-        0, 2 * pi);
-
-    G4SubtractionSolid *water_minus_plug = new G4SubtractionSolid(
-        "water_minus_backend",
-        water_minus_back_end,
-        plug_shape,
-        G4Transform3D(rotm, G4ThreeVector(0, 0, -0.5 * tube_length - backend_minor_axis - 0.5 * plug_depth + plug_protrusion)));
-
-    G4SubtractionSolid *backend = new G4SubtractionSolid(
-        "backend",
-        backend_precut,
-        plug_shape,
-        G4Transform3D());
-
-    G4MultiUnion *whole_bulb = new G4MultiUnion("full_glass_tube");
-    whole_bulb->AddNode(bulb_internal, G4Transform3D(rotm, G4ThreeVector(0, 0, 0.5 * tube_length + curve_depth_total)));
-    whole_bulb->AddNode(bulb_neck, G4Transform3D(rotm, G4ThreeVector(0, 0, 0.5 * tube_length + (curve_depth_total - bulbLowerCut) * 0.5)));
-    // whole_bulb->AddNode(bulb_curl_cut, G4Transform3D(rotm, G4ThreeVector(0, 0, 0.5*tube_length-0.5*hypo_depth)));
-    whole_bulb->AddNode(tube_part, G4Transform3D(rotm, G4ThreeVector(0, 0, 0)));
-    whole_bulb->AddNode(backend, G4Transform3D(rotm, G4ThreeVector(0, 0, -0.5 * tube_length)));
-    // whole_bulb->AddNode(s_bend, G4Transform3D(rotm, G4ThreeVector(0, 0, -2*s_bend_length)) );
-    whole_bulb->Voxelize();
 
     G4double back_box_width = 220 * mm;
     G4double back_box_height = 30 * mm;
@@ -817,6 +701,50 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         dynode_face_plate_full,
         dynode_face_plate_hole);
 
+    G4VisAttributes *invisible = new G4VisAttributes(false);
+    G4VisAttributes *glassy = new G4VisAttributes();
+    glassy->SetVisibility(true);
+    glassy->SetColor(G4Color(114 / 255, 218 / 255, 232 / 255, 0.5));
+
+    G4VisAttributes *vis_absorber = new G4VisAttributes();
+    vis_absorber->SetColor(G4Color(0.3, 0.3, 0.3));
+
+    G4LogicalVolume *logical_aluminum_bulb = new G4LogicalVolume(
+        aluminum_solid,
+        Aluminum,
+        "logical_aluminum_bulb");
+    G4LogicalSkinSurface *ReflectorBulb = new G4LogicalSkinSurface("ReflectorBulb", logical_aluminum_bulb, ReflectorSkinSurface);
+
+    G4LogicalVolume *logical_glass1 = new G4LogicalVolume(
+        glass1_solid,
+        PMTGlass,
+        "logical_glass1");
+    G4LogicalVolume *logical_glass2 = new G4LogicalVolume(
+        glass2_solid,
+        PMTGlass,
+        "logical_glass2");
+    G4LogicalVolume *plug_logic = new G4LogicalVolume(
+        plug_solid,
+        absorberMaterial,
+        "logical_plug");
+    G4LogicalVolume *mesh_logic = new G4LogicalVolume(
+        dynode_face_plate_hole,
+        absorberMaterial,
+        "mesh_logic");
+    mesh_logic->SetVisAttributes(vis_absorber);
+
+    fScoringVolume = new G4LogicalVolume(
+        cathode_solid,
+        PMTGlass,
+        "cathode_logical");
+    fScoringVolume->SetVisAttributes(glassy);
+    logical_glass1->SetVisAttributes(glassy);
+    logical_glass2->SetVisAttributes(glassy);
+
+    logicWorld = new G4LogicalVolume(solidWorld,
+                                     Air,
+                                     "logicWorld");
+
     G4LogicalVolume *logical_back_box = new G4LogicalVolume(
         back_box,
         Aluminum,
@@ -829,45 +757,17 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         dynode_face_plate,
         Aluminum,
         "physical_faceplate");
+    G4LogicalSkinSurface *FacePlateSkin = new G4LogicalSkinSurface("FacePlateSkin", logical_faceplate, ReflectorSkinSurface);
 
-    physical_bulb = new G4LogicalVolume(
-        whole_bulb,
-        PMTGlass,
-        "whole_glass_bulb");
-    G4VisAttributes *invisible = new G4VisAttributes(false);
-    G4VisAttributes *glassy = new G4VisAttributes();
-    glassy->SetVisibility(true);
-    glassy->SetColor(G4Color(114 / 255, 218 / 255, 232 / 255, 0.5));
-    // physical_bulb->SetVisAttributes(glassy);
-
-    fScoringVolume = new G4LogicalVolume(
-        cathode_solid,
-        PMTGlass,
-        "cathode_logical");
-
-    // fScoringVolume
-
-    logicWorld = new G4LogicalVolume(solidWorld,
-                                     Vacuum,
-                                     "logicWorld");
-
-    G4LogicalVolume *plug_logic = new G4LogicalVolume(
-        plug_shape,
-        absorberMaterial,
-        "plug_logic");
     G4VisAttributes *plug_visible = new G4VisAttributes();
     plug_visible->SetVisibility(true);
     plug_visible->SetColor(G4Color(100 / 255, 100 / 255, 100 / 255));
     plug_logic->SetVisAttributes(plug_visible);
 
-    G4LogicalVolume *logicWater = new G4LogicalVolume(water_minus_tube,
-                                                      Water,
-                                                      "logicWater");
-
     G4VisAttributes *watery = new G4VisAttributes();
     watery->SetVisibility(false);
     watery->SetColor(G4Color(180 / 255, 180 / 255, 255 / 255, 0.25));
-    logicWater->SetVisAttributes(watery);
+    //    logicWater->SetVisAttributes(watery);
 
     OpGlassCathodeSurface->SetMaterialPropertiesTable(myST2);
     OpCathodeAirSurface->SetMaterialPropertiesTable(myST2);
@@ -884,6 +784,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         false,
         0,
         true);
+    /*
     G4PVPlacement *all_the_water = new G4PVPlacement(
         nullptr,
         G4ThreeVector(0, 0, 0),
@@ -892,36 +793,54 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         logicWorld,
         false,
         0);
-    G4PVPlacement *plug_physical = new G4PVPlacement(
-        nullptr,
-        G4ThreeVector(0, 0, -0.5 * tube_length - backend_minor_axis - 0.5 * plug_depth + plug_protrusion),
-        plug_logic,
-        "phys_plug",
-        logicWorld,
-        false, 0);
+        */
 
-    G4VPhysicalVolume *bulb = new G4PVPlacement(
+    G4VPhysicalVolume *glass1_volume = new G4PVPlacement(
         nullptr,
         G4ThreeVector(0, 0, 0),
-        physical_bulb,
-        "glass_bulb",
+        logical_glass1,
+        "glass1_volume",
+        logicWorld,
+        false,
+        0);
+    G4VPhysicalVolume *glass2_volume = new G4PVPlacement(
+        nullptr,
+        G4ThreeVector(0, 0, 0),
+        logical_glass2,
+        "glass2_volume",
+        logicWorld,
+        false,
+        0);
+    G4VPhysicalVolume *aluminum_volume = new G4PVPlacement(
+        nullptr,
+        G4ThreeVector(0, 0, 0),
+        logical_aluminum_bulb,
+        "aluminum_volume",
+        logicWorld,
+        false,
+        0);
+    G4VPhysicalVolume *plug_volume = new G4PVPlacement(
+        nullptr,
+        G4ThreeVector(0, 0, 0),
+        plug_logic,
+        "plug_volume",
         logicWorld,
         false,
         0);
 
     G4VPhysicalVolume *phisCath = new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, 0.5 * tube_length + curve_depth_total),
+        G4ThreeVector(0, 0, 0),
         fScoringVolume,
         "phisCath",
         logicWorld,
         false,
         0);
 
-    G4double back_box_shift = 65 * mm;
+    G4double back_box_shift = -250 * mm;
     G4VPhysicalVolume *physical_back_box = new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, 0.5 * tube_length + back_box_shift + back_box_height / 2),
+        G4ThreeVector(0, 0, back_box_shift + back_box_height / 2),
         logical_back_box,
         "physical_back_box",
         logicWorld,
@@ -929,7 +848,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         0);
     G4VPhysicalVolume *physical_dynode_box = new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, 0.5 * tube_length + back_box_shift + back_box_height + shell_height / 2),
+        G4ThreeVector(0, 0, back_box_shift + back_box_height + shell_height / 2),
         logical_dynode_box,
         "phyiscal_dynode_box",
         logicWorld,
@@ -937,14 +856,23 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         0);
     G4VPhysicalVolume *physical_face_plate = new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, 0.5 * tube_length + back_box_shift + back_box_height + shell_height + shell_thickness / 2),
+        G4ThreeVector(0, 0, back_box_shift + back_box_height + shell_height + shell_thickness / 2),
         logical_faceplate,
         "physical_faceplate",
         logicWorld,
         false,
         0);
+    // mesh_logic
+    G4VPhysicalVolume *mesh_grid_abyss = new G4PVPlacement(
+        nullptr,
+        G4ThreeVector(0, 0, back_box_shift + back_box_height + shell_height + shell_thickness / 2),
+        mesh_logic,
+        "mesh_grid_abyss",
+        logicWorld,
+        false,
+        0);
 
-    G4LogicalBorderSurface *GlassCathodeSurface = new G4LogicalBorderSurface("GlassCathodeSurface", all_the_water, phisCath, OpGlassCathodeSurface);
+    // G4LogicalBorderSurface *GlassCathodeSurface = new G4LogicalBorderSurface("GlassCathodeSurface", all_the_water, phisCath, OpGlassCathodeSurface);
     G4LogicalBorderSurface *CathodeAirSurface = new G4LogicalBorderSurface("GlassCathodeSurface", phisCath, physical_world, OpCathodeAirSurface);
 
     WCSimTuningParameters *tuningpars = new WCSimTuningParameters();

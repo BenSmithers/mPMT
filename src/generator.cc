@@ -38,9 +38,6 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName);
 
   G4ThreeVector initialPosition(0.0, 0.0, 47. * mm);
-
-  G4cout << "Angle in degrees = " << angleDegrees << G4endl;
-
   // Define the target Z coordinate
   double targetZ = 44.40 * mm;
 
@@ -57,17 +54,17 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   G4ThreeVector direction = (G4ThreeVector(0.0, 0.0, targetZ) - newPosition).unit();
   // Print the new position and direction
 
-  G4double particleEnergy = 2.47999 * eV;
+  G4double thisen = 2.481 * eV;
 
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleMomentumDirection(direction);
-  fParticleGun->SetParticleEnergy(particleEnergy);
+  fParticleGun->SetParticleEnergy(thisen);
   fParticleGun->SetParticlePosition(newPosition);
 
   G4PrimaryVertex *vertex = new G4PrimaryVertex(newPosition, 0.0);
   G4PrimaryParticle *primary = new G4PrimaryParticle(particle);
 
-  G4ThreeVector momentun = direction * particleEnergy;
+  G4ThreeVector momentun = direction * thisen;
 
   vertex->SetPrimary(primary);
   G4double checkEnergy = fParticleGun->GetParticleEnergy();
@@ -97,8 +94,6 @@ void MyPrimaryGenerator::GeneratePrimaries(G4Event *anEvent)
   G4String particleName = "opticalphoton";
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName);
 
-  std::cout << "generating photon" << std::endl;
-
   //  G4ThreeVector discPosition(0.0,0.0,100.0*mm);
   G4double randomPhi = G4UniformRand() * 360.0 * deg;
 
@@ -127,8 +122,6 @@ void MyPrimaryGenerator::GeneratePrimaries(G4Event *anEvent)
 
   vertex->SetPrimary(primary);
   G4double checkEnergy = fParticleGun->GetParticleEnergy();
-  G4cout << "PARTICLE ENERGY IS:  " << checkEnergy << G4endl;
-  G4cout << "GENERATED THE OPTICAL PHOTON!!!" << G4endl;
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
@@ -165,9 +158,7 @@ void NewGenerator::GeneratePrimaries(G4Event *anEvent)
   G4String particleName = "opticalphoton";
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName);
 
-  std::cout << "generating photon" << std::endl;
-
-  G4double target = 250 * mm;
+  G4double target = 12 * mm;
   G4double distance = 2.5 * m;
 
   //  G4ThreeVector discPosition(0.0,0.0,100.0*mm);
@@ -210,8 +201,6 @@ void NewGenerator::GeneratePrimaries(G4Event *anEvent)
 
   vertex->SetPrimary(primary);
   G4double checkEnergy = fParticleGun->GetParticleEnergy();
-  G4cout << "PARTICLE ENERGY IS:  " << checkEnergy << G4endl;
-  G4cout << "GENERATED THE OPTICAL PHOTON!!!" << G4endl;
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
