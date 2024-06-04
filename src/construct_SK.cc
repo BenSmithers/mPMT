@@ -279,10 +279,11 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4OpticalSurface *ReflectorSkinSurface = new G4OpticalSurface("ReflectorSurface");
     ReflectorSkinSurface->SetType(dielectric_metal);
     ReflectorSkinSurface->SetModel(unified);
-    ReflectorSkinSurface->SetFinish(polished);
+    ReflectorSkinSurface->SetFinish(polishedair);
 
     G4MaterialPropertiesTable *ref = new G4MaterialPropertiesTable();
     ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, NUMENTRIES_ref);
+    ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.95, 0.95}, 2);
     ReflectorSkinSurface->SetMaterialPropertiesTable(ref);
     Aluminum->SetMaterialPropertiesTable(ref);
 
