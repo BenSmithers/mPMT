@@ -20,6 +20,15 @@ MyPrimaryGeneratorMessenger<gentype>::MyPrimaryGeneratorMessenger(gentype *gener
   fSetEnergyCmd = new G4UIcommand("/mygenerator/SetEnergy", this);
   fSetEnergyCmd->SetGuidance("Set the energy in eV");
 
+  fSetXCmd = new G4UIcommand("/mygenerator/SetX", this);
+  fSetXCmd->SetGuidance("Set Start x in mm");
+
+  fSetYCmd = new G4UIcommand("/mygenerator/SetY", this);
+  fSetYCmd->SetGuidance("Set Start y in mm");
+
+  fSetSpreadCmd = new G4UIcommand("/mygenerator/SetSpread", this);
+  fSetSpreadCmd->SetGuidance("Set Start spread in deg");
+
   fSetDiscCmd = new G4UIcommand("/mygenerator/SetDiscRad", this);
   fSetDiscCmd->SetGuidance("Set the disc generation radius in mm");
 
@@ -39,6 +48,21 @@ MyPrimaryGeneratorMessenger<gentype>::MyPrimaryGeneratorMessenger(gentype *gener
   discParam->SetDefaultValue(250);
   fSetDiscCmd->SetParameter(discParam);
   fSetDiscCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  G4UIparameter *xParam = new G4UIparameter("xpos", 'd', false);
+  xParam->SetDefaultValue(0);
+  fSetXCmd->SetParameter(xParam);
+  fSetXCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  G4UIparameter *yParam = new G4UIparameter("ypos", 'd', false);
+  yParam->SetDefaultValue(0);
+  fSetYCmd->SetParameter(yParam);
+  fSetYCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  G4UIparameter *spreadParam = new G4UIparameter("spread", 'd', false);
+  spreadParam->SetDefaultValue(0);
+  fSetSpreadCmd->SetParameter(spreadParam);
+  fSetSpreadCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 template <class gentype>
@@ -60,6 +84,21 @@ void MyPrimaryGeneratorMessenger<gentype>::SetNewValue(G4UIcommand *command, G4S
   {
     G4double discrad = G4UIcommand::ConvertToDouble(newValue);
     fGenerator->SetDiscRad(discrad);
+  }
+  else if (command == fSetXCmd)
+  {
+    G4double xpos = G4UIcommand::ConvertToDouble(newValue);
+    fGenerator->SetX(xpos);
+  }
+  else if (command == fSetYCmd)
+  {
+    G4double xpos = G4UIcommand::ConvertToDouble(newValue);
+    fGenerator->SetY(xpos);
+  }
+  else if (command == fSetSpreadCmd)
+  {
+    G4double xpos = G4UIcommand::ConvertToDouble(newValue);
+    fGenerator->SetSpread(xpos);
   }
 }
 

@@ -23,7 +23,7 @@ Author:   Mohit Gola 10th July 2023
 #include "G4VPhysicalVolume.hh"
 #include "G4StepLimiterPhysics.hh"
 
-using genmech = NewGenerator;
+using genmech = Laser;
 
 int main(int argc, char **argv)
 {

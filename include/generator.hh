@@ -31,6 +31,9 @@ public:
   void SetAngle(G4double angle);
   void SetEnergy(G4double energy);
   void SetDiscRad(G4double discrad);
+  void SetX(G4double xpos);
+  void SetY(G4double ypos);
+  void SetSpread(G4double spread);
 
 private:
   G4ParticleGun *fParticleGun;
@@ -38,6 +41,9 @@ private:
   G4double discRadius = 1 * mm;
   G4double angleRadians;
   G4double particleEnergy;
+  G4double xpos = 0.0;
+  G4double ypos = 0.0;
+  G4double spread = 0.0;
   MyPrimaryGeneratorMessenger<Laser> *fMessenger;
 };
 
@@ -53,6 +59,9 @@ public:
   void SetAngle(G4double angle);
   void SetEnergy(G4double energy);
   void SetDiscRad(G4double discrad);
+  void SetX(G4double xpos) {};
+  void SetY(G4double ypos) {};
+  void SetSpread(G4double spread) {};
 
 private:
   G4ParticleGun *fParticleGun;
@@ -74,6 +83,9 @@ public:
   void SetAngle(G4double angle);
   void SetEnergy(G4double energy);
   void SetDiscRad(G4double discrad);
+  void SetX(G4double xpos) {};
+  void SetY(G4double ypos) {};
+  void SetSpread(G4double spread) {};
 
 private:
   G4ParticleGun *fParticleGun;

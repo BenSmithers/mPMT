@@ -22,6 +22,9 @@ private:
   G4UIcommand *fSetAngleCmd;
   G4UIcommand *fSetEnergyCmd;
   G4UIcommand *fSetDiscCmd;
+  G4UIcommand *fSetXCmd;
+  G4UIcommand *fSetYCmd;
+  G4UIcommand *fSetSpreadCmd;
   gentype *fGenerator;
 };
 
