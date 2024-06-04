@@ -30,6 +30,21 @@ void Laser::SetEnergy(G4double energy)
   particleEnergy = energy;
 }
 
+void Laser::SetX(G4double xpos)
+{
+  this->xpos = xpos;
+}
+
+void Laser::SetY(G4double ypos)
+{
+  this->ypos = ypos;
+}
+
+void Laser::SetSpread(G4double spread)
+{
+  this->spread = spread;
+}
+
 void Laser::GeneratePrimaries(G4Event *anEvent)
 {
 
@@ -37,7 +52,7 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   G4String particleName = "opticalphoton";
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName);
 
-  G4ThreeVector initialPosition(0.0, 0.0, 47. * mm);
+  G4ThreeVector initialPosition(xpos, ypos, 500.0 * mm);
   // Define the target Z coordinate
   double targetZ = 44.40 * mm;
 
@@ -48,10 +63,16 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   double newY = initialPosition.y() + deltaZ * std::tan(angleRadians);
 
   // Create the new position vector
-  G4ThreeVector newPosition(initialPosition.x(), newY, initialPosition.z());
+  // G4ThreeVector newPosition(initialPosition.x(), newY, initialPosition.z());
+
+  G4double random_azi = 2 * M_PI * G4UniformRand();
+  G4double random_zen = G4RandGauss::shoot(0.0, spread * M_PI / 180.0);
 
   // Calculate the direction vector towards the point (0, 0, 35.903)
-  G4ThreeVector direction = (G4ThreeVector(0.0, 0.0, targetZ) - newPosition).unit();
+  // G4ThreeVector direction = (G4ThreeVector(0.0, 0.0, targetZ) - newPosition).unit();
+  G4ThreeVector direction = G4ThreeVector(cos(random_azi) * sin(random_zen),
+                                          sin(random_azi) * sin(random_zen),
+                                          -cos(random_zen));
   // Print the new position and direction
 
   G4double thisen = 2.481 * eV;
@@ -59,9 +80,10 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleMomentumDirection(direction);
   fParticleGun->SetParticleEnergy(thisen);
-  fParticleGun->SetParticlePosition(newPosition);
+  fParticleGun->SetParticlePosition(initialPosition);
+  fParticleGun->SetParticlePolarization(G4ThreeVector(0, 1.0, 0));
 
-  G4PrimaryVertex *vertex = new G4PrimaryVertex(newPosition, 0.0);
+  G4PrimaryVertex *vertex = new G4PrimaryVertex(initialPosition, 0.0);
   G4PrimaryParticle *primary = new G4PrimaryParticle(particle);
 
   G4ThreeVector momentun = direction * thisen;
