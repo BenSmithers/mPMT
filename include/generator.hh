@@ -29,6 +29,8 @@ public:
   G4ThreeVector calculateNewPositionAndAngle(const G4ThreeVector &initialPosition, double initialAngle,
                                              G4ThreeVector &newPosition, double &newAngle);
   void SetAngle(G4double angle);
+  void SetPAzimuthAngle(G4double aziangle);
+  void SetPZenithAngle(G4double zenangle);
   void SetEnergy(G4double energy);
   void SetDiscRad(G4double discrad);
   void SetX(G4double xpos);
@@ -40,6 +42,8 @@ private:
   G4double angleDegrees;
   G4double discRadius = 1 * mm;
   G4double angleRadians;
+  G4double pAzimuthAngle = 0.0;
+  G4double pZenithAngle = 0.0;
   G4double particleEnergy;
   G4double xpos = 0.0;
   G4double ypos = 0.0;
@@ -57,6 +61,8 @@ public:
   G4ThreeVector calculateNewPositionAndAngle(const G4ThreeVector &initialPosition, double initialAngle,
                                              G4ThreeVector &newPosition, double &newAngle);
   void SetAngle(G4double angle);
+  void SetPAzimuthAngle(G4double aziangle);
+  void SetPZenithAngle(G4double zenangle);
   void SetEnergy(G4double energy);
   void SetDiscRad(G4double discrad);
   void SetX(G4double xpos) {};
@@ -67,6 +73,8 @@ private:
   G4ParticleGun *fParticleGun;
   G4double angleDegrees;
   G4double angleRadians;
+  G4double pAzimuthAngle = 0.0;
+  G4double pZenithAngle = 0.0;
   G4double discRadius = 250 * mm;
   G4double particleEnergy;
   MyPrimaryGeneratorMessenger<MyPrimaryGenerator> *fMessenger;
@@ -81,6 +89,8 @@ public:
   G4ThreeVector calculateNewPositionAndAngle(const G4ThreeVector &initialPosition, double initialAngle,
                                              G4ThreeVector &newPosition, double &newAngle);
   void SetAngle(G4double angle);
+  void SetPAzimuthAngle(G4double aziangle);
+  void SetPZenithAngle(G4double zenangle);
   void SetEnergy(G4double energy);
   void SetDiscRad(G4double discrad);
   void SetX(G4double xpos) {};
@@ -91,6 +101,8 @@ private:
   G4ParticleGun *fParticleGun;
   G4double angleDegrees;
   G4double angleRadians;
+  G4double pAzimuthAngle = 0.0;
+  G4double pZenithAngle = 0.0;
   G4double discRadius = 250 * mm;
   G4double particleEnergy;
   MyPrimaryGeneratorMessenger<NewGenerator> *fMessenger;

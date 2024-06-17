@@ -86,6 +86,9 @@ void MyEventAction::EndOfEventAction(const G4Event* event)
   man->FillNtupleIColumn(1, TotalNumAbsorbed);                                                                        
   man->FillNtupleIColumn(2, TotalNumTransmitted);                                                                     
   man->FillNtupleIColumn(3, TotalNumReflected);   
+  man->FillNtupleIColumn(4, xpos);   
+  man->FillNtupleIColumn(5, ypos);   
+  man->FillNtupleIColumn(6, zpos);   
   //  man->AddNtupleRow(0);
 
 

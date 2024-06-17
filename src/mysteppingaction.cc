@@ -102,6 +102,9 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
     G4double checkAngle = -(incidenceAngle - 0.5 * CLHEP::pi);
     //      fEventAction->SetPhotonAngle(checkAngle);
     fEventAction->SetPhotonAngle(incidenceAngle);
+    fEventAction->SetPosX(position.getX());
+    fEventAction->SetPosY(position.getY());
+    fEventAction->SetPosZ(position.getZ());
   }
   ///////////////////////////////////////////////////////////////////////////////////
   //  if (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"){
@@ -142,7 +145,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
           //		      G4cout<<"BOUNDARY PROCESS NAME == "<<opBoundary->GetProcessName()<<G4endl;
           if (opBoundary == nullptr)
           {
-            std::cerr << "BOUDARY IS NULL POINTER" << std::endl;
+            std::cerr << "BOUNDARY IS NULL POINTER" << std::endl;
           }
           boundaryStatus = opBoundary->GetStatus();
 

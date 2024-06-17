@@ -29,6 +29,12 @@ MyPrimaryGeneratorMessenger<gentype>::MyPrimaryGeneratorMessenger(gentype *gener
   fSetSpreadCmd = new G4UIcommand("/mygenerator/SetSpread", this);
   fSetSpreadCmd->SetGuidance("Set Start spread in deg");
 
+  fSetPAzimuthCmd = new G4UIcommand("/mygenerator/SetPAzimuthAngle", this);
+  fSetPAzimuthCmd->SetGuidance("Set Start momentum azimuth angle in deg");
+
+  fSetPZenithCmd = new G4UIcommand("/mygenerator/SetPZenithAngle", this);
+  fSetPZenithCmd->SetGuidance("Set Start momentum zenith angle in deg");
+
   fSetDiscCmd = new G4UIcommand("/mygenerator/SetDiscRad", this);
   fSetDiscCmd->SetGuidance("Set the disc generation radius in mm");
 
@@ -63,6 +69,16 @@ MyPrimaryGeneratorMessenger<gentype>::MyPrimaryGeneratorMessenger(gentype *gener
   spreadParam->SetDefaultValue(0);
   fSetSpreadCmd->SetParameter(spreadParam);
   fSetSpreadCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  G4UIparameter *azimuthParam = new G4UIparameter("aziangle", 'd', false);
+  azimuthParam->SetDefaultValue(0);
+  fSetPAzimuthCmd->SetParameter(azimuthParam);
+  fSetPAzimuthCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  G4UIparameter *zenithParam = new G4UIparameter("zenangle", 'd', false);
+  zenithParam->SetDefaultValue(0);
+  fSetPZenithCmd->SetParameter(zenithParam);
+  fSetPZenithCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 template <class gentype>
@@ -74,7 +90,6 @@ void MyPrimaryGeneratorMessenger<gentype>::SetNewValue(G4UIcommand *command, G4S
     G4double angle = G4UIcommand::ConvertToDouble(newValue);
     fGenerator->SetAngle(angle);
   }
-
   else if (command == fSetEnergyCmd)
   {
     G4double energy = G4UIcommand::ConvertToDouble(newValue);
@@ -99,6 +114,16 @@ void MyPrimaryGeneratorMessenger<gentype>::SetNewValue(G4UIcommand *command, G4S
   {
     G4double xpos = G4UIcommand::ConvertToDouble(newValue);
     fGenerator->SetSpread(xpos);
+  }
+  else if (command == fSetPAzimuthCmd)
+  {
+    G4double aziangle = G4UIcommand::ConvertToDouble(newValue);
+    fGenerator->SetPAzimuthAngle(aziangle);
+  }
+  else if (command == fSetPZenithCmd)
+  {
+    G4double zenangle = G4UIcommand::ConvertToDouble(newValue);
+    fGenerator->SetPZenithAngle(zenangle);
   }
 }
 
