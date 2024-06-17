@@ -42,6 +42,9 @@ public:
   G4int GetNumTransmitted() const;
 
   void SetPhotonAngle(G4double Angle) {photonAngle = Angle;}
+  void SetPosX(G4double PosX) {xpos = PosX;}
+  void SetPosY(G4double PosY) {ypos = PosY;}
+  void SetPosZ(G4double PosZ) {zpos = PosZ;}
   void ResetCounters();
   void SetSteppingAction(MySteppingAction* steppingAction);
 private:
@@ -60,6 +63,9 @@ private:
 
   G4int TotalNumDetected;
   G4double photonAngle;
+  G4double xpos;
+  G4double ypos;
+  G4double zpos;
   G4double photonAngleCorrect;
   G4int totalPhotons;
 

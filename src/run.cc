@@ -21,6 +21,10 @@ MyRunAction::MyRunAction()
   man->CreateNtupleIColumn("Absorbed");
   man->CreateNtupleIColumn("Transmitted");
   man->CreateNtupleIColumn("Reflected");
+  man->CreateNtupleIColumn("PosX");
+  man->CreateNtupleIColumn("PosY");
+  man->CreateNtupleIColumn("PosZ");
+
   man->FinishNtuple(0);
 }
 
