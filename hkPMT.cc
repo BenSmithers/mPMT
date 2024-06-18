@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     G4int WCSimConfiguration = fwm;
 
     std::cout << "Starting Detector Construction" << std::endl;
-    skDetCon *myDetector = new skDetCon(WCSimConfiguration, tuningpars, true);
+    skDetCon *myDetector = new skDetCon(WCSimConfiguration, tuningpars, false);
     // ConstructThing* singlepmt = new ConstructThing();
 
     genmech *primary_gen = new genmech();

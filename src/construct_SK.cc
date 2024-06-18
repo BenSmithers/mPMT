@@ -1,9 +1,11 @@
 #include "construct_SK.h"
 #include "sk_geometry.hh"
+#include "hk_geometry.hh"
 
-skDetCon::skDetCon(G4int DetConfig, WCSimTuningParameters *WCSimTuningPars) : WCSimTuningParams(WCSimTuningPars)
+skDetCon::skDetCon(G4int DetConfig, WCSimTuningParameters *WCSimTuningPars, bool _is_sk) : WCSimTuningParams(WCSimTuningPars)
 {
     myConfiguration = DetConfig;
+    is_sk = _is_sk;
 }
 
 skDetCon::~skDetCon()
@@ -619,42 +621,89 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
             These parameters were all determined and written out in a separate script... there's probably a better way
             to load these in, but I'm lazy
     */
-
-    G4Polycone *cathode_solid = new G4Polycone(
-        "cathode_solid",
-        0.0, 2 * pi,
-        cathode_layer,
-        cathode_z,
-        cathode_inner,
-        cathode_outer);
-    G4Polycone *glass1_solid = new G4Polycone(
-        "glass1_solid",
-        0.0, 2 * pi,
-        glass_1_layers,
-        glass1_z,
-        glass1_inner,
-        glass1_outer);
-    G4Polycone *aluminum_solid = new G4Polycone(
-        "aluminum_solid",
-        0.0, 2 * pi,
-        aluminum_layer,
-        alum_z,
-        alum_inner,
-        alum_outer);
-    G4Polycone *glass2_solid = new G4Polycone(
-        "glass2_solid",
-        0.0, 2 * pi,
-        glass_2_layers,
-        glass2_z,
-        glass2_inner,
-        glass2_outer);
-    G4Polycone *plug_solid = new G4Polycone(
-        "plug_solid",
-        0.0, 2 * pi,
-        plug_layers,
-        plug_z,
-        plug_inner,
-        plug_outer);
+    G4Polycone *cathode_solid;
+    G4Polycone *glass1_solid;
+    G4Polycone *aluminum_solid;
+    G4Polycone *glass2_solid;
+    G4Polycone *plug_solid;
+    if (is_sk)
+    {
+        std::cout << "make sk pmt" << std::endl;
+        cathode_solid = new G4Polycone(
+            "cathode_solid",
+            0.0, 2 * pi,
+            cathode_layer,
+            cathode_z,
+            cathode_inner,
+            cathode_outer);
+        glass1_solid = new G4Polycone(
+            "glass1_solid",
+            0.0, 2 * pi,
+            glass_1_layers,
+            glass1_z,
+            glass1_inner,
+            glass1_outer);
+        aluminum_solid = new G4Polycone(
+            "aluminum_solid",
+            0.0, 2 * pi,
+            aluminum_layer,
+            alum_z,
+            alum_inner,
+            alum_outer);
+        glass2_solid = new G4Polycone(
+            "glass2_solid",
+            0.0, 2 * pi,
+            glass_2_layers,
+            glass2_z,
+            glass2_inner,
+            glass2_outer);
+        plug_solid = new G4Polycone(
+            "plug_solid",
+            0.0, 2 * pi,
+            plug_layers,
+            plug_z,
+            plug_inner,
+            plug_outer);
+    }
+    else
+    {
+        std::cout << "make HK pmt" << std::endl;
+        cathode_solid = new G4Polycone(
+            "cathode_solid",
+            0.0, 2 * pi,
+            cathode_layer_hk,
+            cathode_z_hk,
+            cathode_inner_hk,
+            cathode_outer_hk);
+        glass1_solid = new G4Polycone(
+            "glass1_solid",
+            0.0, 2 * pi,
+            glass_1_layer_hk,
+            glass1_z_hk,
+            glass1_inner_hk,
+            glass1_outer_hk);
+        aluminum_solid = new G4Polycone(
+            "aluminum_solid",
+            0.0, 2 * pi,
+            aluminum_layer_hk,
+            alum_z_hk,
+            alum_inner_hk,
+            alum_outer_hk);
+        glass2_solid = new G4Polycone(
+            "glass2_solid",
+            0.0, 2 * pi,
+            glass_2_layer_hk,
+            glass2_z_hk,
+            glass2_inner_hk,
+            glass2_outer_hk);
+        plug_solid = new G4Polycone(
+            "plug_solid",
+            0.0, 2 * pi,
+            plug_layer_hk,
+            plug_z_hk,
+            plug_inner_hk,
+            plug_outer_hk);
+    }
 
     G4Box *solidWorld = new G4Box("solidWorld", 3 * m, 3 * m, 3 * m);
 
@@ -705,7 +754,11 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4VisAttributes *invisible = new G4VisAttributes(false);
     G4VisAttributes *glassy = new G4VisAttributes();
     glassy->SetVisibility(true);
-    glassy->SetColor(G4Color(114 / 255, 218 / 255, 232 / 255, 0.5));
+    glassy->SetColor(G4Color(114 / 255, 218 / 255, 232 / 255, 0.3));
+
+    G4VisAttributes *photocathy = new G4VisAttributes();
+    photocathy->SetVisibility(true);
+    photocathy->SetColor(G4Color(235 / 255, 170 / 255, 28 / 255, 0.53));
 
     G4VisAttributes *vis_absorber = new G4VisAttributes();
     vis_absorber->SetColor(G4Color(0.3, 0.3, 0.3));
@@ -738,7 +791,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         cathode_solid,
         PMTGlass,
         "cathode_logical");
-    fScoringVolume->SetVisAttributes(glassy);
+    fScoringVolume->SetVisAttributes(photocathy);
     logical_glass1->SetVisAttributes(glassy);
     logical_glass2->SetVisAttributes(glassy);
 
@@ -884,7 +937,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     };
     G4int WCSimConfiguration = fwm;
 
-    skDetCon myDetector(WCSimConfiguration, tuningpars);
+    skDetCon myDetector(WCSimConfiguration, tuningpars, is_sk);
 
     return physical_world;
 }

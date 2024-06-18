@@ -41,61 +41,56 @@
 #include "WCSimTuningParameters.hh"
 #include "WCSimTuningMessenger.hh"
 
+class skDetCon : public G4VUserDetectorConstruction
+{
+public:
+    skDetCon(G4int DetConfig, WCSimTuningParameters *WCSimTuningPars, bool is_sk);
+    ~skDetCon();
 
+    G4VPhysicalVolume *Construct();
 
-class skDetCon : public G4VUserDetectorConstruction{
-    public: 
-        skDetCon(G4int DetConfig, WCSimTuningParameters* WCSimTuningPars);
-        ~skDetCon();
+    void DefineMaterials();
 
-        G4VPhysicalVolume *Construct();
+    G4LogicalVolume *GetScoringVolume() const { return fScoringVolume; } // or this...
+    G4VPhysicalVolume *GetphysWorld() const { return physical_world; }
+    G4LogicalVolume *GetWorldVolume() const { return logicWorld; }
+    G4LogicalVolume *GetLogicmPMT() const { return physical_bulb; }
 
-        void DefineMaterials();
+    G4Material *Vacuum;
+    G4Material *Water;
+    G4Material *Air;
+    G4Material *Aluminum;
+    G4Material *SiO2;
+    G4Material *B2O3;
+    G4Material *Na2O;
+    G4Material *PMTGlass;
+    G4Material *Al2O3;
+    G4Material *absorberMaterial;
 
-        G4LogicalVolume* GetScoringVolume() const {return fScoringVolume;}// or this... 
-        G4VPhysicalVolume* GetphysWorld()const {return physical_world;}
-        G4LogicalVolume* GetWorldVolume()const {return logicWorld; }
-        G4LogicalVolume* GetLogicmPMT() const {return physical_bulb;} 
+private:
+    const static G4int NUMSK = 6;
+    G4double ENERGY_COATED_SK[NUMSK], COATEDRINDEX_glasscath_SK[NUMSK], COATEDRINDEXIM_glasscath_SK[NUMSK];
+    G4double COATEDTHICKNESS_glasscath_SK, COATEDTHICKNESS_glasscath_KCsCb, COATEDTHICKNESS_glasscath_RbCsCb;
+    G4int COATEDFRUSTRATEDTRANSMISSION_glasscath;
 
+    const static G4int NUMWAV = 23;
+    G4double ENERGY_COATED_WAV[NUMWAV], COATEDRINDEX_glasscath_KCsCb[NUMWAV], COATEDRINDEXIM_glasscath_KCsCb[NUMWAV], COATEDRINDEX_glasscath_RbCsCb[NUMWAV], COATEDRINDEXIM_glasscath_RbCsCb[NUMWAV];
 
-        G4Material* Vacuum;
-        G4Material* Water;
-        G4Material* Air;
-        G4Material* Aluminum;
-        G4Material* SiO2;
-        G4Material* B2O3;
-        G4Material* Na2O;
-        G4Material* PMTGlass;
-        G4Material* Al2O3;
-        G4Material* absorberMaterial;
+    G4double density;
+    G4double a;
+    bool is_sk;
 
-    private:
-        const static G4int NUMSK = 6;
-        G4double ENERGY_COATED_SK[NUMSK], COATEDRINDEX_glasscath_SK[NUMSK], COATEDRINDEXIM_glasscath_SK[NUMSK];
-        G4double COATEDTHICKNESS_glasscath_SK, COATEDTHICKNESS_glasscath_KCsCb, COATEDTHICKNESS_glasscath_RbCsCb;
-        G4int COATEDFRUSTRATEDTRANSMISSION_glasscath;
+    G4VPhysicalVolume *DefineVolumes();
+    G4LogicalVolume *fScoringVolume; // what we use for scoring. Things that are absorbed here should bre counted
 
-        const static G4int NUMWAV=23;
-        G4double ENERGY_COATED_WAV[NUMWAV], COATEDRINDEX_glasscath_KCsCb[NUMWAV], COATEDRINDEXIM_glasscath_KCsCb[NUMWAV], COATEDRINDEX_glasscath_RbCsCb[NUMWAV],COATEDRINDEXIM_glasscath_RbCsCb[NUMWAV];
+    G4VPhysicalVolume *physical_world; // mother volume of all volumes
+    G4LogicalVolume *logicWorld;
+    G4LogicalVolume *physical_bulb;
 
-        G4double density;
-        G4double a;
+    G4UserLimits fStepLimit;
 
-        G4VPhysicalVolume* DefineVolumes();
-        G4LogicalVolume *fScoringVolume; //what we use for scoring. Things that are absorbed here should bre counted 
-
-        G4VPhysicalVolume* physical_world; // mother volume of all volumes
-        G4LogicalVolume* logicWorld;
-        G4LogicalVolume* physical_bulb;
-        
-
-        G4UserLimits fStepLimit; 
-
-        WCSimTuningParameters* WCSimTuningParams;
-        G4int myConfiguration;
-
-
+    WCSimTuningParameters *WCSimTuningParams;
+    G4int myConfiguration;
 };
-
 
 #endif
