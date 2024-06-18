@@ -105,6 +105,9 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     Aluminum = new G4Material("Aluminum", density, 1);
     Aluminum->AddElement(elAl, 1);
 
+    FacePlate = new G4Material("FacePlate", density, 1);
+    FacePlate->AddElement(elAl, 1);
+
     G4Element *elC = new G4Element("Carbon", "C", 6, 12.01 * g / mole);
     G4Element *elH = new G4Element("Hydrogen", "H", 1, 1.01 * g / mole);
     absorberMaterial = new G4Material("customAbsorber", density, 2);
@@ -283,11 +286,22 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     ReflectorSkinSurface->SetModel(unified);
     ReflectorSkinSurface->SetFinish(polishedair);
 
+    G4OpticalSurface *ReflectorSkinSurfaceDiffusy = new G4OpticalSurface("ReflectorSkinSurfaceDiffusy");
+    ReflectorSkinSurfaceDiffusy->SetType(dielectric_metal);
+    ReflectorSkinSurfaceDiffusy->SetModel(unified);
+    ReflectorSkinSurfaceDiffusy->SetFinish(polishedair);
+
     G4MaterialPropertiesTable *ref = new G4MaterialPropertiesTable();
     ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, NUMENTRIES_ref);
     ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.95, 0.95}, 2);
     ReflectorSkinSurface->SetMaterialPropertiesTable(ref);
     Aluminum->SetMaterialPropertiesTable(ref);
+
+    G4MaterialPropertiesTable *face_ref = new G4MaterialPropertiesTable();
+    face_ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, NUMENTRIES_ref);
+    face_ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.10, 0.10}, 2);
+    ReflectorSkinSurfaceDiffusy->SetMaterialPropertiesTable(face_ref);
+    FacePlate->SetMaterialPropertiesTable(face_ref);
 
     const G4int numEntries = 2;
     const G4int NUMENTRIES_water = 60;
@@ -801,17 +815,17 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
 
     G4LogicalVolume *logical_back_box = new G4LogicalVolume(
         back_box,
-        Aluminum,
+        FacePlate,
         "physical_back_box");
     G4LogicalVolume *logical_dynode_box = new G4LogicalVolume(
         dynode_box,
-        Aluminum,
+        FacePlate,
         "physical_dynode_box");
     G4LogicalVolume *logical_faceplate = new G4LogicalVolume(
         dynode_face_plate,
-        Aluminum,
+        FacePlate,
         "physical_faceplate");
-    G4LogicalSkinSurface *FacePlateSkin = new G4LogicalSkinSurface("FacePlateSkin", logical_faceplate, ReflectorSkinSurface);
+    G4LogicalSkinSurface *FacePlateSkin = new G4LogicalSkinSurface("FacePlateSkin", logical_faceplate, ReflectorSkinSurfaceDiffusy);
 
     G4VisAttributes *plug_visible = new G4VisAttributes();
     plug_visible->SetVisibility(true);
