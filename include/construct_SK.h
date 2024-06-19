@@ -60,6 +60,7 @@ public:
     G4Material *Water;
     G4Material *Air;
     G4Material *Aluminum;
+    G4Material *FacePlate;
     G4Material *SiO2;
     G4Material *B2O3;
     G4Material *Na2O;
