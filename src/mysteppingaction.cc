@@ -102,6 +102,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
     G4double checkAngle = -(incidenceAngle - 0.5 * CLHEP::pi);
     //      fEventAction->SetPhotonAngle(checkAngle);
     fEventAction->SetPhotonAngle(incidenceAngle);
+
     fEventAction->SetPosX(position.getX());
     fEventAction->SetPosY(position.getY());
     fEventAction->SetPosZ(position.getZ());
@@ -109,6 +110,8 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
   ///////////////////////////////////////////////////////////////////////////////////
   //  if (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"){
   bool is_absorbed = false;
+  bool is_other = false;
+
   if (track->GetDefinition()->GetParticleName() == "opticalphoton")
   {
     G4bool photonTransmitted = false;
@@ -142,7 +145,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
         if (process->GetProcessName() == "OpBoundary")
         {
           opBoundary = static_cast<WCSimOpBoundaryProcess *>(process);
-          //		      G4cout<<"BOUNDARY PROCESS NAME == "<<opBoundary->GetProcessName()<<G4endl;
+          		      // G4cout<<"BOUNDARY PROCESS NAME == "<<opBoundary->GetProcessName()<<G4endl;
           if (opBoundary == nullptr)
           {
             std::cerr << "BOUNDARY IS NULL POINTER" << std::endl;
@@ -153,20 +156,36 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
 
           if (status == BAbsorption) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
           {
-            fEventAction->IncrementNumAbsorbed();
+            // fEventAction->IncrementNumAbsorbed();
+            fEventAction->RecordStep(track->GetCurrentStepNumber(),2,track->GetPosition(),1);
             photonPositions.push_back(position);
             is_absorbed = true;
           }
           else if (status == BTransmission) // && (volume == "pmtGlassLogic"|| volume == "pmtInnerGlassLogic"))
           {
-            fEventAction->IncrementNumTransmitted();
+            fEventAction->RecordStep(track->GetCurrentStepNumber(),0,track->GetPosition(),0);
+            // fEventAction->IncrementNumTransmitted();
             // track->SetTrackStatus(fStopAndKill);
           }
 
           else if (status == BReflection) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
           {
-            fEventAction->IncrementNumReflected();
+            fEventAction->RecordStep(track->GetCurrentStepNumber(),1,track->GetPosition(),0);
+            // fEventAction->IncrementNumReflected();
             // track->SetTrackStatus(fStopAndKill);
+          }
+
+          else if (status == BOther)
+          {
+            is_other = true;
+            if (track->GetTrackStatus()==fStopAndKill)
+            {
+              fEventAction->RecordStep(track->GetCurrentStepNumber(),3,track->GetPosition(),1);
+            }
+            else
+            {
+              fEventAction->RecordStep(track->GetCurrentStepNumber(),3,track->GetPosition(),0);
+            }
           }
         }
       }
@@ -185,6 +204,12 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
   const myDetectorConstruction *pmtDetCon = static_cast<const myDetectorConstruction *>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
 
   G4LogicalVolume *fScoringVolume = detectorConstruction->GetScoringVolume();
+
+  if (track->GetTrackStatus()==fStopAndKill && !is_absorbed && !is_other)
+  {
+    // I think this just covers if particle flies out of bounds
+    fEventAction->RecordStep(track->GetCurrentStepNumber(),3,track->GetPosition(),1);
+  }
 
   if (currentVolume == fScoringVolume)
   {

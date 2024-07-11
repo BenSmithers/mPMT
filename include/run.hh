@@ -20,7 +20,7 @@ public:
   MyRunAction();
   ~MyRunAction();
 
-  void set_name_template(std::string what) { name_template = what; }
+  void set_name_template(std::string name) { name_template = name; }
 
   virtual void BeginOfRunAction(const G4Run *);
   virtual void EndOfRunAction(const G4Run *);
@@ -30,6 +30,9 @@ private:
   G4int TotalNumAbsorbed;
   G4int TotalNumReflected;
   G4int TotalNumTransmitted;
+  G4int master_ntupleId;
+  G4int scanpoint_ntupleId;
+  G4int runId;
 };
 
 #endif

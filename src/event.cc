@@ -79,21 +79,7 @@ void MyEventAction::EndOfEventAction(const G4Event* event)
   G4cout << "No. of Photons Transmitted == " <<TotalNumTransmitted<< G4endl; 
   G4cout << "No. of Photons Detected == " << TotalNumDetected<< G4endl;
   G4cout << "Total no. of Photons == " << totalPhotons<< G4endl;
-  
   G4cout<<"Photon Angle == "<< photonAngle<<G4endl;
-  //  G4AnalysisManager *man = G4AnalysisManager::Instance();
-  man->FillNtupleDColumn(0, photonAngle);
-  man->FillNtupleIColumn(1, TotalNumAbsorbed);                                                                        
-  man->FillNtupleIColumn(2, TotalNumTransmitted);                                                                     
-  man->FillNtupleIColumn(3, TotalNumReflected);   
-  man->FillNtupleIColumn(4, xpos);   
-  man->FillNtupleIColumn(5, ypos);   
-  man->FillNtupleIColumn(6, zpos);   
-  //  man->AddNtupleRow(0);
-
-
-  man->AddNtupleRow(0);
-
 }
 
 void MyEventAction::IncrementNumAbsorbed()
@@ -142,5 +128,22 @@ void MyEventAction::ResetCounters()
   TotalNumReflected=0;
   TotalNumTransmitted=0;
   TotalNumDetected=0;
+}
 
+void MyEventAction::RecordStep(G4int stepnum, G4int status, G4ThreeVector steppos, G4int killstatus)
+// STATUS: transmission==0, reflection==1, absorption==2, anything else==3
+// KILLSTATUS: if step stops and kills track, killstatus==1, otherwise killstatus==0
+{
+  G4AnalysisManager *man = G4AnalysisManager::Instance();
+  man->FillNtupleIColumn(scanpoint_ntupleId, 0, photnum);                                                                        
+  man->FillNtupleIColumn(scanpoint_ntupleId, 1, stepnum);                                                                     
+  man->FillNtupleIColumn(scanpoint_ntupleId, 2, status);
+  man->FillNtupleDColumn(scanpoint_ntupleId, 3, steppos.getX());   
+  man->FillNtupleDColumn(scanpoint_ntupleId, 4, steppos.getY());   
+  man->FillNtupleDColumn(scanpoint_ntupleId, 5, steppos.getZ());  
+  man->AddNtupleRow(scanpoint_ntupleId);
+  if (killstatus==1)
+  {
+    photnum++;
+  }
 }
