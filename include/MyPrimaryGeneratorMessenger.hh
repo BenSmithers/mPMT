@@ -24,6 +24,7 @@ private:
   G4UIcommand *fSetDiscCmd;
   G4UIcommand *fSetXCmd;
   G4UIcommand *fSetYCmd;
+  G4UIcommand *fSetZCmd;
   G4UIcommand *fSetSpreadCmd;
   G4UIcommand *fSetPAzimuthCmd;
   G4UIcommand *fSetPZenithCmd;

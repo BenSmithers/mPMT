@@ -35,6 +35,7 @@ public:
   void SetDiscRad(G4double discrad);
   void SetX(G4double xpos);
   void SetY(G4double ypos);
+  void SetZ(G4double zpos);
   void SetSpread(G4double spread);
 
 private:
@@ -47,6 +48,7 @@ private:
   G4double particleEnergy;
   G4double xpos = 0.0;
   G4double ypos = 0.0;
+  G4double zpos = 500.0 * mm;
   G4double spread = 0.0;
   MyPrimaryGeneratorMessenger<Laser> *fMessenger;
 };
@@ -67,6 +69,7 @@ public:
   void SetDiscRad(G4double discrad);
   void SetX(G4double xpos) {};
   void SetY(G4double ypos) {};
+  void SetZ(G4double zpos) {};
   void SetSpread(G4double spread) {};
 
 private:
@@ -95,6 +98,7 @@ public:
   void SetDiscRad(G4double discrad);
   void SetX(G4double xpos) {};
   void SetY(G4double ypos) {};
+  void SetZ(G4double zpos) {};
   void SetSpread(G4double spread) {};
 
 private:
