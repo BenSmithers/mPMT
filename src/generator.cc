@@ -52,6 +52,11 @@ void Laser::SetY(G4double ypos)
   this->ypos = ypos;
 }
 
+void Laser::SetZ(G4double zpos)
+{
+  this->zpos = zpos;
+}
+
 void Laser::SetSpread(G4double spread)
 {
   this->spread = spread;
@@ -64,7 +69,8 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   G4String particleName = "opticalphoton";
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName);
 
-  G4ThreeVector initialPosition(xpos, ypos, 500.0 * mm);
+ // zpos was 500*mm
+  G4ThreeVector initialPosition(xpos, ypos, zpos);
   // Define the target Z coordinate
   double targetZ = 44.40 * mm;
 

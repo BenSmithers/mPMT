@@ -26,6 +26,9 @@ MyPrimaryGeneratorMessenger<gentype>::MyPrimaryGeneratorMessenger(gentype *gener
   fSetYCmd = new G4UIcommand("/mygenerator/SetY", this);
   fSetYCmd->SetGuidance("Set Start y in mm");
 
+  fSetZCmd = new G4UIcommand("/mygenerator/SetZ", this);
+  fSetZCmd->SetGuidance("Set Start z in mm");
+
   fSetSpreadCmd = new G4UIcommand("/mygenerator/SetSpread", this);
   fSetSpreadCmd->SetGuidance("Set Start spread in deg");
 
@@ -64,6 +67,11 @@ MyPrimaryGeneratorMessenger<gentype>::MyPrimaryGeneratorMessenger(gentype *gener
   yParam->SetDefaultValue(0);
   fSetYCmd->SetParameter(yParam);
   fSetYCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  G4UIparameter *zParam = new G4UIparameter("zpos", 'd', false);
+  zParam->SetDefaultValue(500);
+  fSetZCmd->SetParameter(zParam);
+  fSetZCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 
   G4UIparameter *spreadParam = new G4UIparameter("spread", 'd', false);
   spreadParam->SetDefaultValue(0);
@@ -109,6 +117,11 @@ void MyPrimaryGeneratorMessenger<gentype>::SetNewValue(G4UIcommand *command, G4S
   {
     G4double xpos = G4UIcommand::ConvertToDouble(newValue);
     fGenerator->SetY(xpos);
+  }
+  else if (command == fSetZCmd)
+  {
+    G4double zpos = G4UIcommand::ConvertToDouble(newValue);
+    fGenerator->SetZ(zpos);
   }
   else if (command == fSetSpreadCmd)
   {

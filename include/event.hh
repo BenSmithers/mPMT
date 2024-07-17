@@ -35,16 +35,22 @@ public:
   void IncrementNumDetected();
   void IncrementNumReflected();
   void IncrementNumTransmitted();
+  void RecordStep(G4int stepnum, G4int status, G4ThreeVector steppos, G4int killstatus);
 
   G4int GetNumAbsorbed() const;
   G4int GetNumDetected() const;
   G4int GetNumReflected() const;
   G4int GetNumTransmitted() const;
+  G4double GetPosX() {return xpos;}
+  G4double GetPosY() {return ypos;}
+  G4double GetPosZ() {return zpos;}
 
   void SetPhotonAngle(G4double Angle) {photonAngle = Angle;}
   void SetPosX(G4double PosX) {xpos = PosX;}
   void SetPosY(G4double PosY) {ypos = PosY;}
   void SetPosZ(G4double PosZ) {zpos = PosZ;}
+  void SetScanpointNtupleID(G4double ScanpointNtupleID) {scanpoint_ntupleId = ScanpointNtupleID;}
+  void ResetPhotNum() {photnum=0;}
   void ResetCounters();
   void SetSteppingAction(MySteppingAction* steppingAction);
 private:
@@ -56,6 +62,9 @@ private:
   G4int TotalNumAbsorbed;
   G4int TotalNumReflected;
   G4int TotalNumTransmitted;
+  G4int master_ntupleId;
+  G4int scanpoint_ntupleId;
+  G4int photnum;
 
   //  std::map<G4double, G4int> TotalNumAbsorbed;
   //  std::map<G4double, G4int> TotalNumReflected;
