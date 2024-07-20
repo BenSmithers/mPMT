@@ -40,6 +40,7 @@ void MyEventAction::BeginOfEventAction(const G4Event*)
   NumDetected=0;
   NumReflected=0;
   NumTransmitted=0;
+  stepnum=1;
   //  TotalNumAbsorbed=0;
   //  TotalNumReflected=0;
   //  TotalNumTransmitted=0;
@@ -130,9 +131,13 @@ void MyEventAction::ResetCounters()
   TotalNumDetected=0;
 }
 
-void MyEventAction::RecordStep(G4int stepnum, G4int status, G4ThreeVector steppos, G4int killstatus)
-// STATUS: transmission==0, reflection==1, absorption==2, anything else==3
-// KILLSTATUS: if step stops and kills track, killstatus==1, otherwise killstatus==0
+void MyEventAction::RecordStep(G4int status, G4ThreeVector steppos, G4int killstatus)
+/* 
+STATUS: transmission==0, reflection==1, absorption (photocathode)==2, absorption (glass)==3,
+        absorption (dynode area)==4, absorption (anywhere else)==5, photon leaves world volume==6
+        anything else==7 (should not really be any 7)
+KILLSTATUS: if step stops and kills track, killstatus==1, otherwise killstatus==0
+*/
 {
   G4AnalysisManager *man = G4AnalysisManager::Instance();
   man->FillNtupleIColumn(scanpoint_ntupleId, 0, photnum);                                                                        
@@ -142,6 +147,7 @@ void MyEventAction::RecordStep(G4int stepnum, G4int status, G4ThreeVector steppo
   man->FillNtupleDColumn(scanpoint_ntupleId, 4, steppos.getY());   
   man->FillNtupleDColumn(scanpoint_ntupleId, 5, steppos.getZ());  
   man->AddNtupleRow(scanpoint_ntupleId);
+  stepnum++;
   if (killstatus==1)
   {
     photnum++;

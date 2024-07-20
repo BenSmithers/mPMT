@@ -810,7 +810,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     logical_glass2->SetVisAttributes(glassy);
 
     logicWorld = new G4LogicalVolume(solidWorld,
-                                     Air,
+                                     Vacuum, // Was Air, changed to avoid absorption in air
                                      "logicWorld");
 
     G4LogicalVolume *logical_back_box = new G4LogicalVolume(

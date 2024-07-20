@@ -35,7 +35,7 @@ public:
   void IncrementNumDetected();
   void IncrementNumReflected();
   void IncrementNumTransmitted();
-  void RecordStep(G4int stepnum, G4int status, G4ThreeVector steppos, G4int killstatus);
+  void RecordStep(G4int status, G4ThreeVector steppos, G4int killstatus);
 
   G4int GetNumAbsorbed() const;
   G4int GetNumDetected() const;
@@ -50,7 +50,7 @@ public:
   void SetPosY(G4double PosY) {ypos = PosY;}
   void SetPosZ(G4double PosZ) {zpos = PosZ;}
   void SetScanpointNtupleID(G4double ScanpointNtupleID) {scanpoint_ntupleId = ScanpointNtupleID;}
-  void ResetPhotNum() {photnum=0;}
+  void ResetPhotNum() {photnum=1;}
   void ResetCounters();
   void SetSteppingAction(MySteppingAction* steppingAction);
 private:
@@ -65,6 +65,7 @@ private:
   G4int master_ntupleId;
   G4int scanpoint_ntupleId;
   G4int photnum;
+  G4int stepnum;
 
   //  std::map<G4double, G4int> TotalNumAbsorbed;
   //  std::map<G4double, G4int> TotalNumReflected;

@@ -122,6 +122,10 @@ BoundaryMeta meta_status(WCSimOpBoundaryProcessStatus what)
     {
         return BAbsorption;
     }
+    else if (what == NoRINDEX)
+    {
+        return BNoRINDEX;
+    }
     else if (what == Transmission || what == FresnelRefraction || what == CoatedDielectricRefraction || what == CoatedDielectricFrustratedTransmission)
     {
         return BTransmission;
@@ -134,9 +138,13 @@ BoundaryMeta meta_status(WCSimOpBoundaryProcessStatus what)
     {
         return BReflection;
     }
+    else if (what == StepTooSmall)
+    {
+        return BStepTooSmall; // no point of recording, nothing happens and direction doesn't change
+    }
     else
     {
-        return BOther;
+        return BOther; // NotAtBoundary, SameMaterial, Undefined (this status shouldn't really show up)
     }
 }
 
