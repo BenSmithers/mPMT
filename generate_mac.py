@@ -4,9 +4,9 @@ import numpy as np
 a = 0.254564663*1000
 b = 0.254110205*1000
 c = 0.186002389*1000
+e = (a+b)/2 # xy major/minor axes averaged in actual simulation construction
 
-# z = 0 seems to be approximately 20mm above the middle, would be worth confirming
-d = 20
+d = c-165 # offset b/w z = 0 and centre of the ellipsoid describing PMT bulb
 
 # gets the xyz coordinate of the surface of the PMT corresponding to angular coordinates
 def get_surface(angles):
@@ -15,8 +15,10 @@ def get_surface(angles):
     theta = angles[0]
     phi = angles[1]
 
-    x = a*np.cos(phi)*np.cos(theta)
-    y = b*np.sin(phi)*np.cos(theta)
+    # x = a*np.cos(phi)*np.cos(theta)
+    # y = b*np.sin(phi)*np.cos(theta)
+    x = e*np.cos(phi)*np.cos(theta)
+    y = e*np.sin(phi)*np.cos(theta)
     z = c*np.sin(theta) - d
 
     return np.array([x,y,z])
@@ -31,16 +33,21 @@ def ptCalc(x,y):
     if x == 0:
         if y > 0:
             phi = np.pi / 2
-            theta = np.arccos(y/b)
+            # theta = np.arccos(y/b)
+            theta = np.arccos(y/e)
         elif y < 0:
             phi = -np.pi / 2
-            theta = np.arccos(-y/b)
+            # theta = np.arccos(-y/b)
+            theta = np.arccos(-y/e)
         else:
             phi = 0
             theta = np.pi/2
     else:
-        phi = np.arctan2(a*y, b*x)
-        theta = np.arccos(x/(a*np.cos(phi)))
+        # phi = np.arctan2(a*y, b*x)
+        phi = np.arctan2(y,x)
+        # theta = np.arccos(x/(a*np.cos(phi)))
+        theta = np.arccos(x/(e*np.cos(phi)))
+
 
     return np.array([theta, phi])
 
@@ -50,12 +57,16 @@ def evaluate_norm(angles):
     theta = angles[0]
     phi = angles[1]
     
-    norm_y_nosin = 1/np.sqrt(a*(np.sin(phi))**2 + (b*np.cos(phi)/a)**2 
-                             + (b*np.tan(theta)/c)**2)
+    # norm_y_nosin = 1/np.sqrt(a*(np.sin(phi))**2 + (b*np.cos(phi)/a)**2 
+    #                          + (b*np.tan(theta)/c)**2)
+    norm_y_nosin = 1/np.sqrt(e*(np.sin(phi))**2 + (np.cos(phi))**2 
+                             + (e*np.tan(theta)/c)**2)
     norm_y = norm_y_nosin*np.sin(phi)
 
-    norm_z = norm_y_nosin*(b/c)*np.tan(theta)
-    norm_x = norm_y_nosin*(b/a)*np.cos(phi)
+    # norm_z = norm_y_nosin*(b/c)*np.tan(theta)
+    # norm_x = norm_y_nosin*(b/a)*np.cos(phi)
+    norm_z = norm_y_nosin*(e/c)*np.tan(theta)
+    norm_x = norm_y_nosin*np.cos(phi)
     
     # normalizing
     mag = np.sqrt(norm_x**2 + norm_y**2 + norm_z**2)
@@ -93,7 +104,7 @@ def append_to_mac(macro_file, point_shoot, angles_shoot):
         f"/mygenerator/SetZ {point_shoot[2]} \n", 
         f"/mygenerator/SetPAzimuthAngle {angles_shoot[0]*180/np.pi} \n",
         f"/mygenerator/SetPZenithAngle {angles_shoot[1]*180/np.pi} \n",
-        f"/run/beamOn 500 \n \n"]
+        f"/run/beamOn 100 \n \n"]
     macro_file.writelines(L)
 
 # creates vertical injection simulation macro
@@ -125,10 +136,12 @@ def write_xy_normal_injection_mac(filename):
         for i_y in range(len(ys)):
             
             y = ys[i_y]
-            xy_projection = (x/a)**2 + (y/b)**2
+            # xy_projection = (x/a)**2 + (y/b)**2
+            xy_projection = x**2 + y**2
 
             # only want x,y that are actually on the PMT
-            if xy_projection <= 1:
+            # if xy_projection <= 1:
+            if xy_projection <= e**2:
 
                 angular_coords = ptCalc(x,y)
                 point_surface = get_surface(angular_coords)
@@ -161,6 +174,7 @@ def write_angular_normal_injection_mac(filename):
             angular_coords = np.array([theta,phi])
 
             point_surface = get_surface(angular_coords)
+            print("want theta =", theta*180/np.pi, "and phi =", phi*180/np.pi, "to hit", point_surface)
             norm_surface = evaluate_norm(angular_coords)
 
             # shoot photons from this many mm away (arbitrary choice)
@@ -184,8 +198,7 @@ def main(args):
     else:
         print("List of allowed scan types:", scan_options)
         return
-
-
+    
 if __name__=="__main__":
 
     import sys
