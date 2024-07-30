@@ -159,7 +159,9 @@ enum BoundaryMeta
    BTransmission = 1,
    BReflection = 2,
    BAbsorption = 3,
-   BOther = 4
+   BStepTooSmall = 4,
+   BNoRINDEX = 5,
+   BOther = 6
 };
 
 BoundaryMeta meta_status(WCSimOpBoundaryProcessStatus what);
