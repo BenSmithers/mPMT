@@ -15,8 +15,6 @@ def get_surface(angles):
     theta = angles[0]
     phi = angles[1]
 
-    # x = a*np.cos(phi)*np.cos(theta)
-    # y = b*np.sin(phi)*np.cos(theta)
     x = e*np.cos(phi)*np.cos(theta)
     y = e*np.sin(phi)*np.cos(theta)
     z = c*np.sin(theta) - d
@@ -33,21 +31,16 @@ def ptCalc(x,y):
     if x == 0:
         if y > 0:
             phi = np.pi / 2
-            # theta = np.arccos(y/b)
             theta = np.arccos(y/e)
         elif y < 0:
             phi = -np.pi / 2
-            # theta = np.arccos(-y/b)
             theta = np.arccos(-y/e)
         else:
             phi = 0
             theta = np.pi/2
     else:
-        # phi = np.arctan2(a*y, b*x)
         phi = np.arctan2(y,x)
-        # theta = np.arccos(x/(a*np.cos(phi)))
         theta = np.arccos(x/(e*np.cos(phi)))
-
 
     return np.array([theta, phi])
 
@@ -57,14 +50,10 @@ def evaluate_norm(angles):
     theta = angles[0]
     phi = angles[1]
     
-    # norm_y_nosin = 1/np.sqrt(a*(np.sin(phi))**2 + (b*np.cos(phi)/a)**2 
-    #                          + (b*np.tan(theta)/c)**2)
     norm_y_nosin = 1/np.sqrt(e*(np.sin(phi))**2 + (np.cos(phi))**2 
                              + (e*np.tan(theta)/c)**2)
     norm_y = norm_y_nosin*np.sin(phi)
 
-    # norm_z = norm_y_nosin*(b/c)*np.tan(theta)
-    # norm_x = norm_y_nosin*(b/a)*np.cos(phi)
     norm_z = norm_y_nosin*(e/c)*np.tan(theta)
     norm_x = norm_y_nosin*np.cos(phi)
     
@@ -104,7 +93,7 @@ def append_to_mac(macro_file, point_shoot, angles_shoot):
         f"/mygenerator/SetZ {point_shoot[2]} \n", 
         f"/mygenerator/SetPAzimuthAngle {angles_shoot[0]*180/np.pi} \n",
         f"/mygenerator/SetPZenithAngle {angles_shoot[1]*180/np.pi} \n",
-        f"/run/beamOn 100 \n \n"]
+        f"/run/beamOn 10000 \n \n"]
     macro_file.writelines(L)
 
 # creates vertical injection simulation macro
@@ -118,7 +107,15 @@ def write_vertical_injection_mac(filename):
 
     for i_x in range(len(xs)):
         for i_y in range(len(ys)):
-            append_to_mac(macro_file, [xs[i_x], ys[i_y], 400], [0,0])
+            if (xs[i_x]**2 + ys[i_y]**2) <= e**2:
+                append_to_mac(macro_file, [xs[i_x], ys[i_y], 400], [0,0])
+
+    # if going to do randomly sampled vertical injection, here is one way:
+    # xhits = np.random.uniform(-300, 300, 480001)
+    # yhits = np.random.uniform(-300, 300, 480001)
+    # for i in range(len(xhits)):
+    #     if (xhits[i]**2 + yhits[i]**2) <= e**2:
+    #         append_to_mac(macro_file, [xhits[i], yhits[i], 400], [0,0])
 
 # creates xy normal injection simulation macro
 def write_xy_normal_injection_mac(filename):
@@ -136,11 +133,9 @@ def write_xy_normal_injection_mac(filename):
         for i_y in range(len(ys)):
             
             y = ys[i_y]
-            # xy_projection = (x/a)**2 + (y/b)**2
             xy_projection = x**2 + y**2
 
             # only want x,y that are actually on the PMT
-            # if xy_projection <= 1:
             if xy_projection <= e**2:
 
                 angular_coords = ptCalc(x,y)
@@ -174,7 +169,6 @@ def write_angular_normal_injection_mac(filename):
             angular_coords = np.array([theta,phi])
 
             point_surface = get_surface(angular_coords)
-            print("want theta =", theta*180/np.pi, "and phi =", phi*180/np.pi, "to hit", point_surface)
             norm_surface = evaluate_norm(angular_coords)
 
             # shoot photons from this many mm away (arbitrary choice)
@@ -188,7 +182,7 @@ def write_angular_normal_injection_mac(filename):
 def main(args):
 
     scan_options = ['vertical_injection', 'xy_normal_injection', 'angular_normal_injection']
-    
+
     if args[0] == scan_options[0]:
         write_vertical_injection_mac(args[1])
     elif args[0] == scan_options[1]:
