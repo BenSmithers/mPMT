@@ -50,7 +50,7 @@ public:
   double calculateIncidenceAngle(const G4ThreeVector &Momentum, const G4ThreeVector &Normal);
   const std::vector<G4ThreeVector> &GetPhotonPositions() const;
   void SetEventAction(MyEventAction *eventAction);
-  void RecordAbsorption(MyEventAction *EventAction, G4Track *Track, G4String vol, bool opAbsorption);
+  void RecordAbsorption(MyEventAction *EventAction, G4Track *Track, G4String vol, bool opAbsorption, G4String postvol="");
 
 private:
   MyEventAction *fEventAction;

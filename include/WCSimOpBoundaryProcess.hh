@@ -159,7 +159,7 @@ enum BoundaryMeta
    BTransmission = 1,
    BReflection = 2,
    BAbsorption = 3,
-   BStepTooSmall = 4,
+   BDontCount = 4,
    BNoRINDEX = 5,
    BOther = 6
 };
@@ -365,7 +365,7 @@ inline void WCSimOpBoundaryProcess::ChooseReflection()
 inline void WCSimOpBoundaryProcess::DoAbsorption()
 {
    theStatus = Absorption;
-   G4cout << "ABSORPTION OCCURED!!!!!!!!!" << G4endl;
+   // G4cout << "ABSORPTION OCCURED!!!!!!!!!" << G4endl;
    if (G4BooleanRand(theEfficiency))
    {
 

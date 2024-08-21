@@ -138,13 +138,14 @@ BoundaryMeta meta_status(WCSimOpBoundaryProcessStatus what)
     {
         return BReflection;
     }
-    else if (what == StepTooSmall)
+    else if (what == StepTooSmall || what == SameMaterial)
     {
-        return BStepTooSmall; // no point of recording, nothing happens and direction doesn't change
+        // samematerial shows up when photon transitions b/w glass1 and phiscath
+        return BDontCount; // no point of recording, nothing happens and direction doesn't change
     }
     else
     {
-        return BOther; // NotAtBoundary, SameMaterial, Undefined (this status shouldn't really show up)
+        return BOther; // NotAtBoundary, Undefined (this status shouldn't really show up)
     }
 }
 
@@ -555,7 +556,7 @@ G4VParticleChange *WCSimOpBoundaryProcess::PostStepDoIt(const G4Track &aTrack,
                     BoundaryProcessVerbose();
                 aParticleChange.ProposeLocalEnergyDeposit(thePhotonMomentum);
                 aParticleChange.ProposeTrackStatus(fStopAndKill);
-                std::cout << "Killed for bad sad reason - this mat: " << Material2->GetName() << std::endl;
+                // std::cout << "Killed for bad sad reason - this mat: " << Material2->GetName() << std::endl;
                 return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
             }
         }
