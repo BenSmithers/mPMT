@@ -71,9 +71,9 @@ double MySteppingAction::calculateIncidenceAngle(const G4ThreeVector &Momentum, 
   return incidenceAngle;
 }
 
-void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Track, G4String vol, bool opAbsorption)
+void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Track, G4String vol, bool opAbsorption, G4String postvol)
 {
-  if (vol == "phisCath" && !opAbsorption)
+  if ((vol == "phisCath" && postvol == "inner_pmt_volume") || (vol == "inner_pmt_volume" && postvol == "phisCath") && !opAbsorption)
   {
     EventAction->RecordStep(2,Track->GetPosition(),1);
   }
@@ -82,11 +82,11 @@ void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Tra
   {
     EventAction->RecordStep(3,Track->GetPosition(),1);
   }
-  else if (vol == "physical_back_box" || vol == "phyiscal_dynode_box" || vol == "physical_faceplate" || vol == "mesh_grid_abyss")
+  else if (vol == "mesh_grid_abyss")
   {
     EventAction->RecordStep(4,Track->GetPosition(),1);
   }
-  else if (vol == "plug_volume" || vol == "aluminum_volume" || vol == "phys_world")
+  else if (vol == "plug_volume" || vol == "aluminum_volume" || vol == "phys_world" || vol == "physical_back_box" || vol == "phyiscal_dynode_box" || vol == "physical_faceplate")
   {
     EventAction->RecordStep(5,Track->GetPosition(),1);
   }
@@ -190,7 +190,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
             // fEventAction->IncrementNumAbsorbed();
             if (status == BAbsorption)
             {
-              RecordAbsorption(fEventAction, track, preVolumeName, false);
+              RecordAbsorption(fEventAction, track, preVolumeName, false, postVolumeName);
             }
             else if (status == BNoRINDEX)
             {
@@ -275,7 +275,6 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
     {
       track->SetTrackStatus(fStopAndKill);
     }
-    //    step->GetTrack()->SetTrackStatus(fStopAndKill);
   }
   else
   {
