@@ -281,6 +281,9 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
                                                  13.937926, 13.699244, 13.469614, 13.258739, 13.064613, 12.895495,
                                                  12.757626, 12.645281, 12.563377, 12.518963};
 
+    G4double new_e_reflect[2] = {1.7712e-09, 1e-08};
+    G4double new_reflect[2] = {40, 40};
+
     G4OpticalSurface *ReflectorSkinSurface = new G4OpticalSurface("ReflectorSurface");
     ReflectorSkinSurface->SetType(dielectric_metal);
     ReflectorSkinSurface->SetModel(unified);
@@ -292,14 +295,17 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     ReflectorSkinSurfaceDiffusy->SetFinish(polishedair);
 
     G4MaterialPropertiesTable *ref = new G4MaterialPropertiesTable();
-    ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, NUMENTRIES_ref);
-    ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.95, 0.95}, 2);
+
+    ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, 2);
+    ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.40, 0.40}, 2);
+    ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.55, 0.55}, 2);
     ReflectorSkinSurface->SetMaterialPropertiesTable(ref);
     Aluminum->SetMaterialPropertiesTable(ref);
 
     G4MaterialPropertiesTable *face_ref = new G4MaterialPropertiesTable();
-    face_ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, NUMENTRIES_ref);
-    face_ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.10, 0.10}, 2);
+    face_ref->AddProperty("REFLECTIVITY", new_e_reflect, new_reflect, 2);
+    face_ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.05, 0.05}, 2);
+    face_ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.30, 0.30}, 2);
     ReflectorSkinSurfaceDiffusy->SetMaterialPropertiesTable(face_ref);
     FacePlate->SetMaterialPropertiesTable(face_ref);
 
@@ -573,9 +579,13 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4double PP[NUM] = {1.4E-9 * GeV, 6.2E-9 * GeV};
 
     G4MaterialPropertiesTable *myST2 = new G4MaterialPropertiesTable();
-    myST2->AddProperty("RINDEX", PP, RINDEX_cathode, NUM);
-    myST2->AddProperty("REFLECTIVITY", PP, REFLECTIVITY_glasscath, NUM);
+    myST2->AddProperty("RINDEX", ENERGY_glass, RINDEX_glass2, 45);
+    myST2->AddProperty("REFLECTIVITY", ENERGY_glass, ABSORPTION_glass2, 45);
     myST2->AddProperty("EFFICIENCY", PP, EFFICIENCY_glasscath, NUM);
+    /*
+        myMPT5->AddProperty("RINDEX", ENERGY_glass, RINDEX_glass2, 45);
+        myMPT5->AddProperty("ABSLENGTH", ENERGY_glass, ABSORPTION_glass2, 45);
+    */
     G4int pmtsurftype = WCSimTuningParams->GetPMTSurfType(); // Choose one of the two models, see WCSimOpBoundaryProcess for model details
     G4cout << "PMT SURFACE == " << pmtsurftype << G4endl;
 
@@ -782,12 +792,41 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
             plug_outer_hk);
     }
 
-    G4Box *solidWorld = new G4Box("solidWorld", 3 * m, 3 * m, 3 * m);
+    G4Polycone *dynode_part1 = new G4Polycone("dynode_part1",
+                                              0,
+                                              2 * pi,
+                                              dynode_1_count,
+                                              dynode_1z,
+                                              dynode_1inner,
+                                              dynode_1outer);
+    G4Polycone *dynode_part2 = new G4Polycone("dynode_part2",
+                                              0,
+                                              2 * pi,
+                                              dynode_2_count,
+                                              dynode_2z,
+                                              dynode_2inner,
+                                              dynode_2outer);
+    G4Polycone *dynode_part3 = new G4Polycone("dynode_part3",
+                                              0,
+                                              2 * pi,
+                                              dynode_3_count,
+                                              dynode_3z,
+                                              dynode_3inner,
+                                              dynode_3outer);
+    G4Tubs *mesh_hole = new G4Tubs(
+        "mesh_hole",
+        0,
+        0.044 * 1000 * mm,
+        0.0005 * 1000 * mm,
+        0, 2 * pi);
 
-    G4UnionSolid* inner_cathodeglass1 = new G4UnionSolid("inner_cathodeglass1", cathode_inner_solid, glass1_inner_solid);
-    G4UnionSolid* inner_cathodeglass1alum = new G4UnionSolid("inner_cathodeglass1alum", inner_cathodeglass1, aluminum_inner_solid);
-    G4UnionSolid* inner_pmt_solid = new G4UnionSolid("inner_pmt_solid", inner_cathodeglass1alum, glass2_inner_solid);
+    G4Box *solidWorld = new G4Box("solidWorld", 2 * m, 2 * m, 2 * m);
 
+    G4UnionSolid *inner_cathodeglass1 = new G4UnionSolid("inner_cathodeglass1", cathode_inner_solid, glass1_inner_solid);
+    G4UnionSolid *inner_cathodeglass1alum = new G4UnionSolid("inner_cathodeglass1alum", inner_cathodeglass1, aluminum_inner_solid);
+    G4UnionSolid *inner_pmt_solid = new G4UnionSolid("inner_pmt_solid", inner_cathodeglass1alum, glass2_inner_solid);
+
+    // inner_pmt_solid
     G4double back_box_width = 220 * mm;
     G4double back_box_height = 30 * mm;
     G4double shell_thickness = 2 * mm;
@@ -795,42 +834,6 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4double shell_width = 143 * mm;
     G4double reflector_plate_width = 220 * mm;
     G4double reflector_plate_hole_width = 80 * mm;
-
-    G4Tubs *back_box = new G4Tubs(
-        "back_box",
-        0,
-        back_box_width / 2,
-        back_box_height / 2,
-        0,
-        2 * pi);
-
-    G4Tubs *dynode_box = new G4Tubs(
-        "dynode_box",
-        shell_width / 2 - shell_thickness,
-        shell_width / 2,
-        shell_height / 2,
-        0,
-        2 * pi);
-
-    G4Tubs *dynode_face_plate_full = new G4Tubs(
-        "dynode_face_plate_full",
-        0,
-        reflector_plate_width / 2,
-        shell_thickness / 2,
-        0,
-        2 * pi);
-    G4Tubs *dynode_face_plate_hole = new G4Tubs(
-        "dynode_face_plate_hole",
-        0,
-        reflector_plate_hole_width / 2,
-        shell_thickness,
-        0,
-        2 * pi);
-
-    G4SubtractionSolid *dynode_face_plate = new G4SubtractionSolid(
-        "dynode_face_plate",
-        dynode_face_plate_full,
-        dynode_face_plate_hole);
 
     G4VisAttributes *invisible = new G4VisAttributes(false);
     G4VisAttributes *glassy = new G4VisAttributes();
@@ -849,11 +852,6 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         Aluminum,
         "logical_aluminum_bulb");
     G4LogicalSkinSurface *ReflectorBulb = new G4LogicalSkinSurface("ReflectorBulb", logical_aluminum_bulb, ReflectorSkinSurface);
-    
-    G4LogicalVolume *logical_inner_pmt = new G4LogicalVolume(
-        inner_pmt_solid, 
-        Vacuum,
-        "Inner_PMT");
 
     G4LogicalVolume *logical_glass1 = new G4LogicalVolume(
         glass1_solid,
@@ -867,8 +865,28 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         plug_solid,
         absorberMaterial,
         "logical_plug");
-    G4LogicalVolume *mesh_logic = new G4LogicalVolume(
-        dynode_face_plate_hole,
+
+    G4LogicalVolume *dynode_part1_log = new G4LogicalVolume(
+        dynode_part1,
+        Aluminum,
+        "dynode_part1_log");
+    G4LogicalVolume *dynode_part2_log = new G4LogicalVolume(
+        dynode_part2,
+        Aluminum,
+        "dynode_part2_log");
+    G4LogicalVolume *dynode_part3_log = new G4LogicalVolume(
+        dynode_part3,
+        Aluminum,
+        "dynode_part3_log");
+
+    G4RotationMatrix rotm = G4RotationMatrix();
+    G4SubtractionSolid *inner_minus_d1 = new G4SubtractionSolid("world_minus_pmt", inner_pmt_solid, dynode_part1, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
+    G4SubtractionSolid *inner_minus_d2 = new G4SubtractionSolid("world_minus_pmt1", inner_minus_d1, dynode_part2, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
+    G4SubtractionSolid *inner_minus_d2_abs = new G4SubtractionSolid("world_minus_pmt2", inner_minus_d2, mesh_hole, G4Transform3D(rotm, G4ThreeVector(0, 0, -115 * mm)));
+    G4SubtractionSolid *inner_minus_d3 = new G4SubtractionSolid("world_minus_pmt3", inner_minus_d2_abs, dynode_part3, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
+
+        G4LogicalVolume *mesh_logic = new G4LogicalVolume(
+        mesh_hole,
         absorberMaterial,
         "mesh_logic");
     mesh_logic->SetVisAttributes(vis_absorber);
@@ -880,25 +898,15 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     fScoringVolume->SetVisAttributes(photocathy);
     logical_glass1->SetVisAttributes(glassy);
     logical_glass2->SetVisAttributes(glassy);
-    logical_inner_pmt->SetVisAttributes(invisible);
+    // logical_inner_pmt->SetVisAttributes(invisible);
 
     logicWorld = new G4LogicalVolume(solidWorld,
-                                     Vacuum, // Was Air, changed to Vacuum avoid absorption in air
+                                     Air, // Was Air, changed to Vacuum avoid absorption in air
                                      "logicWorld");
 
-    G4LogicalVolume *logical_back_box = new G4LogicalVolume(
-        back_box,
-        FacePlate,
-        "physical_back_box");
-    G4LogicalVolume *logical_dynode_box = new G4LogicalVolume(
-        dynode_box,
-        FacePlate,
-        "physical_dynode_box");
-    G4LogicalVolume *logical_faceplate = new G4LogicalVolume(
-        dynode_face_plate,
-        FacePlate,
-        "physical_faceplate");
-    G4LogicalSkinSurface *FacePlateSkin = new G4LogicalSkinSurface("FacePlateSkin", logical_faceplate, ReflectorSkinSurfaceDiffusy);
+    G4LogicalSkinSurface *FacePlateSkin = new G4LogicalSkinSurface("FacePlateSkin", dynode_part2_log, ReflectorSkinSurfaceDiffusy);
+    G4LogicalSkinSurface *FacePlateSkin2 = new G4LogicalSkinSurface("FacePlateSkin2", dynode_part1_log, ReflectorSkinSurfaceDiffusy);
+    G4LogicalSkinSurface *FacePlateSkin3 = new G4LogicalSkinSurface("FacePlateSkin3", dynode_part3_log, ReflectorSkinSurfaceDiffusy);
 
     G4VisAttributes *plug_visible = new G4VisAttributes();
     plug_visible->SetVisibility(true);
@@ -908,12 +916,18 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4VisAttributes *watery = new G4VisAttributes();
     watery->SetVisibility(false);
     watery->SetColor(G4Color(180 / 255, 180 / 255, 255 / 255, 0.25));
-    //    logicWater->SetVisAttributes(watery);
+    // logicWater->SetVisAttributes(watery);
+
+    G4LogicalVolume *logic_inside_vacuum = new G4LogicalVolume(
+        inner_minus_d3,
+        Vacuum,
+        "Inner_PMT");
+    logic_inside_vacuum->SetVisAttributes(watery);
 
     OpGlassCathodeSurface->SetMaterialPropertiesTable(myST2);
     OpCathodeAirSurface->SetMaterialPropertiesTable(myST2);
 
-    logicWorld->SetVisAttributes(invisible);
+    logicWorld->SetVisAttributes(watery);
     //   logicWorld->SetSensitiveDetector(NULL);
 
     physical_world = new G4PVPlacement(
@@ -925,21 +939,11 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         false,
         0,
         true);
-    /*
-    G4PVPlacement *all_the_water = new G4PVPlacement(
-        nullptr,
-        G4ThreeVector(0, 0, 0),
-        logicWater,
-        "phys_water",
-        logicWorld,
-        false,
-        0);
-        */
 
     G4VPhysicalVolume *inner_pmt_volume = new G4PVPlacement(
         nullptr,
         G4ThreeVector(0, 0, 0),
-        logical_inner_pmt,
+        logic_inside_vacuum,
         "inner_pmt_volume",
         logicWorld,
         false,
@@ -976,7 +980,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         logicWorld,
         false,
         0);
-        
+
     G4VPhysicalVolume *phisCath = new G4PVPlacement(
         nullptr,
         G4ThreeVector(0, 0, 0),
@@ -986,38 +990,40 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         false,
         0);
 
-    G4double back_box_shift = -250 * mm;
-    G4VPhysicalVolume *physical_back_box = new G4PVPlacement(
+    G4VPhysicalVolume *dynode_1_physical = new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, back_box_shift + back_box_height / 2),
-        logical_back_box,
-        "physical_back_box",
-        logical_inner_pmt,
+        G4ThreeVector(0, 0, -130 * mm),
+        dynode_part1_log,
+        "dynode_1_physical",
+        logicWorld,
         false,
         0);
-    G4VPhysicalVolume *physical_dynode_box = new G4PVPlacement(
+    G4VPhysicalVolume *dynode_2_physical = new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, back_box_shift + back_box_height + shell_height / 2),
-        logical_dynode_box,
-        "phyiscal_dynode_box",
-        logical_inner_pmt,
+        G4ThreeVector(0, 0, -130 * mm),
+        dynode_part2_log,
+        "dynode_2_physical",
+        logicWorld,
         false,
         0);
-    G4VPhysicalVolume *physical_face_plate = new G4PVPlacement(
+    G4VPhysicalVolume *dynode_3_physical = new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, back_box_shift + back_box_height + shell_height + shell_thickness / 2),
-        logical_faceplate,
-        "physical_faceplate",
-        logical_inner_pmt,
+        G4ThreeVector(0, 0, -130 * mm),
+        dynode_part3_log,
+        "dynode_3_physical",
+        logicWorld,
         false,
         0);
+
+    G4double back_box_shift = -130 * mm;
+
     // mesh_logic
     G4VPhysicalVolume *mesh_grid_abyss = new G4PVPlacement(
         nullptr,
-        G4ThreeVector(0, 0, back_box_shift + back_box_height + shell_height + shell_thickness / 2),
+        G4ThreeVector(0, 0, -115 * mm),
         mesh_logic,
         "mesh_grid_abyss",
-        logical_inner_pmt,
+        logicWorld,
         false,
         0);
 

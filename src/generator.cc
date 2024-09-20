@@ -69,7 +69,7 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   G4String particleName = "opticalphoton";
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName);
 
- // zpos was 500*mm
+  // zpos was 500*mm
   G4ThreeVector initialPosition(xpos, ypos, zpos);
   // Define the target Z coordinate
   double targetZ = 44.40 * mm;
@@ -86,7 +86,7 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   G4double azi = pAzimuthAngle;
   G4double zen = pZenithAngle;
 
-  /* 
+  /*
   At a zenith angle of 0, the vector will point in the negative z direction. At an
   azimuthal angle of 0, if zenith angle increases, the vector will rotate toward
   positive x, through the xz plane. If the azimuthal angle increases, the vector
@@ -94,8 +94,8 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   */
 
   G4ThreeVector centralDirection = G4ThreeVector(-cos(azi) * sin(zen),
-                                        -sin(azi) * sin(zen),
-                                        cos(zen));
+                                                 -sin(azi) * sin(zen),
+                                                 cos(zen));
 
   G4double random_azi = 2 * M_PI * G4UniformRand();
   G4double random_zen = G4RandGauss::shoot(0.0, spread * M_PI / 180.0);
@@ -104,25 +104,22 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   // G4ThreeVector direction = (G4ThreeVector(0.0, 0.0, targetZ) - newPosition).unit();
 
   G4ThreeVector spreadDirection = G4ThreeVector(cos(random_azi) * sin(random_zen),
-                                          sin(random_azi) * sin(random_zen),
-                                          -cos(random_zen));
+                                                sin(random_azi) * sin(random_zen),
+                                                -cos(random_zen));
 
   G4ThreeVector finalDirection = spreadDirection.rotateUz(centralDirection);
-               
+
   // Print the new position and direction
-
-  G4double thisen = 2.481 * eV;
-
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleMomentumDirection(finalDirection);
-  fParticleGun->SetParticleEnergy(thisen);
+  fParticleGun->SetParticleEnergy(particleEnergy * eV);
   fParticleGun->SetParticlePosition(initialPosition);
   fParticleGun->SetParticlePolarization(G4ThreeVector(0, 1.0, 0));
 
   G4PrimaryVertex *vertex = new G4PrimaryVertex(initialPosition, 0.0);
   G4PrimaryParticle *primary = new G4PrimaryParticle(particle);
 
-  G4ThreeVector momentun = finalDirection * thisen;
+  G4ThreeVector momentun = finalDirection * particleEnergy;
 
   vertex->SetPrimary(primary);
   G4double checkEnergy = fParticleGun->GetParticleEnergy();
