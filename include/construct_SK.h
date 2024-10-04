@@ -40,7 +40,7 @@
 
 #include "WCSimTuningParameters.hh"
 #include "WCSimTuningMessenger.hh"
-
+const G4int NUMSK = 6;
 class skDetCon : public G4VUserDetectorConstruction
 {
 public:
@@ -70,12 +70,57 @@ public:
 
 private:
     const static G4int NUMSK = 6;
-    G4double ENERGY_COATED_SK[NUMSK], COATEDRINDEX_glasscath_SK[NUMSK], COATEDRINDEXIM_glasscath_SK[NUMSK];
-    G4double COATEDTHICKNESS_glasscath_SK, COATEDTHICKNESS_glasscath_KCsCb, COATEDTHICKNESS_glasscath_RbCsCb;
-    G4int COATEDFRUSTRATEDTRANSMISSION_glasscath;
-
     const static G4int NUMWAV = 23;
-    G4double ENERGY_COATED_WAV[NUMWAV], COATEDRINDEX_glasscath_KCsCb[NUMWAV], COATEDRINDEXIM_glasscath_KCsCb[NUMWAV], COATEDRINDEX_glasscath_RbCsCb[NUMWAV], COATEDRINDEXIM_glasscath_RbCsCb[NUMWAV];
+
+    G4double ENERGY_COATED_SK[NUMSK] =
+        {
+            1.000 * eV, 2.786 * eV, 3.061 * eV, 3.306 * eV, 3.679 * eV, 9.000 * eV};
+    // Real refractive index of photocathode film
+    G4double COATEDRINDEX_glasscath_SK[NUMSK] =
+        {3.4, 3.4, 3.1, 2.8, 2.4, 2.4};
+    // Imaginary refractive index of photocathode film
+    G4double COATEDRINDEXIM_glasscath_SK[NUMSK] =
+        {1.7, 1.7, 1.6, 1.5, 1.4, 1.4};
+
+    G4double COATEDTHICKNESS_glasscath_SK = 20.5 * nm;
+    G4double COATEDTHICKNESS_glasscath_KCsCb = 15.5 * nm;
+    G4double COATEDTHICKNESS_glasscath_RbCsCb = 23.4 * nm;
+    G4int COATEDFRUSTRATEDTRANSMISSION_glasscath = 1;
+
+    G4double ENERGY_COATED_WAV[NUMWAV] = {
+        1.000 * eV, 1.823 * eV, 1.864 * eV, 1.907 * eV, 1.953 * eV,
+        2.000 * eV, 2.049 * eV, 2.101 * eV, 2.156 * eV, 2.214 * eV,
+        2.275 * eV, 2.339 * eV, 2.407 * eV, 2.480 * eV, 2.556 * eV,
+        2.638 * eV, 2.725 * eV, 2.818 * eV, 2.917 * eV, 3.024 * eV,
+        3.139 * eV, 3.263 * eV, 9.000 * eV};
+    G4double COATEDRINDEX_glasscath_KCsCb[NUMWAV] =
+        {
+            2.96, 2.96, 2.95, 2.95, 2.95,
+            2.96, 2.98, 3.01, 3.06, 3.12,
+            3.20, 3.26, 3.09, 3.00, 3.00,
+            3.00, 2.87, 2.70, 2.61, 2.38,
+            2.18, 1.92, 1.92};
+    G4double COATEDRINDEXIM_glasscath_KCsCb[NUMWAV] =
+        {
+            0.33, 0.33, 0.34, 0.34, 0.35,
+            0.37, 0.38, 0.42, 0.46, 0.53,
+            0.63, 0.86, 1.05, 1.06, 1.11,
+            1.34, 1.44, 1.50, 1.53, 1.71,
+            1.69, 1.69, 1.69};
+
+    G4double COATEDRINDEX_glasscath_RbCsCb[NUMWAV] = {
+        3.13, 3.13, 3.14, 3.14, 3.15,
+        3.18, 3.22, 3.28, 3.39, 3.32,
+        3.23, 3.21, 3.22, 3.16, 2.99,
+        2.81, 2.63, 2.50, 2.40, 2.30,
+        2.22, 2.07, 2.07};
+    G4double COATEDRINDEXIM_glasscath_RbCsCb[NUMWAV] =
+        {
+            0.35, 0.35, 0.37, 0.37, 0.38,
+            0.40, 0.43, 0.46, 0.59, 0.76,
+            0.86, 0.90, 1.04, 1.21, 1.37,
+            1.41, 1.40, 1.35, 1.27, 1.21,
+            1.17, 1.22, 1.22};
 
     G4double density;
     G4double a;

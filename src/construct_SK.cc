@@ -14,56 +14,7 @@ skDetCon::~skDetCon()
 
 void skDetCon::DefineMaterials()
 {
-
-    G4double ENERGY_COATED_SK[NUMSK] =
-        {
-            1.000 * eV, 2.786 * eV, 3.061 * eV, 3.306 * eV, 3.679 * eV, 9.000 * eV};
-    // Real refractive index of photocathode film
-    G4double COATEDRINDEX_glasscath_SK[NUMSK] =
-        {3.4, 3.4, 3.1, 2.8, 2.4, 2.4};
-    // Imaginary refractive index of photocathode film
-    G4double COATEDRINDEXIM_glasscath_SK[NUMSK] =
-        {1.7, 1.7, 1.6, 1.5, 1.4, 1.4};
-
-    COATEDTHICKNESS_glasscath_SK = 11.5 * nm;
-    COATEDTHICKNESS_glasscath_RbCsCb = 23.4 * nm;
-
-    G4double ENERGY_COATED_WAV[NUMWAV] =
-        {
-            1.000 * eV, 1.823 * eV, 1.864 * eV, 1.907 * eV, 1.953 * eV,
-            2.000 * eV, 2.049 * eV, 2.101 * eV, 2.156 * eV, 2.214 * eV,
-            2.275 * eV, 2.339 * eV, 2.407 * eV, 2.480 * eV, 2.556 * eV,
-            2.638 * eV, 2.725 * eV, 2.818 * eV, 2.917 * eV, 3.024 * eV,
-            3.139 * eV, 3.263 * eV, 9.000 * eV};
-    G4double COATEDRINDEX_glasscath_KCsCb[NUMWAV] =
-        {
-            2.96, 2.96, 2.95, 2.95, 2.95,
-            2.96, 2.98, 3.01, 3.06, 3.12,
-            3.20, 3.26, 3.09, 3.00, 3.00,
-            3.00, 2.87, 2.70, 2.61, 2.38,
-            2.18, 1.92, 1.92};
-    G4double COATEDRINDEXIM_glasscath_KCsCb[NUMWAV] =
-        {
-            0.33, 0.33, 0.34, 0.34, 0.35,
-            0.37, 0.38, 0.42, 0.46, 0.53,
-            0.63, 0.86, 1.05, 1.06, 1.11,
-            1.34, 1.44, 1.50, 1.53, 1.71,
-            1.69, 1.69, 1.69};
-
-    G4double COATEDRINDEX_glasscath_RbCsCb[NUMWAV] = {
-        3.13, 3.13, 3.14, 3.14, 3.15,
-        3.18, 3.22, 3.28, 3.39, 3.32,
-        3.23, 3.21, 3.22, 3.16, 2.99,
-        2.81, 2.63, 2.50, 2.40, 2.30,
-        2.22, 2.07, 2.07};
-    COATEDTHICKNESS_glasscath_KCsCb = 15.5 * nm;
-    G4double COATEDRINDEXIM_glasscath_RbCsCb[NUMWAV] =
-        {
-            0.35, 0.35, 0.37, 0.37, 0.38,
-            0.40, 0.43, 0.46, 0.59, 0.76,
-            0.86, 0.90, 1.04, 1.21, 1.37,
-            1.41, 1.40, 1.35, 1.27, 1.21,
-            1.17, 1.22, 1.22};
+    std::cout << "eV " << eV << std::endl;
 }
 
 G4VPhysicalVolume *skDetCon::Construct()
@@ -494,25 +445,25 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
 
     G4MaterialPropertiesTable *vacuum_mat_properties = new G4MaterialPropertiesTable();
     vacuum_mat_properties->AddProperty("RINDEX", ENERGY_water, RINDEX_vacuum, NUMENTRIES_water);
-    // vacuum_mat_properties->AddProperty("ABSLENGTH", ENERGY_water, BLACKABS_blacksheet, NUMENTRIES_water);
-    //   vacuum_mat_properties->AddProperty("RAYLEIGH",ENERGY_water, RAYLEIGH_air, NUMENTRIES_water);
+    vacuum_mat_properties->AddProperty("ABSLENGTH", ENERGY_water, BLACKABS_blacksheet, NUMENTRIES_water);
 
     // we don't really _need_ air
     // Air1->SetMaterialPropertiesTable(vacuum_mat_properties);
 
-    G4MaterialPropertiesTable *absorberProperties = new G4MaterialPropertiesTable();
     G4MaterialPropertiesTable *mptWorld = new G4MaterialPropertiesTable();
-
-    absorberProperties->AddProperty("ABSLENGTH", photonEnergy, absorption, numEntries);
     mptWorld->AddProperty("RINDEX", photonEnergy, rindexWorld, numEntries);
     mptWorld->AddProperty("ABSLENGTH", photonEnergy, absorption, numEntries);
-
-    absorberMaterial->SetMaterialPropertiesTable(absorberProperties);
     Air->SetMaterialPropertiesTable(mptWorld);
+
+    G4MaterialPropertiesTable *absorberProperties = new G4MaterialPropertiesTable();
+    absorberProperties->AddProperty("ABSLENGTH", photonEnergy, absorption, numEntries);
+    absorberProperties->AddProperty("RINDEX", photonEnergy, RINDEX1, numEntries);
+    absorberProperties->AddProperty("RAYLEIGH", photonEnergy, absorption, numEntries);
+    absorberMaterial->SetMaterialPropertiesTable(absorberProperties);
 
     G4MaterialPropertiesTable *water_mat_properties = new G4MaterialPropertiesTable();
     water_mat_properties->AddProperty("RINDEX", ENERGY_water, RINDEX1, NUMENTRIES_water);
-    water_mat_properties->AddProperty("ABSLENGTH", ENERGY_water, PHOTON_KILLER, NUMENTRIES_water);
+    water_mat_properties->AddProperty("ABSLENGTH", ENERGY_water, ABSORPTION_water, NUMENTRIES_water);
     water_mat_properties->AddProperty("RAYLEIGH", ENERGY_water, RAYLEIGH_water, NUMENTRIES_water);
 
     Vacuum->SetMaterialPropertiesTable(vacuum_mat_properties);
@@ -610,8 +561,19 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         if (cathodepara == 0)
         {
             printf("Using SK cathode optical parameters\n");
-            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_SK, COATEDRINDEX_glasscath_SK, NUMSK);
-            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_SK, COATEDRINDEXIM_glasscath_SK, NUMSK);
+            std::cout << "eV " << eV << std::endl;
+            std::cout << ENERGY_COATED_SK[0] << std::endl;
+            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_SK, COATEDRINDEXIM_glasscath_SK, NUMSK, true, false);
+            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_SK, COATEDRINDEX_glasscath_SK, NUMSK, true, false);
+
+            G4MaterialPropertyVector *pp = myST2->GetProperty("SCINTILLATIONCOMPONENT2");
+            std::cout << "aaaaaaaah " << pp->Value(1 * eV) << std::endl;
+            std::cout << "aaaaaaaah " << pp->Value(2 * eV) << std::endl;
+            std::cout << "aaaaaaaah " << pp->Value(3 * eV) << std::endl;
+            std::cout << "aaaaaaaah " << pp->Value(4 * eV) << std::endl;
+            std::cout << "aaaaaaaah " << pp->Value(5 * eV) << std::endl;
+            std::cout << "aaaaaaaah " << pp->Value(6 * eV) << std::endl;
+
             myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_SK);
             myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
         }
@@ -651,10 +613,6 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4Polycone *aluminum_solid;
     G4Polycone *glass2_solid;
     G4Polycone *plug_solid;
-    G4Polycone *cathode_inner_solid;
-    G4Polycone *glass1_inner_solid;
-    G4Polycone *aluminum_inner_solid;
-    G4Polycone *glass2_inner_solid;
 
     if (is_sk)
     {
@@ -666,27 +624,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
             cathode_z,
             cathode_inner,
             cathode_outer);
-        cathode_inner_solid = new G4Polycone(
-            "cathode_inner_solid",
-            0.0, 2 * pi,
-            cathode_layer,
-            cathode_z,
-            cathode_inner_2,
-            cathode_inner);
-        glass1_solid = new G4Polycone(
-            "glass1_solid",
-            0.0, 2 * pi,
-            glass_1_layers,
-            glass1_z,
-            glass1_inner,
-            glass1_outer);
-        glass1_inner_solid = new G4Polycone(
-            "glass1_inner_solid",
-            0.0, 2 * pi,
-            glass_1_layers,
-            glass1_z,
-            glass1_inner_2,
-            glass1_inner);
+
         aluminum_solid = new G4Polycone(
             "aluminum_solid",
             0.0, 2 * pi,
@@ -694,13 +632,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
             alum_z,
             alum_inner,
             alum_outer);
-        aluminum_inner_solid = new G4Polycone(
-            "aluminum_inner_solid",
-            0.0, 2 * pi,
-            aluminum_layer,
-            alum_z,
-            alum_inner_2,
-            alum_inner);
+
         glass2_solid = new G4Polycone(
             "glass2_solid",
             0.0, 2 * pi,
@@ -708,13 +640,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
             glass2_z,
             glass2_inner,
             glass2_outer);
-        glass2_inner_solid = new G4Polycone(
-            "glass2_inner_solid",
-            0.0, 2 * pi,
-            glass_2_layers,
-            glass2_z,
-            glass2_inner_2,
-            glass2_inner);
+
         plug_solid = new G4Polycone(
             "plug_solid",
             0.0, 2 * pi,
@@ -734,41 +660,14 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
             cathode_z_hk,
             cathode_inner_hk,
             cathode_outer_hk);
-        cathode_inner_solid = new G4Polycone(
-            "cathode_inner_solid",
-            0.0, 2 * pi,
-            cathode_layer,
-            cathode_z,
-            cathode_inner_2,
-            cathode_inner);
-        glass1_solid = new G4Polycone(
-            "glass1_solid",
-            0.0, 2 * pi,
-            glass_1_layer_hk,
-            glass1_z_hk,
-            glass1_inner_hk,
-            glass1_outer_hk);
-        glass1_inner_solid = new G4Polycone(
-            "glass1_inner_solid",
-            0.0, 2 * pi,
-            glass_1_layers,
-            glass1_z,
-            glass1_inner_2,
-            glass1_inner);
+
         aluminum_solid = new G4Polycone(
             "aluminum_solid",
             0.0, 2 * pi,
             aluminum_layer_hk,
             alum_z_hk,
-            alum_inner_hk,
-            alum_outer_hk);
-        aluminum_inner_solid = new G4Polycone(
-            "aluminum_inner_solid",
-            0.0, 2 * pi,
-            aluminum_layer,
-            alum_z,
             alum_inner_2,
-            alum_inner);
+            alum_outer_hk);
         glass2_solid = new G4Polycone(
             "glass2_solid",
             0.0, 2 * pi,
@@ -776,13 +675,6 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
             glass2_z_hk,
             glass2_inner_hk,
             glass2_outer_hk);
-        glass2_inner_solid = new G4Polycone(
-            "glass2_inner_solid",
-            0.0, 2 * pi,
-            glass_2_layers,
-            glass2_z,
-            glass2_inner_2,
-            glass2_inner);
         plug_solid = new G4Polycone(
             "plug_solid",
             0.0, 2 * pi,
@@ -822,9 +714,21 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
 
     G4Box *solidWorld = new G4Box("solidWorld", 2 * m, 2 * m, 2 * m);
 
-    G4UnionSolid *inner_cathodeglass1 = new G4UnionSolid("inner_cathodeglass1", cathode_inner_solid, glass1_inner_solid);
-    G4UnionSolid *inner_cathodeglass1alum = new G4UnionSolid("inner_cathodeglass1alum", inner_cathodeglass1, aluminum_inner_solid);
-    G4UnionSolid *inner_pmt_solid = new G4UnionSolid("inner_pmt_solid", inner_cathodeglass1alum, glass2_inner_solid);
+    // G4UnionSolid *inner_cathodeglass1 = new G4UnionSolid("inner_cathodeglass1", cathode_inner_solid, glass1_inner_solid);
+    // G4UnionSolid *inner_cathodeglass1alum = new G4UnionSolid("inner_cathodeglass1alum", inner_cathodeglass1, aluminum_inner_solid);
+    // G4UnionSolid *inner_pmt_almost = new G4UnionSolid("inner_pmt_almost", inner_cathodeglass1alum, glass2_inner_solid);
+    // G4UnionSolid *inner_pmt_solid = new G4UnionSolid("inner_pmt_solid", inner_pmt_almost, plug_solid);
+
+    G4Polycone *inner_pmt_solid = new G4Polycone(
+        "inner_pmt_full",
+        0,
+        2 * pi,
+        n_layers_tot,
+        full_z,
+        full_innerinner,
+        full_inner);
+
+    G4SubtractionSolid *world_minus_pmt = new G4SubtractionSolid("world_minus_pmt", solidWorld, inner_pmt_solid);
 
     // inner_pmt_solid
     G4double back_box_width = 220 * mm;
@@ -853,10 +757,6 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         "logical_aluminum_bulb");
     G4LogicalSkinSurface *ReflectorBulb = new G4LogicalSkinSurface("ReflectorBulb", logical_aluminum_bulb, ReflectorSkinSurface);
 
-    G4LogicalVolume *logical_glass1 = new G4LogicalVolume(
-        glass1_solid,
-        PMTGlass,
-        "logical_glass1");
     G4LogicalVolume *logical_glass2 = new G4LogicalVolume(
         glass2_solid,
         PMTGlass,
@@ -878,14 +778,18 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         dynode_part3,
         Aluminum,
         "dynode_part3_log");
+    G4LogicalVolume *world_minus_pmt_volume = new G4LogicalVolume(
+        world_minus_pmt,
+        Vacuum,
+        "world_minus_pmt_volume");
 
     G4RotationMatrix rotm = G4RotationMatrix();
-    G4SubtractionSolid *inner_minus_d1 = new G4SubtractionSolid("world_minus_pmt", inner_pmt_solid, dynode_part1, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
-    G4SubtractionSolid *inner_minus_d2 = new G4SubtractionSolid("world_minus_pmt1", inner_minus_d1, dynode_part2, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
-    G4SubtractionSolid *inner_minus_d2_abs = new G4SubtractionSolid("world_minus_pmt2", inner_minus_d2, mesh_hole, G4Transform3D(rotm, G4ThreeVector(0, 0, -115 * mm)));
-    G4SubtractionSolid *inner_minus_d3 = new G4SubtractionSolid("world_minus_pmt3", inner_minus_d2_abs, dynode_part3, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
+    // G4SubtractionSolid *inner_minus_d1 = new G4SubtractionSolid("world_minus_pmt", inner_pmt_solid, dynode_part1, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
+    // G4SubtractionSolid *inner_minus_d2 = new G4SubtractionSolid("world_minus_pmt1", inner_minus_d1, dynode_part2, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
+    // G4SubtractionSolid *inner_minus_d2_abs = new G4SubtractionSolid("world_minus_pmt2", inner_minus_d2, mesh_hole, G4Transform3D(rotm, G4ThreeVector(0, 0, -115 * mm)));
+    // G4SubtractionSolid *inner_minus_d3 = new G4SubtractionSolid("world_minus_pmt3", inner_minus_d2_abs, dynode_part3, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
 
-        G4LogicalVolume *mesh_logic = new G4LogicalVolume(
+    G4LogicalVolume *mesh_logic = new G4LogicalVolume(
         mesh_hole,
         absorberMaterial,
         "mesh_logic");
@@ -896,7 +800,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         PMTGlass,
         "cathode_logical");
     fScoringVolume->SetVisAttributes(photocathy);
-    logical_glass1->SetVisAttributes(glassy);
+    // logical_glass1->SetVisAttributes(glassy);
     logical_glass2->SetVisAttributes(glassy);
     // logical_inner_pmt->SetVisAttributes(invisible);
 
@@ -914,16 +818,17 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     plug_logic->SetVisAttributes(plug_visible);
 
     G4VisAttributes *watery = new G4VisAttributes();
-    watery->SetVisibility(false);
+    watery->SetVisibility(true);
     watery->SetColor(G4Color(180 / 255, 180 / 255, 255 / 255, 0.25));
     // logicWater->SetVisAttributes(watery);
-
+    world_minus_pmt_volume->SetVisAttributes(watery);
+    /*
     G4LogicalVolume *logic_inside_vacuum = new G4LogicalVolume(
         inner_minus_d3,
         Vacuum,
         "Inner_PMT");
     logic_inside_vacuum->SetVisAttributes(watery);
-
+    */
     OpGlassCathodeSurface->SetMaterialPropertiesTable(myST2);
     OpCathodeAirSurface->SetMaterialPropertiesTable(myST2);
 
@@ -939,20 +844,21 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         false,
         0,
         true);
-
-    G4VPhysicalVolume *inner_pmt_volume = new G4PVPlacement(
+    /*
+        G4VPhysicalVolume *inner_pmt_volume = new G4PVPlacement(
+            nullptr,
+            G4ThreeVector(0, 0, 0),
+            logic_inside_vacuum,
+            "inner_pmt_volume",
+            logicWorld,
+            false,
+            0);
+            */
+    G4VPhysicalVolume *world_minus_pmt_placed = new G4PVPlacement(
         nullptr,
         G4ThreeVector(0, 0, 0),
-        logic_inside_vacuum,
-        "inner_pmt_volume",
-        logicWorld,
-        false,
-        0);
-    G4VPhysicalVolume *glass1_volume = new G4PVPlacement(
-        nullptr,
-        G4ThreeVector(0, 0, 0),
-        logical_glass1,
-        "glass1_volume",
+        world_minus_pmt_volume,
+        "world_minus_pmt_volume",
         logicWorld,
         false,
         0);
@@ -989,7 +895,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         logicWorld,
         false,
         0);
-
+    /**/
     G4VPhysicalVolume *dynode_1_physical = new G4PVPlacement(
         nullptr,
         G4ThreeVector(0, 0, -130 * mm),
@@ -1028,8 +934,8 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         0);
 
     // G4LogicalBorderSurface *GlassCathodeSurface = new G4LogicalBorderSurface("GlassCathodeSurface", all_the_water, phisCath, OpGlassCathodeSurface);
-    G4LogicalBorderSurface *cathodeglasstoinner = new G4LogicalBorderSurface("cathodeglasstoinner", phisCath, inner_pmt_volume, OpCathodeAirSurface);
-    G4LogicalBorderSurface *cathodeinnertoglass = new G4LogicalBorderSurface("cathodeinnertoglass", inner_pmt_volume, phisCath, OpCathodeAirSurface);
+    G4LogicalBorderSurface *cathodeglasstoinner = new G4LogicalBorderSurface("cathodeglasstoinner", phisCath, physical_world, OpGlassCathodeSurface);
+    G4LogicalBorderSurface *cathodeinnertoglass = new G4LogicalBorderSurface("cathodeinnertoglass", physical_world, phisCath, OpCathodeAirSurface);
 
     WCSimTuningParameters *tuningpars = new WCSimTuningParameters();
     enum DetConfiguration

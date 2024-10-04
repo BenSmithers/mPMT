@@ -18,7 +18,7 @@ WCSimTuningParameters::WCSimTuningParameters()
   rgcff = 0.32;
   mieff = 0.0;
 
-  pmtsurftype = 1;
+  pmtsurftype = 2;
   cathodepara = 0;
 
   // jl145 - For Top Veto
