@@ -55,10 +55,8 @@ file(COPY ${MACRO_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 
 add_executable(skPMT skPMT.cc ${sources} ${headers} ${DICT_OUTPUT})
 add_executable(hkPMT hkPMT.cc ${sources} ${headers} ${DICT_OUTPUT})
-add_executable(mPMT mPMT.cc ${sources} ${headers} ${DICT_OUTPUT})
 
 target_link_libraries(skPMT ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Core RIO Hist Tree)
-target_link_libraries(mPMT ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Core RIO Hist Tree)
 target_link_libraries(hkPMT ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Core RIO Hist Tree)
 
 
