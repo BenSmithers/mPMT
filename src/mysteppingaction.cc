@@ -73,22 +73,26 @@ double MySteppingAction::calculateIncidenceAngle(const G4ThreeVector &Momentum, 
 
 void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Track, G4String vol, bool opAbsorption, G4String postvol)
 {
-  if ((vol == "phisCath" && postvol == "inner_pmt_volume") || (vol == "inner_pmt_volume" && postvol == "phisCath") && !opAbsorption)
+  if ((vol == "phisCath" && postvol == "phys_world") || (vol == "phys_world" && postvol == "phisCath") && !opAbsorption)
   {
-    EventAction->RecordStep(2,Track->GetPosition(),1);
+    fEventAction->IncrementNumDetected();
+    EventAction->RecordStep(2, Track->GetPosition(), 1);
   }
   // opAbsorption in phisCath (not at boundary) won't produce a pe, count it as absorbed in glass
-  else if (vol=="phisCath" || vol == "glass1_volume" || vol == "glass2_volume")
+  else if (vol == "phisCath" || vol == "glass1_volume" || vol == "glass2_volume")
   {
-    EventAction->RecordStep(3,Track->GetPosition(),1);
+    fEventAction->IncrementNumAbsorbed();
+    EventAction->RecordStep(3, Track->GetPosition(), 1);
   }
   else if (vol == "mesh_grid_abyss")
   {
-    EventAction->RecordStep(4,Track->GetPosition(),1);
+    fEventAction->IncrementNumAbsorbed();
+    EventAction->RecordStep(4, Track->GetPosition(), 1);
   }
-  else if (vol == "plug_volume" || vol == "aluminum_volume" || vol == "phys_world" || vol == "physical_back_box" || vol == "phyiscal_dynode_box" || vol == "physical_faceplate")
+  else if (vol == "world_minus_pmt_volume" || vol == "plug_volume" || vol == "aluminum_volume" || vol == "phys_world" || vol == "physical_back_box" || vol == "phyiscal_dynode_box" || vol == "physical_faceplate")
   {
-    EventAction->RecordStep(5,Track->GetPosition(),1);
+    fEventAction->IncrementNumAbsorbed();
+    EventAction->RecordStep(5, Track->GetPosition(), 1);
   }
   else
   {
@@ -175,7 +179,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
         if (process->GetProcessName() == "OpBoundary")
         {
           opBoundary = static_cast<WCSimOpBoundaryProcess *>(process);
-          		      // G4cout<<"BOUNDARY PROCESS NAME == "<<opBoundary->GetProcessName()<<G4endl;
+          // G4cout<<"BOUNDARY PROCESS NAME == "<<opBoundary->GetProcessName()<<G4endl;
           if (opBoundary == nullptr)
           {
             std::cerr << "BOUNDARY IS NULL POINTER" << std::endl;
@@ -184,8 +188,21 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
 
           BoundaryMeta status = meta_status(boundaryStatus);
 
+          if (preVolumeName == "mesh_grid_abyss" || postVolumeName == "mesh_grid_abyss")
+          {
+            G4double rand = G4UniformRand();
+            if (rand > 0.75)
+            {
+              track->SetTrackStatus(fStopAndKill);
+            }
+          }
+
           // NoRINDEX is recorded as absorption
-          if (status == BAbsorption || status == BNoRINDEX) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
+          if (status == BNoRINDEX)
+          {
+            throw std::runtime_error("no r index");
+          }
+          if (status == BAbsorption) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
           {
             // fEventAction->IncrementNumAbsorbed();
             if (status == BAbsorption)
@@ -202,25 +219,25 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
 
           else if (status == BTransmission) // && (volume == "pmtGlassLogic"|| volume == "pmtInnerGlassLogic"))
           {
-            // fEventAction->IncrementNumTransmitted();
-            fEventAction->RecordStep(0,track->GetPosition(),0);
+            fEventAction->IncrementNumTransmitted();
+            fEventAction->RecordStep(0, track->GetPosition(), 0);
           }
 
           else if (status == BReflection) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
           {
-            // fEventAction->IncrementNumReflected();
-            fEventAction->RecordStep(1,track->GetPosition(),0);
+            fEventAction->IncrementNumReflected();
+            fEventAction->RecordStep(1, track->GetPosition(), 0);
           }
 
           else if (status == BOther)
           {
-            if (track->GetTrackStatus()==fStopAndKill)
+            if (track->GetTrackStatus() == fStopAndKill)
             {
-              fEventAction->RecordStep(7,track->GetPosition(),1);
+              fEventAction->RecordStep(7, track->GetPosition(), 1);
             }
             else
             {
-              fEventAction->RecordStep(7,track->GetPosition(),0);
+              fEventAction->RecordStep(7, track->GetPosition(), 0);
             }
             is_other = true;
           }
@@ -242,17 +259,21 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
 
   G4LogicalVolume *fScoringVolume = detectorConstruction->GetScoringVolume();
 
-  if (track->GetTrackStatus()==fStopAndKill && !is_absorbed && !is_other)
+  if (track->GetTrackStatus() == fStopAndKill && !is_absorbed && !is_other)
   {
     G4String procname = step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
     if (!step->GetPostStepPoint()->GetPhysicalVolume())
     {
       // If photon leaves the world volume
-      fEventAction->RecordStep(6,track->GetPosition(),1);
+      fEventAction->RecordStep(6, track->GetPosition(), 1);
     }
     else if (procname == "OpAbsorption")
     {
       // if the photon is not absorbed at a boundary but while it passes through material
+      RecordAbsorption(fEventAction, track, step->GetPostStepPoint()->GetPhysicalVolume()->GetName(), true);
+    }
+    else if (procname == "Transportation")
+    {
       RecordAbsorption(fEventAction, track, step->GetPostStepPoint()->GetPhysicalVolume()->GetName(), true);
     }
     else
@@ -271,7 +292,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
     //  G4Track* track = step->GetTrack();
     // is_absorbed
 
-    if (is_absorbed)
+    if (false)
     {
       track->SetTrackStatus(fStopAndKill);
     }

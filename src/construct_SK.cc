@@ -543,10 +543,12 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     if (pmtsurftype == 1)
     {
         OpGlassCathodeSurface->SetType(G4SurfaceType(101));
+        OpCathodeAirSurface->SetType(G4SurfaceType(101));
     }
     else if (pmtsurftype == 2)
     {
         OpGlassCathodeSurface->SetType(G4SurfaceType(102));
+        OpCathodeAirSurface->SetType(G4SurfaceType(102));
     }
     else if (pmtsurftype != 0)
     {
@@ -561,19 +563,8 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         if (cathodepara == 0)
         {
             printf("Using SK cathode optical parameters\n");
-            std::cout << "eV " << eV << std::endl;
-            std::cout << ENERGY_COATED_SK[0] << std::endl;
-            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_SK, COATEDRINDEXIM_glasscath_SK, NUMSK, true, false);
-            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_SK, COATEDRINDEX_glasscath_SK, NUMSK, true, false);
-
-            G4MaterialPropertyVector *pp = myST2->GetProperty("SCINTILLATIONCOMPONENT2");
-            std::cout << "aaaaaaaah " << pp->Value(1 * eV) << std::endl;
-            std::cout << "aaaaaaaah " << pp->Value(2 * eV) << std::endl;
-            std::cout << "aaaaaaaah " << pp->Value(3 * eV) << std::endl;
-            std::cout << "aaaaaaaah " << pp->Value(4 * eV) << std::endl;
-            std::cout << "aaaaaaaah " << pp->Value(5 * eV) << std::endl;
-            std::cout << "aaaaaaaah " << pp->Value(6 * eV) << std::endl;
-
+            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_SK, COATEDRINDEXIM_glasscath_SK, NUMSK);
+            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_SK, COATEDRINDEX_glasscath_SK, NUMSK);
             myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_SK);
             myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
         }
@@ -780,7 +771,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         "dynode_part3_log");
     G4LogicalVolume *world_minus_pmt_volume = new G4LogicalVolume(
         world_minus_pmt,
-        Vacuum,
+        Air,
         "world_minus_pmt_volume");
 
     G4RotationMatrix rotm = G4RotationMatrix();
@@ -791,7 +782,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
 
     G4LogicalVolume *mesh_logic = new G4LogicalVolume(
         mesh_hole,
-        absorberMaterial,
+        Aluminum,
         "mesh_logic");
     mesh_logic->SetVisAttributes(vis_absorber);
 
@@ -805,12 +796,13 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     // logical_inner_pmt->SetVisAttributes(invisible);
 
     logicWorld = new G4LogicalVolume(solidWorld,
-                                     Air, // Was Air, changed to Vacuum avoid absorption in air
+                                     Vacuum, // Was Air, changed to Vacuum avoid absorption in air
                                      "logicWorld");
 
     G4LogicalSkinSurface *FacePlateSkin = new G4LogicalSkinSurface("FacePlateSkin", dynode_part2_log, ReflectorSkinSurfaceDiffusy);
     G4LogicalSkinSurface *FacePlateSkin2 = new G4LogicalSkinSurface("FacePlateSkin2", dynode_part1_log, ReflectorSkinSurfaceDiffusy);
     G4LogicalSkinSurface *FacePlateSkin3 = new G4LogicalSkinSurface("FacePlateSkin3", dynode_part3_log, ReflectorSkinSurfaceDiffusy);
+    G4LogicalSkinSurface *mesh_surfaceskin = new G4LogicalSkinSurface("mesh_surfaceskin", mesh_logic, ReflectorSkinSurfaceDiffusy);
 
     G4VisAttributes *plug_visible = new G4VisAttributes();
     plug_visible->SetVisibility(true);
