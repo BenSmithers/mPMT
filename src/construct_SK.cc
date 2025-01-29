@@ -245,20 +245,30 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     ReflectorSkinSurfaceDiffusy->SetModel(unified);
     ReflectorSkinSurfaceDiffusy->SetFinish(polishedair);
 
-    G4MaterialPropertiesTable *ref = new G4MaterialPropertiesTable();
+    G4OpticalSurface *DynodeMeshMat = new G4OpticalSurface("DynodeMeshMat");
+    DynodeMeshMat->SetType(dielectric_metal);
+    DynodeMeshMat->SetModel(unified);
+    DynodeMeshMat->SetFinish(polishedair);
 
+    G4MaterialPropertiesTable *ref = new G4MaterialPropertiesTable();
     ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, 2);
-    ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.40, 0.40}, 2);
-    ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.55, 0.55}, 2);
-    ReflectorSkinSurface->SetMaterialPropertiesTable(ref);
-    Aluminum->SetMaterialPropertiesTable(ref);
+    ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.20, 0.20}, 2);
+    ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.60, 0.60}, 2);
 
     G4MaterialPropertiesTable *face_ref = new G4MaterialPropertiesTable();
     face_ref->AddProperty("REFLECTIVITY", new_e_reflect, new_reflect, 2);
-    face_ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.05, 0.05}, 2);
+    face_ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.20, 0.20}, 2);
     face_ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.30, 0.30}, 2);
-    ReflectorSkinSurfaceDiffusy->SetMaterialPropertiesTable(face_ref);
+
+    G4MaterialPropertiesTable *total_diffusion = new G4MaterialPropertiesTable();
+    total_diffusion->AddProperty("REFLECTIVITY", new_e_reflect, new_reflect, 2);
+    total_diffusion->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.00, 0.0}, 2);
+    total_diffusion->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.01, 0.01}, 2);
+
+    ReflectorSkinSurfaceDiffusy->SetMaterialPropertiesTable(ref);
     FacePlate->SetMaterialPropertiesTable(face_ref);
+    DynodeMeshMat->SetMaterialPropertiesTable(total_diffusion);
+    Aluminum->SetMaterialPropertiesTable(ref);
 
     const G4int numEntries = 2;
     const G4int NUMENTRIES_water = 60;
@@ -696,6 +706,14 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
                                               dynode_3z,
                                               dynode_3inner,
                                               dynode_3outer);
+
+    G4Tubs *dynode_internal = new G4Tubs(
+        "dynode_internal",
+        0,
+        48 * mm,
+        0.5 * 93 * mm,
+        0,
+        2 * pi);
     G4Tubs *mesh_hole = new G4Tubs(
         "mesh_hole",
         0,
@@ -752,6 +770,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         glass2_solid,
         PMTGlass,
         "logical_glass2");
+    // G4LogicalSkinSurface *glass2skin = new G4LogicalSkinSurface("glass2skin", logical_glass2, ReflectorSkinSurface);
     G4LogicalVolume *plug_logic = new G4LogicalVolume(
         plug_solid,
         absorberMaterial,
@@ -773,6 +792,11 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         world_minus_pmt,
         Air,
         "world_minus_pmt_volume");
+
+    G4LogicalVolume *dynode_internal_logical = new G4LogicalVolume(
+        dynode_internal,
+        Aluminum,
+        "dynode_internal_logical");
 
     G4RotationMatrix rotm = G4RotationMatrix();
     // G4SubtractionSolid *inner_minus_d1 = new G4SubtractionSolid("world_minus_pmt", inner_pmt_solid, dynode_part1, G4Transform3D(rotm, G4ThreeVector(0, 0, -130 * mm)));
@@ -802,7 +826,8 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4LogicalSkinSurface *FacePlateSkin = new G4LogicalSkinSurface("FacePlateSkin", dynode_part2_log, ReflectorSkinSurfaceDiffusy);
     G4LogicalSkinSurface *FacePlateSkin2 = new G4LogicalSkinSurface("FacePlateSkin2", dynode_part1_log, ReflectorSkinSurfaceDiffusy);
     G4LogicalSkinSurface *FacePlateSkin3 = new G4LogicalSkinSurface("FacePlateSkin3", dynode_part3_log, ReflectorSkinSurfaceDiffusy);
-    G4LogicalSkinSurface *mesh_surfaceskin = new G4LogicalSkinSurface("mesh_surfaceskin", mesh_logic, ReflectorSkinSurfaceDiffusy);
+    G4LogicalSkinSurface *DynodeSkin = new G4LogicalSkinSurface("DynodeSkin", dynode_internal_logical, ReflectorSkinSurfaceDiffusy);
+    G4LogicalSkinSurface *mesh_surfaceskin = new G4LogicalSkinSurface("mesh_surfaceskin", mesh_logic, DynodeMeshMat);
 
     G4VisAttributes *plug_visible = new G4VisAttributes();
     plug_visible->SetVisibility(true);
@@ -909,6 +934,14 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         G4ThreeVector(0, 0, -130 * mm),
         dynode_part3_log,
         "dynode_3_physical",
+        logicWorld,
+        false,
+        0);
+    G4VPhysicalVolume *dynode_internal_physical = new G4PVPlacement(
+        nullptr,
+        G4ThreeVector(0, 0, -130 * mm - 36 * mm),
+        dynode_internal_logical,
+        "dynode_internal_physical",
         logicWorld,
         false,
         0);

@@ -13,10 +13,10 @@ const G4double dynode_2z[dynode_2_count] = {shift - 94.0, shift - 96.0, shift - 
 const G4double dynode_2inner[dynode_2_count] = {64.0, 64.0, 64.0, 64.0, 45.0, 45.0};
 const G4double dynode_2outer[dynode_2_count] = {89.0, 89.0, 66.0, 66.0, 66.0, 66.0};
 
-const int dynode_3_count = 4;
-const G4double dynode_3z[dynode_3_count] = {shift - 147.0, shift - 149.0, shift - 149.1, shift - 199.0};
-const G4double dynode_3inner[dynode_3_count] = {45.0, 45.0, 99.0, 99.0};
-const G4double dynode_3outer[dynode_3_count] = {101.0, 101.0, 101.0, 101.0};
+const int dynode_3_count = 6;
+const G4double dynode_3z[dynode_3_count] = {shift - 147.0, shift - 149.0, shift - 149.1, shift - 199.0, shift - 199.1, shift - 201.0};
+const G4double dynode_3inner[dynode_3_count] = {50.0, 50.0, 99.0, 99.0, 75.0, 75.0};
+const G4double dynode_3outer[dynode_3_count] = {101.0, 101.0, 101.0, 101.0, 101.0, 101.0};
 
 const int cathode_layer = 225 + 48;
 

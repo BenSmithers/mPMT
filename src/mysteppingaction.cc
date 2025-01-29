@@ -191,10 +191,14 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
           if (preVolumeName == "mesh_grid_abyss" || postVolumeName == "mesh_grid_abyss")
           {
             G4double rand = G4UniformRand();
-            if (rand > 0.75)
+            if (rand > 0.50)
             {
               track->SetTrackStatus(fStopAndKill);
             }
+          }
+          else if (preVolumeName == "dynode_internal_logical" || postVolumeName == "dynode_internal_logical")
+          {
+            track->SetTrackStatus(fStopAndKill);
           }
 
           // NoRINDEX is recorded as absorption

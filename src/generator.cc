@@ -5,6 +5,108 @@ Author:    Mohit Gola 10th July 2023
 #include "generator.hh"
 #include "MyPrimaryGeneratorMessenger.hh"
 
+/* Precision Gen Part */
+
+PrecisionGen::PrecisionGen()
+{
+  fParticleGun = new G4ParticleGun(1);
+  fMessenger = new MyPrimaryGeneratorMessenger(this);
+  angleDegrees = 50.0;
+  angleRadians = angleDegrees * CLHEP::degree;
+  particleEnergy = 3.0996;
+}
+
+void PrecisionGen::SetDiscRad(G4double disc_rad)
+{
+  discRadius = disc_rad;
+}
+
+void PrecisionGen::SetAngle(G4double angle)
+{
+  angleDegrees = angle;
+  angleRadians = angleDegrees * CLHEP::degree;
+}
+
+void PrecisionGen::SetPAzimuthAngle(G4double aziangle)
+{
+  // angle is input in degrees, stored in radians
+  this->pAzimuthAngle = aziangle * CLHEP::degree;
+}
+
+void PrecisionGen::SetPZenithAngle(G4double zenangle)
+{
+  // angle is input in degrees, stored in radians
+  this->pZenithAngle = zenangle * CLHEP::degree;
+}
+
+void PrecisionGen::SetEnergy(G4double energy)
+{
+  particleEnergy = energy;
+}
+
+void PrecisionGen::SetX(G4double xpos)
+{
+  this->xpos = xpos;
+}
+
+void PrecisionGen::SetY(G4double ypos)
+{
+  this->ypos = ypos;
+}
+
+void PrecisionGen::SetZ(G4double zpos)
+{
+  this->zpos = zpos;
+}
+
+void PrecisionGen::SetSpread(G4double spread)
+{
+  this->spread = spread;
+}
+
+void PrecisionGen::GeneratePrimaries(G4Event *anEvent)
+{
+
+  G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
+  G4String particleName = "opticalphoton";
+  G4ParticleDefinition *particle = particleTable->FindParticle(particleName);
+
+  // zpos was 500*mm
+  G4double randomPhi = G4UniformRand() * 360.0 * deg;
+  G4ThreeVector initialPosition(xpos, ypos, zpos);
+
+  G4double azi = pAzimuthAngle;
+  G4double zen = pZenithAngle;
+
+  /*
+  At a zenith angle of 0, the vector will point in the negative z direction. As it increases, it bends towards the Y axis.
+  */
+
+  G4ThreeVector finalDirection = G4ThreeVector(sin(azi) * sin(zen),
+                                               cos(azi) * sin(zen),
+                                               -cos(zen));
+
+  // Calculate the direction vector towards the point (0, 0, 35.903)
+  // G4ThreeVector direction = (G4ThreeVector(0.0, 0.0, targetZ) - newPosition).unit();
+
+  // Print the new position and direction
+  fParticleGun->SetParticleDefinition(particle);
+  fParticleGun->SetParticleMomentumDirection(finalDirection);
+  fParticleGun->SetParticleEnergy(particleEnergy * eV);
+  fParticleGun->SetParticlePosition(initialPosition);
+  // fParticleGun->SetParticlePolarization(G4ThreeVector(0, 1.0, 0));
+
+  G4PrimaryVertex *vertex = new G4PrimaryVertex(initialPosition, 0.0);
+  G4PrimaryParticle *primary = new G4PrimaryParticle(particle);
+
+  G4ThreeVector momentun = finalDirection * particleEnergy;
+
+  vertex->SetPrimary(primary);
+  G4double checkEnergy = fParticleGun->GetParticleEnergy();
+
+  fParticleGun->GeneratePrimaryVertex(anEvent);
+}
+
 Laser::Laser()
 {
   fParticleGun = new G4ParticleGun(1);
@@ -70,7 +172,10 @@ void Laser::GeneratePrimaries(G4Event *anEvent)
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName);
 
   // zpos was 500*mm
-  G4ThreeVector initialPosition(xpos, ypos, zpos);
+  G4double randomPhi = G4UniformRand() * 360.0 * deg;
+  G4double randomRadius = std::sqrt(G4UniformRand()) * discRadius;
+  G4ThreeVector initialPosition(xpos + randomRadius * std::cos(randomPhi), ypos + randomRadius * std::sin(randomPhi), zpos);
+
   // Define the target Z coordinate
   double targetZ = 44.40 * mm;
 

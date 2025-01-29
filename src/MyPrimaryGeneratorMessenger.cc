@@ -143,8 +143,12 @@ void MyPrimaryGeneratorMessenger<gentype>::SetNewValue(G4UIcommand *command, G4S
 // we need these here so that they compile
 template void MyPrimaryGeneratorMessenger<NewGenerator>::SetNewValue(G4UIcommand *, G4String);
 template MyPrimaryGeneratorMessenger<NewGenerator>::MyPrimaryGeneratorMessenger(NewGenerator *);
+
 template void MyPrimaryGeneratorMessenger<MyPrimaryGenerator>::SetNewValue(G4UIcommand *, G4String);
 template MyPrimaryGeneratorMessenger<MyPrimaryGenerator>::MyPrimaryGeneratorMessenger(MyPrimaryGenerator *);
 
 template void MyPrimaryGeneratorMessenger<Laser>::SetNewValue(G4UIcommand *, G4String);
 template MyPrimaryGeneratorMessenger<Laser>::MyPrimaryGeneratorMessenger(Laser *);
+
+template void MyPrimaryGeneratorMessenger<PrecisionGen>::SetNewValue(G4UIcommand *, G4String);
+template MyPrimaryGeneratorMessenger<PrecisionGen>::MyPrimaryGeneratorMessenger(PrecisionGen *);

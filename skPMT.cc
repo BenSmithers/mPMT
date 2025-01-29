@@ -23,7 +23,7 @@ Author:   Mohit Gola 10th July 2023
 #include "G4VPhysicalVolume.hh"
 #include "G4StepLimiterPhysics.hh"
 
-using genmech = Laser;
+using genmech = PrecisionGen;
 
 int main(int argc, char **argv)
 {
@@ -48,7 +48,6 @@ int main(int argc, char **argv)
     G4int WCSimConfiguration = fwm;
 
     std::cout << "Starting Detector Construction" << std::endl;
-    skDetCon *myDetector = new skDetCon(WCSimConfiguration, tuningpars, true);
     // ConstructThing* singlepmt = new ConstructThing();
 
     genmech *primary_gen = new genmech();
@@ -57,8 +56,10 @@ int main(int argc, char **argv)
         primary_gen,
         "output_sk");
 
-    runManager->SetUserInitialization(myDetector);
     runManager->SetUserInitialization(actionman);
+
+    skDetCon *myDetector = new skDetCon(WCSimConfiguration, tuningpars, true);
+    runManager->SetUserInitialization(myDetector);
 
     std::cout << "Starting Initialization" << std::endl;
     runManager->Initialize();

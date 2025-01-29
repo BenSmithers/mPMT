@@ -50,3 +50,7 @@ template void MyActionInitialization<MyPrimaryGenerator>::Build() const;
 template MyActionInitialization<Laser>::MyActionInitialization(Laser *);
 template MyActionInitialization<Laser>::MyActionInitialization(Laser *, std::string);
 template void MyActionInitialization<Laser>::Build() const;
+
+template MyActionInitialization<PrecisionGen>::MyActionInitialization(PrecisionGen *);
+template MyActionInitialization<PrecisionGen>::MyActionInitialization(PrecisionGen *, std::string);
+template void MyActionInitialization<PrecisionGen>::Build() const;
