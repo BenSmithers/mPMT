@@ -232,44 +232,6 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
                                                  13.937926, 13.699244, 13.469614, 13.258739, 13.064613, 12.895495,
                                                  12.757626, 12.645281, 12.563377, 12.518963};
 
-    G4double new_e_reflect[2] = {1.7712e-09, 1e-08};
-    G4double new_reflect[2] = {40, 40};
-
-    G4OpticalSurface *ReflectorSkinSurface = new G4OpticalSurface("ReflectorSurface");
-    ReflectorSkinSurface->SetType(dielectric_metal);
-    ReflectorSkinSurface->SetModel(unified);
-    ReflectorSkinSurface->SetFinish(polishedair);
-
-    G4OpticalSurface *ReflectorSkinSurfaceDiffusy = new G4OpticalSurface("ReflectorSkinSurfaceDiffusy");
-    ReflectorSkinSurfaceDiffusy->SetType(dielectric_metal);
-    ReflectorSkinSurfaceDiffusy->SetModel(unified);
-    ReflectorSkinSurfaceDiffusy->SetFinish(polishedair);
-
-    G4OpticalSurface *DynodeMeshMat = new G4OpticalSurface("DynodeMeshMat");
-    DynodeMeshMat->SetType(dielectric_metal);
-    DynodeMeshMat->SetModel(unified);
-    DynodeMeshMat->SetFinish(polishedair);
-
-    G4MaterialPropertiesTable *ref = new G4MaterialPropertiesTable();
-    ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, 2);
-    ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.20, 0.20}, 2);
-    ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.60, 0.60}, 2);
-
-    G4MaterialPropertiesTable *face_ref = new G4MaterialPropertiesTable();
-    face_ref->AddProperty("REFLECTIVITY", new_e_reflect, new_reflect, 2);
-    face_ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.20, 0.20}, 2);
-    face_ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.30, 0.30}, 2);
-
-    G4MaterialPropertiesTable *total_diffusion = new G4MaterialPropertiesTable();
-    total_diffusion->AddProperty("REFLECTIVITY", new_e_reflect, new_reflect, 2);
-    total_diffusion->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.00, 0.0}, 2);
-    total_diffusion->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.01, 0.01}, 2);
-
-    ReflectorSkinSurfaceDiffusy->SetMaterialPropertiesTable(ref);
-    FacePlate->SetMaterialPropertiesTable(face_ref);
-    DynodeMeshMat->SetMaterialPropertiesTable(total_diffusion);
-    Aluminum->SetMaterialPropertiesTable(ref);
-
     const G4int numEntries = 2;
     const G4int NUMENTRIES_water = 60;
 
@@ -538,6 +500,50 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4double REFLECTIVITY_glasscath[NUM] = {1.0 * RGCFF, 1.0 * RGCFF};
     G4double EFFICIENCY_glasscath[NUM] = {0.0, 0.0};
     G4double PP[NUM] = {1.4E-9 * GeV, 6.2E-9 * GeV};
+
+    G4double new_e_reflect[2] = {1.7712e-09, 1e-08};
+    G4double new_reflect[2] = {40, 40};
+
+    G4OpticalSurface *ReflectorSkinSurface = new G4OpticalSurface("ReflectorSurface");
+    ReflectorSkinSurface->SetType(dielectric_metal);
+    ReflectorSkinSurface->SetModel(unified);
+    ReflectorSkinSurface->SetFinish(polishedair);
+
+    G4OpticalSurface *ReflectorSkinSurfaceDiffusy = new G4OpticalSurface("ReflectorSkinSurfaceDiffusy");
+    ReflectorSkinSurfaceDiffusy->SetType(dielectric_metal);
+    ReflectorSkinSurfaceDiffusy->SetModel(unified);
+    ReflectorSkinSurfaceDiffusy->SetFinish(polishedair);
+
+    G4OpticalSurface *DynodeMeshMat = new G4OpticalSurface("DynodeMeshMat");
+    DynodeMeshMat->SetType(dielectric_metal);
+    DynodeMeshMat->SetModel(unified);
+    DynodeMeshMat->SetFinish(polishedair);
+
+    G4MaterialPropertiesTable *ref = new G4MaterialPropertiesTable();
+    ref->AddProperty("REFLECTIVITY", ENERGY_ref, REFLECTIVITY_ref, 2);
+    ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.20, 0.20}, 2);
+    ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.60, 0.60}, 2);
+    ref->AddProperty("RINDEX", ENERGY_glass, RINDEX_glass2, 45);
+    ref->AddProperty("ABSLENGTH", ENERGY_glass, ABSORPTION_glass2, 45);
+
+    G4MaterialPropertiesTable *face_ref = new G4MaterialPropertiesTable();
+    face_ref->AddProperty("REFLECTIVITY", new_e_reflect, new_reflect, 2);
+    face_ref->AddProperty("RINDEX", ENERGY_glass, RINDEX_glass2, 45);
+    face_ref->AddProperty("ABSLENGTH", ENERGY_glass, ABSORPTION_glass2, 45);
+    face_ref->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.20, 0.20}, 2);
+    face_ref->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.30, 0.30}, 2);
+
+    G4MaterialPropertiesTable *total_diffusion = new G4MaterialPropertiesTable();
+    total_diffusion->AddProperty("REFLECTIVITY", new_e_reflect, new_reflect, 2);
+    total_diffusion->AddProperty("SPECULARSPIKECONSTANT", {0, 1e9}, {0.00, 0.0}, 2);
+    total_diffusion->AddProperty("SPECULARLOBECONSTANT", {0, 1e9}, {0.01, 0.01}, 2);
+    total_diffusion->AddProperty("RINDEX", ENERGY_glass, RINDEX_glass2, 45);
+    total_diffusion->AddProperty("ABSLENGTH", ENERGY_glass, ABSORPTION_glass2, 45);
+
+    ReflectorSkinSurfaceDiffusy->SetMaterialPropertiesTable(ref);
+    FacePlate->SetMaterialPropertiesTable(face_ref);
+    DynodeMeshMat->SetMaterialPropertiesTable(total_diffusion);
+    Aluminum->SetMaterialPropertiesTable(ref);
 
     G4MaterialPropertiesTable *myST2 = new G4MaterialPropertiesTable();
     myST2->AddProperty("RINDEX", ENERGY_glass, RINDEX_glass2, 45);
