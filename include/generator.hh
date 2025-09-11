@@ -20,6 +20,11 @@ Author:    Mohit Gola 10th July 2023
 #include "G4DynamicParticle.hh"
 #include "MyPrimaryGeneratorMessenger.hh"
 
+const float A = 254.564663 * mm;
+const float B = 254.110205 * mm;
+const float E = 0.5 * (A + B);
+const float C = 186.002389 * mm;
+
 class Laser : public G4VUserPrimaryGeneratorAction
 {
 public:

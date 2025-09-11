@@ -3,6 +3,7 @@
 #include "WCSimTuningMessenger.hh"
 #include "WCSimRootOptions.hh"
 #include "globals.hh"
+#include "G4SystemOfUnits.hh"
 
 class WCSimTuningParameters
 {
@@ -10,43 +11,43 @@ public:
   WCSimTuningParameters();
   ~WCSimTuningParameters();
 
-
   // Setters and getters
-  G4double GetRayff() {return rayff;}
-  void SetRayff(G4double rparam) {rayff=rparam;}
+  G4double GetRayff() { return rayff; }
+  void SetRayff(G4double rparam) { rayff = rparam; }
 
-  G4double GetBsrff() {return bsrff;}
-  void SetBsrff(G4double rparam) {bsrff=rparam;}
+  G4double GetBsrff() { return bsrff; }
+  void SetBsrff(G4double rparam) { bsrff = rparam; }
 
-  G4double GetAbwff() {return abwff;}
-  void SetAbwff(G4double rparam) {abwff=rparam;}
+  G4double GetAbwff() { return abwff; }
+  void SetAbwff(G4double rparam) { abwff = rparam; }
 
-  G4double GetRgcff() {return rgcff;}
-  void SetRgcff(G4double rparam) {rgcff=rparam;}
+  G4double GetRgcff() { return rgcff; }
+  void SetRgcff(G4double rparam) { rgcff = rparam; }
 
-  G4double GetMieff() {return mieff;}
-  void SetMieff(G4double rparam) {mieff=rparam;}
+  G4double GetMieff() { return mieff; }
+  void SetMieff(G4double rparam) { mieff = rparam; }
 
-  G4int GetPMTSurfType() {return pmtsurftype;}
-  void SetPMTSurfType(G4double rparam) {pmtsurftype=rparam;}
+  G4int GetPMTSurfType() { return pmtsurftype; }
+  void SetPMTSurfType(G4double rparam) { pmtsurftype = rparam; }
 
-  G4int GetCathodePara() {return cathodepara;}
-  void SetCathodePara(G4double rparam) {cathodepara=rparam;}
+  G4int GetCathodePara() { return cathodepara; }
+  void SetCathodePara(G4double rparam) { cathodepara = rparam; }
 
-  //For Top Veto - jl145
-  G4double GetTVSpacing() {return tvspacing;}
-  void SetTVSpacing(G4double tparam) {tvspacing=tparam;}
+  // For Top Veto - jl145
+  G4double GetTVSpacing() { return tvspacing; }
+  void SetTVSpacing(G4double tparam) { tvspacing = tparam; }
 
-  G4bool GetTopVeto() {return topveto;}
-  void SetTopVeto(G4double tparam) {topveto=tparam;}
+  G4bool GetTopVeto() { return topveto; }
+  void SetTopVeto(G4double tparam) { topveto = tparam; }
 
-  void SaveOptionsToOutput(WCSimRootOptions * wcopt);
+  G4bool GetThickness() { return thickness; }
+  void SetThickness(G4double thisthick) { thickness = thisthick * nm; }
+
+  void SaveOptionsToOutput(WCSimRootOptions *wcopt);
 
 private:
-
   // The messenger
-  WCSimTuningMessenger* TuningMessenger;
-
+  WCSimTuningMessenger *TuningMessenger;
 
   // The parameters that need to be set before WCSimDetectorConstruction
   // is created
@@ -56,22 +57,15 @@ private:
   G4double abwff;
   G4double rgcff;
   G4double mieff;
+  G4double thickness;
 
   // PMT photocathode surface properties
   G4int pmtsurftype;
   G4int cathodepara;
 
-  //For Top Veto - jl145
+  // For Top Veto - jl145
   G4double tvspacing;
   G4bool topveto;
-
 };
 
 #endif
-
-
-
-
-
-
-

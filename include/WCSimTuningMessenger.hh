@@ -1,5 +1,5 @@
-/*                                                                                                                         
-Author:    Mohit Gola 10th July 2023                                                                                       
+/*
+Author:    Mohit Gola 10th July 2023
 */
 
 #ifndef WCSimTuningMessenger_h
@@ -15,36 +15,35 @@ class WCSimTuningParameters;
 class G4UIdirectory;
 class G4UIcommand;
 class G4UIcmdWithADouble;
-class G4UIcmdWithABool; //jl145
+class G4UIcmdWithABool; // jl145
 class G4UIcmdWithAnInteger;
 
-
-class WCSimTuningMessenger: public G4UImessenger
+class WCSimTuningMessenger : public G4UImessenger
 {
 public:
-  WCSimTuningMessenger(WCSimTuningParameters*);
+  WCSimTuningMessenger(WCSimTuningParameters *);
   ~WCSimTuningMessenger();
 
-  void SetNewValue(G4UIcommand* command, G4String newValue);
+  void SetNewValue(G4UIcommand *command, G4String newValue);
 
 private:
+  WCSimTuningParameters *WCSimTuningParams;
 
-  WCSimTuningParameters* WCSimTuningParams;
+  G4UIdirectory *WCSimDir;
+  G4UIcmdWithADouble *Rayff;
+  G4UIcmdWithADouble *Bsrff;
+  G4UIcmdWithADouble *Abwff;
+  G4UIcmdWithADouble *Rgcff;
+  G4UIcmdWithADouble *Mieff;
 
-  G4UIdirectory*      WCSimDir;
-  G4UIcmdWithADouble* Rayff;
-  G4UIcmdWithADouble* Bsrff;
-  G4UIcmdWithADouble* Abwff;
-  G4UIcmdWithADouble* Rgcff;
-  G4UIcmdWithADouble* Mieff;
+  G4UIcmdWithADouble *SetThick;
 
-  G4UIcmdWithAnInteger* PMTSurfType;
-  G4UIcmdWithAnInteger* CathodePara;
+  G4UIcmdWithAnInteger *PMTSurfType;
+  G4UIcmdWithAnInteger *CathodePara;
 
-  //For Top Veto - jl145
-  G4UIcmdWithADouble* TVSpacing;
-  G4UIcmdWithABool* TopVeto;
-
+  // For Top Veto - jl145
+  G4UIcmdWithADouble *TVSpacing;
+  G4UIcmdWithABool *TopVeto;
 };
 
 #endif

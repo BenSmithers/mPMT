@@ -11,7 +11,7 @@ PrecisionGen::PrecisionGen()
 {
   fParticleGun = new G4ParticleGun(1);
   fMessenger = new MyPrimaryGeneratorMessenger(this);
-  angleDegrees = 50.0;
+  angleDegrees = 0.0;
   angleRadians = angleDegrees * CLHEP::degree;
   particleEnergy = 3.0996;
 }
@@ -73,10 +73,22 @@ void PrecisionGen::GeneratePrimaries(G4Event *anEvent)
 
   // zpos was 500*mm
   G4double randomPhi = G4UniformRand() * 360.0 * deg;
-  G4ThreeVector initialPosition(xpos, ypos, zpos);
+
+  // makes them between 0-90
+  G4double randomTheta = acos(G4UniformRand());
+
+  G4ThreeVector initialPosition(
+      E * sin(randomTheta) * cos(randomPhi) * 1.05,
+      E * sin(randomTheta) * sin(randomPhi) * 1.05,
+      C * cos(randomTheta));
 
   G4double azi = pAzimuthAngle;
   G4double zen = pZenithAngle;
+
+  G4ThreeVector finalPosition(
+      initialPosition[0],
+      initialPosition[1] + 10 * cos(pZenithAngle) * mm,
+      initialPosition[2] - 10 * sin(pZenithAngle) * mm);
 
   /*
   At a zenith angle of 0, the vector will point in the negative z direction. As it increases, it bends towards the Y axis.
@@ -93,10 +105,10 @@ void PrecisionGen::GeneratePrimaries(G4Event *anEvent)
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleMomentumDirection(finalDirection);
   fParticleGun->SetParticleEnergy(particleEnergy * eV);
-  fParticleGun->SetParticlePosition(initialPosition);
+  fParticleGun->SetParticlePosition(finalPosition);
   // fParticleGun->SetParticlePolarization(G4ThreeVector(0, 1.0, 0));
 
-  G4PrimaryVertex *vertex = new G4PrimaryVertex(initialPosition, 0.0);
+  G4PrimaryVertex *vertex = new G4PrimaryVertex(finalPosition, 0.0);
   G4PrimaryParticle *primary = new G4PrimaryParticle(particle);
 
   G4ThreeVector momentun = finalDirection * particleEnergy;
