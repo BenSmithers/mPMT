@@ -6,6 +6,7 @@ Modified:  Mohit Gola 10th July 2023
 
 #include "WCSimTuningParameters.hh"
 #include "WCSimTuningMessenger.hh"
+#include "G4SystemOfUnits.hh"
 
 WCSimTuningParameters::WCSimTuningParameters()
 {
@@ -17,9 +18,19 @@ WCSimTuningParameters::WCSimTuningParameters()
   abwff = 1.30;
   rgcff = 0.32;
   mieff = 0.0;
+  thickness = 10.5 * nm;
 
+  // the model type, like 101 or 102
+  // 0 - nothing?
+  // 1 - 101
+  // 2 - 102
   pmtsurftype = 2;
-  cathodepara = 0;
+
+  // cathode material
+  // 0- sk
+  // 1- KCsCb
+  // 2- RbCsCb
+  cathodepara = 1;
 
   // jl145 - For Top Veto
   tvspacing = 100.0;

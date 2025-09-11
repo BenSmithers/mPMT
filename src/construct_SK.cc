@@ -586,10 +586,10 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         }
         else if (cathodepara == 1)
         {
-            printf("Using KCsCb cathode optical parameters\n");
-            myST2->AddProperty("SCINTILLATIONCOMPONENT2", ENERGY_COATED_WAV, COATEDRINDEX_glasscath_KCsCb, NUMWAV);
-            myST2->AddProperty("SCINTILLATIONCOMPONENT1", ENERGY_COATED_WAV, COATEDRINDEXIM_glasscath_KCsCb, NUMWAV);
-            myST2->AddConstProperty("COATEDTHICKNESS", COATEDTHICKNESS_glasscath_KCsCb);
+            printf("Using KCsCb cathode optical parameters with thickness \n");
+            myST2->AddProperty("SCINTILLATIONCOMPONENT2", NEW_ENERGY_COATED_WAV, COATEDRINDEX_glasscath_KCsCb, NEWNUMWAV);
+            myST2->AddProperty("SCINTILLATIONCOMPONENT1", NEW_ENERGY_COATED_WAV, COATEDRINDEXIM_glasscath_KCsCb, NEWNUMWAV);
+            myST2->AddConstProperty("COATEDTHICKNESS", WCSimTuningParams->GetThickness());
             myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
         }
         else if (cathodepara == 2)
