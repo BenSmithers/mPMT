@@ -53,6 +53,12 @@ int main(int argc, char **argv)
 
     genmech *primary_gen = new genmech();
 
+    G4UImanager *UImanager = G4UImanager::GetUIpointer();
+
+    UImanager->ApplyCommand("/control/execute tuning_parameters.mac");
+    UImanager->ApplyCommand("/gui/addMenu true");
+    UImanager->ApplyCommand("/tracking/verbose 1");
+
     MyActionInitialization<genmech> *actionman = new MyActionInitialization<genmech>(
         primary_gen,
         "output_sk");
@@ -74,12 +80,6 @@ int main(int argc, char **argv)
 
     G4VisManager *visManager = new G4VisExecutive();
     visManager->Initialize();
-
-    G4UImanager *UImanager = G4UImanager::GetUIpointer();
-
-    UImanager->ApplyCommand("/control/execute tuning_parameters.mac");
-    UImanager->ApplyCommand("/gui/addMenu true");
-    UImanager->ApplyCommand("/tracking/verbose 1");
 
     //  runManager->SetUserAction(generator);
 
