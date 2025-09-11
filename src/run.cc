@@ -7,15 +7,6 @@ Author:    Mohit Gola 10th July 2023
 MyRunAction::MyRunAction()
 {
   G4AnalysisManager *man = G4AnalysisManager::Instance();
-  man->OpenFile(name_template + ".root");
-
-  G4int master_ntupleId = man->CreateNtuple("Photons_Master", "Photons_Master");
-
-  man->CreateNtupleIColumn(master_ntupleId, "Scanpoint_ID");
-  man->CreateNtupleDColumn(master_ntupleId, "PosX_Initial");
-  man->CreateNtupleDColumn(master_ntupleId, "PosY_Initial");
-  man->CreateNtupleDColumn(master_ntupleId, "PosZ_Initial");
-  man->FinishNtuple(master_ntupleId);
 }
 
 MyRunAction::~MyRunAction()
@@ -28,6 +19,16 @@ void MyRunAction::BeginOfRunAction(const G4Run *run)
 {
   G4AnalysisManager *man = G4AnalysisManager::Instance();
   G4RunManager *runManager = G4RunManager::GetRunManager();
+
+  man->OpenFile(name_template + ".root");
+
+  G4int master_ntupleId = man->CreateNtuple("Photons_Master", "Photons_Master");
+
+  man->CreateNtupleIColumn(master_ntupleId, "Scanpoint_ID");
+  man->CreateNtupleDColumn(master_ntupleId, "PosX_Initial");
+  man->CreateNtupleDColumn(master_ntupleId, "PosY_Initial");
+  man->CreateNtupleDColumn(master_ntupleId, "PosZ_Initial");
+  man->FinishNtuple(master_ntupleId);
 
   std::stringstream strRunId;
   runId = run->GetRunID();
@@ -64,8 +65,8 @@ void MyRunAction::EndOfRunAction(const G4Run *)
     if (myEventAction)
     {
       man->FillNtupleIColumn(master_ntupleId, 0, runId);
-      man->FillNtupleDColumn(master_ntupleId, 1, myEventAction->GetPosX());                                                                     
-      man->FillNtupleDColumn(master_ntupleId, 2, myEventAction->GetPosY());                                                                     
+      man->FillNtupleDColumn(master_ntupleId, 1, myEventAction->GetPosX());
+      man->FillNtupleDColumn(master_ntupleId, 2, myEventAction->GetPosY());
       man->FillNtupleDColumn(master_ntupleId, 3, myEventAction->GetPosZ());
       man->AddNtupleRow(master_ntupleId);
       myEventAction->ResetCounters();

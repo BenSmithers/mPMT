@@ -13,7 +13,6 @@ Author:   Mohit Gola 10th July 2023
 #include "G4SteppingManager.hh"
 
 #include "physics.hh"
-#include "action.hh"
 #include "mysteppingaction.hh"
 #include "WCSimTuningParameters.hh"
 #include "generator.hh"
@@ -22,6 +21,8 @@ Author:   Mohit Gola 10th July 2023
 
 #include "G4VPhysicalVolume.hh"
 #include "G4StepLimiterPhysics.hh"
+
+#include "action.hh"
 
 using genmech = PrecisionGen;
 

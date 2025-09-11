@@ -25,7 +25,7 @@
 #include "G4IntersectionSolid.hh"
 #include "G4Material.hh"
 #include "G4SDManager.hh"
-#include "mysteppingaction.hh"
+
 #include "G4UserLimits.hh"
 #include "G4EventManager.hh"
 #include "G4RunManager.hh"

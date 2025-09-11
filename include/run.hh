@@ -20,13 +20,13 @@ public:
   MyRunAction();
   ~MyRunAction();
 
-  void set_name_template(std::string name) { name_template = name; }
+  void set_name_template(const G4String name) { name_template = name; }
 
   virtual void BeginOfRunAction(const G4Run *);
   virtual void EndOfRunAction(const G4Run *);
 
 private:
-  std::string name_template = "output";
+  G4String name_template = "output";
   G4int TotalNumAbsorbed;
   G4int TotalNumReflected;
   G4int TotalNumTransmitted;
