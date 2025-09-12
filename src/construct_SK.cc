@@ -575,7 +575,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     if (pmtsurftype != 0)
     {
         G4int cathodepara = WCSimTuningParams->GetCathodePara(); // Choose predefined set of optical parameters
-        G4cout << "CATHODE PARAMETER == " << cathodepara << G4endl;
+        G4double thicky = WCSimTuningParams->GetThickness();
         if (cathodepara == 0)
         {
             printf("Using SK cathode optical parameters\n");
@@ -586,10 +586,10 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         }
         else if (cathodepara == 1)
         {
-            printf("Using KCsCb cathode optical parameters with thickness \n");
+            G4cout << "Using KCsCb cathode optical parameters with thickness " << thicky << G4endl;
             myST2->AddProperty("SCINTILLATIONCOMPONENT2", NEW_ENERGY_COATED_WAV, COATEDRINDEX_glasscath_KCsCb, NEWNUMWAV);
             myST2->AddProperty("SCINTILLATIONCOMPONENT1", NEW_ENERGY_COATED_WAV, COATEDRINDEXIM_glasscath_KCsCb, NEWNUMWAV);
-            myST2->AddConstProperty("COATEDTHICKNESS", WCSimTuningParams->GetThickness());
+            myST2->AddConstProperty("COATEDTHICKNESS", thicky);
             myST2->AddConstProperty("COATEDFRUSTRATEDTRANSMISSION", COATEDFRUSTRATEDTRANSMISSION_glasscath);
         }
         else if (cathodepara == 2)
@@ -968,7 +968,6 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     G4LogicalBorderSurface *cathodeglasstoinner = new G4LogicalBorderSurface("cathodeglasstoinner", phisCath, physical_world, OpGlassCathodeSurface);
     G4LogicalBorderSurface *cathodeinnertoglass = new G4LogicalBorderSurface("cathodeinnertoglass", physical_world, phisCath, OpCathodeAirSurface);
 
-    WCSimTuningParameters *tuningpars = new WCSimTuningParameters();
     enum DetConfiguration
     {
         wfm = 1,
@@ -976,7 +975,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     };
     G4int WCSimConfiguration = fwm;
 
-    skDetCon myDetector(WCSimConfiguration, tuningpars, is_sk);
+    skDetCon myDetector(WCSimConfiguration, WCSimTuningParams, is_sk);
 
     return physical_world;
 }

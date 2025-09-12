@@ -40,7 +40,7 @@ public:
   G4bool GetTopVeto() { return topveto; }
   void SetTopVeto(G4double tparam) { topveto = tparam; }
 
-  G4bool GetThickness() { return thickness; }
+  G4double GetThickness() { return thickness; }
   void SetThickness(G4double thisthick) { thickness = thisthick * nm; }
 
   void SaveOptionsToOutput(WCSimRootOptions *wcopt);

@@ -24,7 +24,7 @@ WCSimTuningMessenger::WCSimTuningMessenger(WCSimTuningParameters *WCTuningPars) 
 
   SetThick = new G4UIcmdWithADouble("/WCSim/tuning/thickness", this);
   SetThick->SetGuidance("Set the thickness of the photocathode in nm");
-  SetThick->SetParameterName("thickness", true);
+  SetThick->SetParameterName("SetThick", true);
   SetThick->SetDefaultValue(10.5);
 
   Bsrff = new G4UIcmdWithADouble("/WCSim/tuning/bsrff", this);
@@ -177,6 +177,5 @@ void WCSimTuningMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
   else if (command == SetThick)
   {
     WCSimTuningParams->SetThickness(SetThick->GetNewDoubleValue(newValue));
-    printf("Setting new thickness %f\n", SetThick->GetNewDoubleValue(newValue));
   }
 }
