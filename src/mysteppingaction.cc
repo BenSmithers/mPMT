@@ -80,7 +80,7 @@ void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Tra
     EventAction->RecordStep(2, Track->GetPosition(), 1);
   }
   // opAbsorption in phisCath (not at boundary) won't produce a pe, count it as absorbed in glass
-  else if (vol == "totalPMT" || vol == "pmtPhysReflector" || vol == "pmtPhysInnerTube" || vol == "pmtInnerPhysBulb" || vol == "innerReflector")
+  else if (vol == "totalPMT" || vol == "pmtPhysBulb" || vol == "pmtPhysReflector" || vol == "pmtPhysInnerTube" || vol == "pmtInnerPhysBulb" || vol == "innerReflector")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(3, Track->GetPosition(), 1);
