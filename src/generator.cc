@@ -123,7 +123,7 @@ Laser::Laser()
 {
   fParticleGun = new G4ParticleGun(1);
   fMessenger = new MyPrimaryGeneratorMessenger(this);
-  angleDegrees = 50.0;
+  angleDegrees = 0.0;
   angleRadians = angleDegrees * CLHEP::degree;
   particleEnergy = 3.0996;
 }

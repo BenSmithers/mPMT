@@ -53,21 +53,21 @@ public:
 
   static myDetectorConstruction* GetInstance() {return instance;}
   
-  G4LogicalVolume *ConstructPMT();
-
+  G4LogicalVolume *ConstructPMT() ;
   G4LogicalVolume *GetScoringVolume() const { return fScoringVolume; }
   G4LogicalVolume *GetScoringPMTVolume() const { return fScoringPMTVolume; }
   G4LogicalVolume *GetScoringInnerPMTVolume() const { return fScoringInnerPMTVolume; }
 
   virtual G4VPhysicalVolume *Construct();
+  G4VPhysicalVolume* GetWorldVolume() const {return physWorld; }
 
 
 private:
+  G4VPhysicalVolume* physWorld;
   static myDetectorConstruction* instance;
   G4double density;
   G4double a;
 
-  
   G4LogicalVolume *logicabsorber;
   G4LogicalVolume *logicCombine;
   G4LogicalVolume *pmtGlassLogic;

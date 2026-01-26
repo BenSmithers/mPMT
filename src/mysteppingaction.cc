@@ -73,32 +73,53 @@ double MySteppingAction::calculateIncidenceAngle(const G4ThreeVector &Momentum, 
 
 void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Track, G4String vol, bool opAbsorption, G4String postvol)
 {
-  if ((vol == "phisCath" && postvol == "phys_world") || (vol == "phys_world" && postvol == "phisCath") && !opAbsorption)
+  // pmtPhysBulb and  pmtInnerPhysBulb
+  if ((vol == "pmtPhysBulb" && postvol == "pmtInnerPhysBulb") || (vol == "pmtInnerPhysBulb" && postvol == "pmtPhysBulb") && !opAbsorption)
   {
     fEventAction->IncrementNumDetected();
     EventAction->RecordStep(2, Track->GetPosition(), 1);
   }
   // opAbsorption in phisCath (not at boundary) won't produce a pe, count it as absorbed in glass
-  else if (vol == "phisCath" || vol == "glass1_volume" || vol == "glass2_volume")
+  else if (vol == "totalPMT" || vol == "pmtPhysReflector" || vol == "pmtPhysInnerTube" || vol == "pmtInnerPhysBulb" || vol == "innerReflector")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(3, Track->GetPosition(), 1);
   }
-  else if (vol == "mesh_grid_abyss")
+  else if (vol == "pmtAbsorber")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(4, Track->GetPosition(), 1);
   }
-  else if (vol == "world_minus_pmt_volume" || vol == "plug_volume" || vol == "aluminum_volume" || vol == "phys_world" || vol == "physical_back_box" || vol == "phyiscal_dynode_box" || vol == "physical_faceplate")
+  else if (vol == "physWorld")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(5, Track->GetPosition(), 1);
   }
+  else if (vol == "Matrix" || vol == "gelPhys" || vol == "physDome" || vol == "physCylinder")
+  {
+    fEventAction->IncrementNumAbsorbed();
+    EventAction->RecordStep(6, Track->GetPosition(), 1);
+  }
   else
   {
-    std::ostringstream volerror;
-    volerror << "This volume hasn't been accounted for: " << vol;
-    throw std::runtime_error(volerror.str());
+    bool found = false;
+    G4String this_name;
+    for (int pmtIndex = 0; pmtIndex < 20; pmtIndex++)
+    {
+      this_name = "PMTCopy" + G4String(std::to_string(pmtIndex));
+      if (vol == this_name)
+      {
+        fEventAction->IncrementNumAbsorbed();
+        EventAction->RecordStep(7 + pmtIndex, Track->GetPosition(), 1);
+        found = true;
+      }
+    }
+    if (not found)
+    {
+      std::ostringstream volerror;
+      volerror << "This volume hasn't been accounted for: " << vol;
+      throw std::runtime_error(volerror.str());
+    }
   }
 }
 
@@ -204,7 +225,9 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
           // NoRINDEX is recorded as absorption
           if (status == BNoRINDEX)
           {
-            throw std::runtime_error("no r index");
+            track->SetTrackStatus(fStopAndKill);
+            // std::cout << "stepping from " << preVolume->GetName() << " to " << postVolume->GetName() << std::endl;
+            // throw std::runtime_error("no r index");
           }
           if (status == BAbsorption) // && (volume == "pmtGlassLogic" || volume == "pmtInnerGlassLogic"))
           {
@@ -251,7 +274,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
   }
   else
   {
-    std::cout << track->GetDefinition()->GetParticleName();
+    // std::cout << track->GetDefinition()->GetParticleName();
   }
   //    }
   //	}
