@@ -1,7 +1,6 @@
-/*                                                                                                                      
-Author:    Mohit Gola 10th July 2023                                                                                      
+/*
+Author:    Mohit Gola 10th July 2023
 */
-
 
 #ifndef EVENT_HH
 #define EVENT_HH
@@ -9,7 +8,7 @@ Author:    Mohit Gola 10th July 2023
 #include "G4UserEventAction.hh"
 #include "G4Event.hh"
 #include "G4RunManager.hh"
-//#include "G4AnalysisManager.hh"
+// #include "G4AnalysisManager.hh"
 #include "G4UIcommand.hh"
 
 #include <G4AnalysisManager.hh>
@@ -27,10 +26,10 @@ public:
   MyEventAction();
   ~MyEventAction();
 
-  virtual void BeginOfEventAction(const G4Event*);
-  virtual void EndOfEventAction(const G4Event*);
+  virtual void BeginOfEventAction(const G4Event *);
+  virtual void EndOfEventAction(const G4Event *);
 
-  void AddEdep(G4double edep) {fEdep += edep; }
+  void AddEdep(G4double edep) { fEdep += edep; }
   void IncrementNumAbsorbed();
   void IncrementNumDetected();
   void IncrementNumReflected();
@@ -41,18 +40,19 @@ public:
   G4int GetNumDetected() const;
   G4int GetNumReflected() const;
   G4int GetNumTransmitted() const;
-  G4double GetPosX() {return xpos;}
-  G4double GetPosY() {return ypos;}
-  G4double GetPosZ() {return zpos;}
+  G4double GetPosX() { return xpos; }
+  G4double GetPosY() { return ypos; }
+  G4double GetPosZ() { return zpos; }
 
-  void SetPhotonAngle(G4double Angle) {photonAngle = Angle;}
-  void SetPosX(G4double PosX) {xpos = PosX;}
-  void SetPosY(G4double PosY) {ypos = PosY;}
-  void SetPosZ(G4double PosZ) {zpos = PosZ;}
-  void SetScanpointNtupleID(G4double ScanpointNtupleID) {scanpoint_ntupleId = ScanpointNtupleID;}
-  void ResetPhotNum() {photnum=1;}
+  void SetPhotonAngle(G4double Angle) { photonAngle = Angle; }
+  void SetPosX(G4double PosX) { xpos = PosX; }
+  void SetPosY(G4double PosY) { ypos = PosY; }
+  void SetPosZ(G4double PosZ) { zpos = PosZ; }
+  void SetScanpointNtupleID(G4double ScanpointNtupleID) { scanpoint_ntupleId = ScanpointNtupleID; }
+  void ResetPhotNum() { photnum = 1; }
   void ResetCounters();
-  void SetSteppingAction(MySteppingAction* steppingAction);
+  void SetSteppingAction(MySteppingAction *steppingAction);
+
 private:
   G4int NumAbsorbed;
   G4int NumDetected;
@@ -79,7 +79,7 @@ private:
   G4double photonAngleCorrect;
   G4int totalPhotons;
 
-  MySteppingAction* mySteppingAction;
+  MySteppingAction *mySteppingAction;
 };
 
 #endif

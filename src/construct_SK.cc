@@ -386,27 +386,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
                                   1.516295, 1.515909, 1.515539, 1.515186, 1.514846,
                                   1.514520, 1.514207, 1.513905, 1.513615, 1.513335};
 
-    G4double ABSORPTION_glass[NUMENTRIES_water] =
-        {1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm, 1.0e9 * cm,
-         1.0e9 * cm, 1.0e9 * cm};
-
-    G4double ABSORPTION_glass2[45] = {0.000574415 * m, 0.000854808 * m, 0.00134354 * m, 0.00226156 * m, 0.00414292 * m,
-                                      0.00834524 * m, 0.0180342 * m, 0.0382308 * m, 0.0785805 * m, 0.143885 * m,
-                                      0.299827 * m, 0.629713 * m, 1.07439 * m, 1.45803 * m, 2.26023 * m,
-                                      3.11245 * m, 3.75419 * m, 3.55892 * m, 3.2194 * m, 3.11393 * m,
-                                      3.30197 * m, 3.55878 * m, 3.6993 * m, 3.77316 * m, 3.88867 * m,
-                                      4.15414 * m, 4.63536 * m, 5.22806 * m, 5.78547 * m, 6.16079 * m,
-                                      6.21063 * m, 5.92339 * m, 5.45867 * m, 4.98751 * m, 4.64493 * m,
-                                      4.42188 * m, 4.27329 * m, 4.15408 * m, 4.03614 * m, 3.95912 * m,
-                                      3.97959 * m, 4.15417 * m, 4.51931 * m, 5.031 * m, 5.31356 * m};
+    G4double ABSORPTION_glass2[45] = {0.0 * m, 0.0 * m, 0.0 * m, 0.0 * m, 0.007743680311053233 * m, 0.015638675009103344 * m, 0.03272093362618246 * m, 0.06926108593190539 * m, 0.1152969152984068 * m, 0.21704735572795672 * m, 0.46439849860802473 * m, 0.876327911018488 * m, 1.3378938621074439 * m, 1.9329727897417748 * m, 2.8546621355649364 * m, 3.39776052468851 * m, 3.464894242147979 * m, 3.3514088489185077 * m, 3.325394871802513 * m, 3.355436366290141 * m, 3.415355538920447 * m, 3.6498666464997576 * m, 3.880582191672106 * m, 4.2608926622715515 * m, 4.611127179818072 * m, 4.777828266394786 * m, 4.900808734841847 * m, 4.993208923704711 * m, 5.027383052701497 * m, 5.027866831960988 * m, 5.026066431400557 * m, 5.030004816211714 * m, 5.036916537841332 * m, 5.043979943652799 * m, 5.04862524488633 * m, 5.050419481612529 * m, 5.0500077323556765 * m, 5.048044507312218 * m, 5.045250535629448 * m, 5.042992559652919 * m, 5.042988837212202 * m, 5.04696178727552 * m, 5.05711379905387 * m, 5.08069416195608 * m, 5.126533145953435 * m};
 
     //  G4MaterialPropertiesTable *myMPT = new G4MaterialPropertiesTable();
     //  myMPT->AddProperty("RINDEX", ENERGY_water, RINDEX_vacuum, NUMENTRIES_water);
@@ -458,7 +438,19 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     a = 22.99 * g / mole;
     G4Element *Na = new G4Element("Sodium", "Na", 11, a);
 
-    density = 2.47 * g / cm3;
+    a = 137.33 * g / mole;
+    G4Element *Ba = new G4Element("Barium", "Ba", 56, a);
+
+    a = 39.098 * g / mole;
+    G4Element *K = new G4Element("Potassium", "K", 19, a);
+
+    density = 2.54 * g / cm3;
+    Na2CO3 = new G4Material("Na2CO3", density, 3);
+    Na2CO3->AddElement(nist->FindOrBuildElement("Na"), 2);
+    Na2CO3->AddElement(elC, 1);
+    Na2CO3->AddElement(nist->FindOrBuildElement("O"), 3);
+
+    density = 2.49 * g / cm3;
     Na2O = new G4Material("Na2O", density, 2);
     Na2O->AddElement(nist->FindOrBuildElement("Na"), 2);
     Na2O->AddElement(nist->FindOrBuildElement("O"), 1);
@@ -468,12 +460,30 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     Al2O3->AddElement(nist->FindOrBuildElement("Al"), 2);
     Al2O3->AddElement(nist->FindOrBuildElement("O"), 3);
 
-    density = 2.23 * g / cm3;
-    PMTGlass = new G4Material("PMTGlass", density, 4);
-    PMTGlass->AddMaterial(SiO2, 80.6 * perCent);
-    PMTGlass->AddMaterial(B2O3, 13.0 * perCent);
-    PMTGlass->AddMaterial(Na2O, 4.0 * perCent);
-    PMTGlass->AddMaterial(Al2O3, 2.4 * perCent);
+    density = 2.32 * g / cm3;
+    K2O = new G4Material("K2O", density, 2);
+    K2O->AddElement(nist->FindOrBuildElement("K"), 2);
+    K2O->AddElement(nist->FindOrBuildElement("O"), 1);
+
+    density = 5.72 * g / cm3;
+    BaO = new G4Material("BaO", density, 2);
+    BaO->AddElement(nist->FindOrBuildElement("Ba"), 1);
+    BaO->AddElement(nist->FindOrBuildElement("O"), 1);
+
+    density = 2.51 * g / cm3;
+    PMTGlass = new G4Material("PMTGlass", density, 6);
+
+    PMTGlass->AddMaterial(SiO2, 69.13 * perCent); // silica sand
+    PMTGlass->AddMaterial(B2O3, 10.75 * perCent); // boric oxide
+    PMTGlass->AddMaterial(BaO, 3.07 * perCent);   // Barium Oxide
+    PMTGlass->AddMaterial(Na2O, 10.40 * perCent); // Sodium Oxide
+    PMTGlass->AddMaterial(K2O, 6.29 * perCent);   // Potasium Oxide
+    PMTGlass->AddMaterial(Al2O3, 0.36 * perCent); // alumina
+
+    // PMTGlass->AddMaterial(SiO2, 80.6 * perCent);
+    // PMTGlass->AddMaterial(B2O3, 13.0 * perCent);
+    // PMTGlass->AddMaterial(Na2O, 4.0 * perCent);
+    // PMTGlass->AddMaterial(Al2O3, 2.4 * perCent);
 
     G4MaterialPropertiesTable *myMPT5 = new G4MaterialPropertiesTable();
     std::reverse(std::begin(ENERGY_glass), std::end(ENERGY_glass));
@@ -796,7 +806,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
         "dynode_part3_log");
     G4LogicalVolume *world_minus_pmt_volume = new G4LogicalVolume(
         world_minus_pmt,
-        Air,
+        Water,
         "world_minus_pmt_volume");
 
     G4LogicalVolume *dynode_internal_logical = new G4LogicalVolume(
@@ -826,7 +836,7 @@ G4VPhysicalVolume *skDetCon::DefineVolumes()
     // logical_inner_pmt->SetVisAttributes(invisible);
 
     logicWorld = new G4LogicalVolume(solidWorld,
-                                     Vacuum, // Was Air, changed to Vacuum avoid absorption in air
+                                     Vacuum, // this is the inside area
                                      "logicWorld");
 
     G4LogicalSkinSurface *FacePlateSkin = new G4LogicalSkinSurface("FacePlateSkin", dynode_part2_log, ReflectorSkinSurfaceDiffusy);

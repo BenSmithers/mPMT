@@ -24,13 +24,13 @@ Author:   Mohit Gola 10th July 2023
 
 #include "action.hh"
 
-using genmech = PrecisionGen;
+using genmech = Laser;
 
 int main(int argc, char **argv)
 {
     G4RunManager *runManager = new G4RunManager();
     // G4SteppingVerbose::SetInstance(new G4SteppingVerbose);
-    runManager->SetVerboseLevel(1);
+    runManager->SetVerboseLevel(0);
     WCSimTuningParameters *tuningpars = new WCSimTuningParameters();
     auto physicsList = new MyPhysicsList();
 
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     UImanager->ApplyCommand("/control/execute tuning_parameters.mac");
     UImanager->ApplyCommand("/gui/addMenu true");
-    UImanager->ApplyCommand("/tracking/verbose 1");
+    UImanager->ApplyCommand("/tracking/verbose 0");
 
     MyActionInitialization<genmech> *actionman = new MyActionInitialization<genmech>(
         primary_gen,

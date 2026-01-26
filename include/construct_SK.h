@@ -63,10 +63,13 @@ public:
     G4Material *FacePlate;
     G4Material *SiO2;
     G4Material *B2O3;
+    G4Material *Na2CO3;
     G4Material *Na2O;
     G4Material *PMTGlass;
     G4Material *Al2O3;
     G4Material *absorberMaterial;
+    G4Material *BaO;
+    G4Material *K2O;
 
 private:
     const static G4int NUMSK = 6;

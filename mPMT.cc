@@ -12,15 +12,21 @@ Author:   Mohit Gola 10th July 2023
 #include "G4SteppingVerbose.hh"
 #include "G4SteppingManager.hh"
 
-#include "construction.hh"
 #include "physics.hh"
-#include "action.hh"
 #include "mysteppingaction.hh"
 #include "WCSimTuningParameters.hh"
 #include "generator.hh"
 #include "MyPrimaryGeneratorMessenger.hh"
-#include "constructMultiPMT.hh"
 
+#include "G4VPhysicalVolume.hh"
+#include "G4StepLimiterPhysics.hh"
+
+#include "action.hh"
+
+#include "constructMultiPMT.hh"
+#include "constructInSitumPMT.hh"
+#include "constructionPMT.hh"
+#include "inSituPMT.hh"
 using genmech = Laser;
 
 int main(int argc, char **argv)
@@ -41,14 +47,24 @@ int main(int argc, char **argv)
   };
   G4int WCSimConfiguration = fwm;
 
-  myDetectorConstruction *myDetector = new myDetectorConstruction(WCSimConfiguration, tuningpars);
-  ConstructMultiPMT *multiPMT = new ConstructMultiPMT();
   genmech *generator = new genmech();
-  MyActionInitialization<genmech> *actionman = new MyActionInitialization<genmech>(generator);
 
-  runManager->SetUserInitialization(myDetector);
-  runManager->SetUserInitialization(multiPMT);
+  G4UImanager *UImanager = G4UImanager::GetUIpointer();
+  UImanager->ApplyCommand("/control/execute tuning_parameters.mac");
+  UImanager->ApplyCommand("/gui/addMenu true");
+  UImanager->ApplyCommand("/tracking/verbose 0");
+
+  MyActionInitialization<genmech> *actionman = new MyActionInitialization<genmech>(
+      generator,
+      "output_mPMT");
+
   runManager->SetUserInitialization(actionman);
+  pmtConstruction *subtractionPMT = new pmtConstruction();
+  G4VSolid *PMTSolid = subtractionPMT->ConstructionPMT();
+
+  ConstructInSitumPMT *InSitumPMT = new ConstructInSitumPMT(subtractionPMT, PMTSolid);
+  runManager->SetUserInitialization(InSitumPMT);
+
   runManager->Initialize();
 
   G4UIExecutive *ui = 0;
@@ -60,16 +76,8 @@ int main(int argc, char **argv)
 
   G4VisManager *visManager = new G4VisExecutive();
   visManager->Initialize();
-  G4UImanager *UImanager = G4UImanager::GetUIpointer();
-
-  UImanager->ApplyCommand("/control/execute tuning_parameters.mac");
-  UImanager->ApplyCommand("/gui/addMenu true");
-  UImanager->ApplyCommand("/tracking/verbose 1");
-
-  //  runManager->SetUserAction(generator);
 
   MyPrimaryGeneratorMessenger<genmech> *generatorMessenger = new MyPrimaryGeneratorMessenger<genmech>(generator);
-  //  runManager->SetUserAction(generatorMessenger);
 
   if (ui)
   {
