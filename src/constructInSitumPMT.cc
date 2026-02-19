@@ -12,7 +12,7 @@ Author:    Mohit Gola 5th February 2024
 #include <algorithm>
 #include <vector>
 #include <tuple>
-ConstructInSitumPMT::ConstructInSitumPMT(pmtConstruction *subtractionPMT, G4VSolid *PMTSolid) : subtractionPMT(subtractionPMT), PMTSolid(PMTSolid) {}
+ConstructInSitumPMT::ConstructInSitumPMT() {}
 
 ConstructInSitumPMT::~ConstructInSitumPMT() {}
 
@@ -375,72 +375,6 @@ G4VPhysicalVolume *ConstructInSitumPMT::Construct()
   AcrPropTable->AddProperty("ABSLENGTH", ENERGY_skAcrylic, ABSORPTION_skAcrylic, 306);
   Acrylic->SetMaterialPropertiesTable(AcrPropTable);
 
-  /////////////////////////////////////////////////////////
-
-  G4Box *solidInSitumPMT = new G4Box("solidInSitumPMT", 3.5 * m, 3.5 * m, 3.5 * m);
-
-  G4LogicalVolume *logicInSitumPMT = new G4LogicalVolume(solidInSitumPMT,
-                                                         // Air,
-                                                         Water,
-                                                         "logicInSitumPMT");
-
-  G4VPhysicalVolume *physWorld = new G4PVPlacement(0,
-                                                   G4ThreeVector(0., 0., 0.),
-                                                   logicInSitumPMT,
-                                                   "physWorld",
-                                                   0,
-                                                   false,
-                                                   0,
-                                                   true);
-
-  ///////////////////////In-Situ Matrix///////////////////////////
-  G4Sphere *inSituMatrixSolid = new G4Sphere("inSituMatrixSolid",
-                                             264.208 * mm,
-                                             325.603 * mm,
-                                             0.0 * deg, 360.0 * deg,
-                                             0.0, 43.226 * deg);
-
-  /*
-  G4LogicalVolume *inSituMatrixLogic = new G4LogicalVolume(inSituMatrixSolid,
-                 Plastic,
-                 "inSituMatrixLogic");
-
-
-  */
-  //////////////Making holes in the in-situ matrix/////////////////
-  /*
-  G4MultiUnion* pmt_holes = new G4MultiUnion("UnitedHoles");
-  G4ThreeVector pmtPos1 = G4ThreeVector(0., 0., 279.006*mm);
-  G4ThreeVector pmtPos2 = G4ThreeVector(20.*mm, 20.*mm, 279.006*mm);
-  //  G4VSolid* pmtSolid = PMTLogic->GetSolid();
-  G4RotationMatrix rot = G4RotationMatrix(0,0,0);
-  rot.rotateX(0.*deg);
-  rot.rotateY(0.*deg);
-  rot.rotateZ(0.*deg);
-
-  //  G4Transform3D transform1(G4Translate3D(0,0,(325.603*mm - 53.*mm)));
-  //  G4Transform3D transform1(G4Translate3D(0,0,279.006*mm))
-  G4Transform3D transform1 = G4Transform3D(rot, pmtPos1);
-  G4Transform3D transform2 = G4Transform3D(rot, pmtPos2);
-  pmt_holes->AddNode(*solidWorld, transform1);
-  pmt_holes->AddNode(*solidWorld, transform2);
-  pmt_holes->Voxelize();
-
-
-  G4SubtractionSolid *subtraction = new G4SubtractionSolid("subtraction",
-                 inSituMatrixSolid,
-                 pmt_holes
-                 //rot,
-                 //G4ThreeVector(0.,0.,0.)
-                 );
-
-
-
-  G4LogicalVolume *PMTLogic = new G4LogicalVolume(PMTSolid,
-                                                  Air,
-                                                  "inSituMatrixLogic");
-
-  */
   ////////////////////Making holes in the Matrix////////////////
 
   WCSimTuningParameters *tuningpars = new WCSimTuningParameters();
@@ -452,228 +386,93 @@ G4VPhysicalVolume *ConstructInSitumPMT::Construct()
   G4int WCSimConfiguration = fwm;
   inSituPMTConstruction inSituPMT(WCSimConfiguration, tuningpars);
 
-  G4LogicalVolume *inSituPMTLogic = inSituPMT.ConstructioninSituPMT();
+  G4int numPMTs = 19;
 
-  G4int numPMTs = 12;
-
-  G4double xArray[] = {0. * mm, 82.43 * mm, 41.21 * mm, -41.21 * mm, -82.43 * mm, -41.21 * mm, 41.21 * mm, 153.109 * mm, 132.59 * mm, 76.55 * mm, 0. * mm, -76.55 * mm, -132.59 * mm, -153.109 * mm, -132.59 * mm, -76.55 * mm, 0. * mm, 76.55 * mm, 132.59 * mm};
-
-  G4double yArray[] = {0. * mm, 0. * mm, -71.39 * mm, -71.39 * mm, 0. * mm, 71.39 * mm, 71.39 * mm, 0. * mm, -76.55 * mm, -132.59 * mm, -153.109 * mm, -132.59 * mm, -76.55 * mm, 0. * mm, 76.55 * mm, 132.59 * mm, 153.109 * mm, 132.59 * mm, 76.55 * mm};
-
-  G4double zArray[] = {274.003 * mm, 260.093 * mm, 260.093 * mm, 260.093 * mm, 260.093 * mm, 260.093 * mm, 260.093 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm, 223.123 * mm};
-
-  G4double zPMTArray[] = {0.0 * mm, -13.91 * mm, -13.91 * mm, -13.91 * mm, -13.91 * mm, -13.91 * mm, -13.91 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm, -50.88 * mm};
-
-  G4double zRefSubtractionArray[] = {293.5 * mm, 279.13 * mm, 279.13 * mm, 279.13 * mm, 279.13 * mm, 279.13 * mm, 279.13 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm, 240.5 * mm};
-
-  G4double zRefArray[] = {
-      39.9 * mm,
-      25.53 * mm,
-      25.53 * mm,
-      25.53 * mm,
-      25.53 * mm,
-      25.53 * mm,
-      25.53 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-      -13.1 * mm,
-  };
-
-  //  G4double zGelArray[] = {248.4*mm, 234.49*mm, 234.49*mm, 234.49*mm, 234.49*mm, 234.49*mm, 234.49*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm, 197.52*mm};
-
-  G4double zGelArray[] = {277.6 * mm, 263.69 * mm, 263.69 * mm, 263.69 * mm, 263.69 * mm, 263.69 * mm, 263.69 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm, 226.72 * mm};
-
-  G4double xthetaArray[] = {0. * deg, 0. * deg, 15.8353 * deg, 15.8353 * deg, 0. * deg, -15.8353 * deg, -15.8353 * deg, 0. * deg, 19.5049 * deg, 31.5299 * deg, 35.3149 * deg, 31.5299 * deg, 19.5049 * deg, 0. * deg, -19.5049 * deg, -31.5299 * deg, -35.3149 * deg, -31.5299 * deg, -19.5049 * deg};
-
-  G4double ythetaArray[] = {0. * deg, 18.1345 * deg, 9.3001 * deg, -9.3001 * deg, -18.1345 * deg, -9.3001 * deg, 9.3001 * deg, 35.3149 * deg, 31.5299 * deg, 19.5049 * deg, 0. * deg, -19.5049 * deg, -31.5299 * deg, -35.3149 * deg, -31.5299 * deg, -19.5049 * deg, 0. * deg, 19.5049 * deg, 31.5299 * deg};
-
-  G4double phiArray[] = {0. * deg, 0. * deg, -60. * deg, -120. * deg, 180. * deg, 120. * deg, 60 * deg, 0. * deg, -30. * deg, -60. * deg, -90. * deg, -120. * deg, -150. * deg, 180. * deg, 150. * deg, 120. * deg, 90. * deg, 60. * deg, 30. * deg};
-
-  G4VSolid *newSubtraction = inSituMatrixSolid;
-
-  G4Transform3D *transform = new G4Transform3D[numPMTs];
-
-  for (G4int i = 0; i < numPMTs; ++i)
-  {
-    transform[i] = G4Translate3D(xArray[i], yArray[i], zArray[i]) * G4RotateX3D(xthetaArray[i]) * G4RotateY3D(ythetaArray[i]) * G4RotateZ3D(phiArray[i]);
-  }
-
-  for (G4int i = 0; i < numPMTs; ++i)
-  {
-    std::stringstream ss;
-    ss << i;
-    std::string index_str = ss.str();
-
-    newSubtraction = new G4SubtractionSolid("subtraction_" + index_str,
-                                            newSubtraction,
-                                            PMTSolid,
-                                            // inSituPMTLogic->GetSolid(),
-                                            transform[i]);
-  }
-
-  G4LogicalVolume *subtractionLogic = new G4LogicalVolume(newSubtraction,
-                                                          Plastic,
-                                                          "subtractionLogic");
-
-  G4LogicalSkinSurface *matrixSurfaceProperties = new G4LogicalSkinSurface("matrixSkinSurface", subtractionLogic, PlasticSkinSurface);
-
-  G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
-  visAttributes->SetForceSolid(false);
-  visAttributes->SetForceWireframe(true);
-  subtractionLogic->SetVisAttributes(visAttributes);
-
-  G4VPhysicalVolume *Matrix = new G4PVPlacement(0,
-                                                G4ThreeVector(0., 0., -274.003 * mm),
-                                                subtractionLogic,
-                                                "Matrix",
-                                                logicInSitumPMT,
-                                                false,
-                                                0,
-                                                true);
-
-  /////////////////////Placing PMT on the matrix////////////////////
-  G4VisAttributes *pmtAttributes = new G4VisAttributes();
-  pmtAttributes->SetColor(1.0, 0.0, 0.0, 0.5);
-  pmtAttributes->SetVisibility(true);
-  pmtAttributes->SetForceSolid(true);
-  inSituPMTLogic->SetVisAttributes(pmtAttributes);
-
-  for (int i = 0; i < numPMTs; i++)
-  {
-    G4double x = xArray[i];
-    G4double y = yArray[i];
-    G4double z = zPMTArray[i];
-
-    G4double xtheta = xthetaArray[i];
-    G4double ytheta = ythetaArray[i];
-    G4double phi = phiArray[i];
-
-    std::stringstream ss;
-    ss << "PMTCopy" << i;
-    std::string pmtName = ss.str();
-
-    G4RotationMatrix *rot = new G4RotationMatrix();
-    rot->rotateX(-xtheta);
-    rot->rotateY(-ytheta);
-    rot->rotateZ(phi);
-
-    G4ThreeVector translation(x, y, z);
-
-    G4VPhysicalVolume *pmtCopy = new G4PVPlacement(rot,
-                                                   translation,
-                                                   inSituPMTLogic,
-                                                   pmtName.c_str(),
-                                                   logicInSitumPMT,
-                                                   false,
-                                                   i,
-                                                   true);
-  }
-
-  ///////////////////////Making gel/////////////////////////////////////////
-
-  G4Sphere *gelSolid = new G4Sphere("gelSolid",
-                                    323.5 * mm,
-                                    332. * mm,
-                                    0.0 * deg, 360.0 * deg,
-                                    0.0, 90.0 * deg); // 44.952*deg);
-
-  G4Box *solidGelCutOut = new G4Box("BoxCutOut",
-                                    332 * mm + 1. * cm,
-                                    332 * mm + 1. * cm,
-                                    241.04 * mm);
-
-  G4VSolid *gelSphere = new G4SubtractionSolid("domeSolid",
-                                               gelSolid,
-                                               solidGelCutOut);
-
-  G4VSolid *gelSubtraction = new G4SubtractionSolid("gelSubtractionFromMatrix",
-                                                    gelSphere,
-                                                    newSubtraction,
-                                                    0,
-                                                    G4ThreeVector(0., 0., 3.597 * mm));
-
-  G4VSolid *newGelSubtraction = gelSubtraction;
-
-  G4Transform3D *transformGel = new G4Transform3D[numPMTs];
-
-  for (G4int i = 0; i < numPMTs; ++i)
-  {
-    transformGel[i] = G4Translate3D(xArray[i], yArray[i], zGelArray[i]) * G4RotateX3D(xthetaArray[i]) * G4RotateY3D(ythetaArray[i]) * G4RotateZ3D(phiArray[i]);
-  }
-
-  for (G4int i = 0; i < numPMTs; ++i)
-  {
-    std::stringstream ss;
-    ss << i;
-    std::string index_str = ss.str();
-
-    newGelSubtraction = new G4SubtractionSolid("subtraction_" + index_str,
-                                               newGelSubtraction,
-                                               inSituPMTLogic->GetSolid(),
-                                               transformGel[i]);
-  }
-
-  G4LogicalVolume *gelLogic = new G4LogicalVolume(newGelSubtraction,
-                                                  SilGel,
-                                                  "gelLogic");
-
-  G4VisAttributes *gelAttributes = new G4VisAttributes();
-  gelAttributes->SetColor(1.0, 1.0, 1.0, 0.5);
-  gelAttributes->SetVisibility(true);
-  gelAttributes->SetForceSolid(true);
-  gelLogic->SetVisAttributes(gelAttributes);
-
-  G4VPhysicalVolume *gelPhys = new G4PVPlacement(0,
-                                                 // G4ThreeVector(0.,0.,-271.9*mm),
-                                                 G4ThreeVector(0., 0., -277.6 * mm),
-                                                 gelLogic,
-                                                 "gelPhys",
-                                                 logicInSitumPMT,
-                                                 false,
-                                                 0,
-                                                 true);
-
-  ////////////////////Dome Placement////////////////////////////
+  G4double vessel_cylinder_height = 77.785 * 2 * mm;
+  G4double vessel_inner_radius = 250.93 * mm;
+  G4double vessel_outer_radius = 254. * mm;
 
   G4double domeInnerRadius = 332. * mm;
   G4double domeOuterRadius = 347. * mm;
+  G4double domeCut = 235 * mm;
+  G4double dome_height = domeOuterRadius - domeCut;
 
-  G4Sphere *domeSphere = new G4Sphere("DomeSphere",
-                                      domeInnerRadius,
-                                      domeOuterRadius,
-                                      0.0 * deg, 360.0 * deg,
-                                      0.0, 90. * deg);
+  G4double mPMT_zRange_outer[2] = {0, // start from zero for easier placement in ID
+                                   vessel_cylinder_height};
+  G4double mPMT_RRange_outer[2] = {vessel_outer_radius,
+                                   vessel_outer_radius};
+  G4double mPMT_rRange_outer[2] = {0., 0.};
 
-  G4Box *solidBoxCutOut = new G4Box("BoxCutOut",
-                                    domeOuterRadius + 1. * cm,
-                                    domeOuterRadius + 1. * cm,
-                                    235 * mm);
+  // Although G4Tubs is more natural, Polycone is used to be in control of z position
+  // and because z = 0 is position of bottom of cylinder, vs center in G4Tubs
+  G4Polycone *solidMultiPMT_vessel =
+      new G4Polycone("WCmPMT_vessel",
+                     0.0 * deg,
+                     360.0 * deg,
+                     2,
+                     mPMT_zRange_outer,
+                     mPMT_rRange_outer,  // R Inner
+                     mPMT_RRange_outer); // R Outer
+
+  G4Sphere *mPMT_top_sphere =
+      new G4Sphere("WCmPMT_tsphere",
+                   0,
+                   domeOuterRadius,
+                   0.0 * deg, 360.0 * deg,
+                   0.0 * deg, 90.0 * deg);
+
+  G4Box *solidCutOffTubs =
+      new G4Box("cutOffTubs",
+                domeOuterRadius + 1. * cm, // x/2
+                domeOuterRadius + 1. * cm, // y/2
+                domeCut);                  // z/2
+
+  G4SubtractionSolid *mPMT_top_cap_vessel = new G4SubtractionSolid("WCmPMT_tsphere_vessel",
+                                                                   mPMT_top_sphere,
+                                                                   solidCutOffTubs);
+
+  G4UnionSolid *solidMultiPMT =
+      new G4UnionSolid("WCmPMT", solidMultiPMT_vessel, mPMT_top_cap_vessel, 0, G4ThreeVector(0, 0, vessel_cylinder_height - domeCut));
+
+  G4Box *solidInSitumPMT = new G4Box("solidInSitumPMT", 3.5 * m, 3.5 * m, 3.5 * m);
+  G4LogicalVolume *logicWCMultiPMT =
+      new G4LogicalVolume(solidInSitumPMT,
+                          Air,
+                          "WCMultiPMT",
+                          0, 0, 0);
+
+  G4VPhysicalVolume *physWorld = new G4PVPlacement(0,
+                                                   G4ThreeVector(0., 0., 0.),
+                                                   logicWCMultiPMT,
+                                                   "physWorld",
+                                                   0,
+                                                   false,
+                                                   0,
+                                                   true);
+
+  G4Sphere *domeSphere =
+      new G4Sphere("DomeSphere",
+                   domeInnerRadius,
+                   domeOuterRadius,
+                   0.0 * deg, 360.0 * deg,
+                   0.0, 90. * deg);
 
   G4VSolid *domeSolid = new G4SubtractionSolid("domeSolid",
                                                domeSphere,
-                                               solidBoxCutOut);
+                                               solidCutOffTubs);
 
   G4LogicalVolume *domeLogic = new G4LogicalVolume(domeSolid,
                                                    Acrylic,
-                                                   "DomeLogic");
+                                                   "logicDome");
 
-  G4VPhysicalVolume *physDome = new G4PVPlacement(0,
-                                                  G4ThreeVector(0., 0., -277.6 * mm),
-                                                  domeLogic,
-                                                  "physDome",
-                                                  logicInSitumPMT,
-                                                  false,
-                                                  0,
-                                                  true);
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., vessel_cylinder_height - domeCut),
+                    domeLogic,
+                    "physInsituDome",
+                    logicWCMultiPMT,
+                    false,
+                    0,
+                    true);
 
   G4VisAttributes *domeAttributes = new G4VisAttributes();
   domeAttributes->SetColor(1.0, 1.0, 1.0, 0.5);
@@ -681,33 +480,172 @@ G4VPhysicalVolume *ConstructInSitumPMT::Construct()
   domeAttributes->SetForceSolid(true);
   domeLogic->SetVisAttributes(domeAttributes);
 
-  //////////////////////////cylinder Placement//////////////////////////////////////
-
   G4Tubs *cylinderSolid = new G4Tubs("cylinderSolid",
-                                     250.93 * mm,
-                                     254. * mm,
-                                     77.785 * mm,
+                                     vessel_inner_radius,
+                                     vessel_outer_radius,
+                                     vessel_cylinder_height / 2,
                                      0. * deg, 360. * deg);
 
-  G4LogicalVolume *cylinderLogic = new G4LogicalVolume(cylinderSolid,
+  G4LogicalVolume *logicCylinder = new G4LogicalVolume(cylinderSolid,
                                                        Plastic,
-                                                       "flangeLogic");
+                                                       "logicCylinder");
 
-  G4VPhysicalVolume *physCylinder = new G4PVPlacement(0,
-                                                      G4ThreeVector(0., 0., -120.385 * mm),
-                                                      cylinderLogic,
-                                                      "physCylinder",
-                                                      logicInSitumPMT,
-                                                      false,
-                                                      0,
-                                                      true);
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., vessel_cylinder_height / 2),
+                    logicCylinder,
+                    "physInsituCylinder",
+                    logicWCMultiPMT,
+                    false,
+                    0,
+                    true);
 
   G4VisAttributes *cylinderAttributes = new G4VisAttributes();
   cylinderAttributes->SetColor(0.2, 0.2, 0.2, 1.0);
   cylinderAttributes->SetVisibility(true);
   cylinderAttributes->SetForceSolid(true);
-  cylinderLogic->SetVisAttributes(cylinderAttributes);
+  logicCylinder->SetVisAttributes(cylinderAttributes);
+
+  /////////////////////////////////////////////////////////////////////////
+  /// 3) This is the area between the outer shell and the inner shell.  ///
+  ///    In this space, the PMTs will live.                             ///
+  /////////////////////////////////////////////////////////////////////////
+
+  // Matrix, where PMTs are placed as daughters
+  G4double matrixRmin = 263.003 * mm;
+  G4double matrixRmax = 325.603 * mm;
+  G4double matrixUpshift = 5.7 * mm;
+  G4Sphere *solidMatrix =
+      new G4Sphere("solidMatrix",
+                   matrixRmin,
+                   matrixRmax,
+                   0.0 * deg, 360.0 * deg,
+                   0.0, 43.4549 * deg);
+
+  G4LogicalVolume *logicMatrix = new G4LogicalVolume(solidMatrix,
+                                                     Plastic,
+                                                     "logicMatrix");
+
+  G4double gelRmin = 323.5 * mm;
+  G4Sphere *solidGelSphere = new G4Sphere("solidGelSphere",
+                                          gelRmin,
+                                          domeInnerRadius,
+                                          0.0 * deg, 360.0 * deg,
+                                          0.0, 90.0 * deg);
+
+  G4Box *solidGelCutOut = new G4Box("BoxGelCutOut",
+                                    domeInnerRadius + 1. * cm,
+                                    domeInnerRadius + 1. * cm,
+                                    241.04 * mm);
+
+  G4VSolid *solidGelSphereCut =
+      new G4SubtractionSolid("solidGelSphereCut",
+                             solidGelSphere,
+                             solidGelCutOut);
+
+  G4VSolid *solidGel = new G4SubtractionSolid("solidGel",
+                                              solidGelSphereCut,
+                                              solidMatrix,
+                                              0,
+                                              G4ThreeVector(0., 0., gelRmin - matrixRmax + matrixUpshift));
+
+  G4LogicalVolume *logicGel = new G4LogicalVolume(solidGel,
+                                                  SilGel,
+                                                  "logicGel");
+
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., vessel_cylinder_height - domeCut),
+                    logicGel,
+                    "gel",
+                    logicWCMultiPMT,
+                    false,
+                    0,
+                    true);
+
+  G4VisAttributes *gelAttributes = new G4VisAttributes();
+  gelAttributes->SetColor(1.0, 1.0, 1.0, 0.5);
+  gelAttributes->SetVisibility(true);
+  gelAttributes->SetForceSolid(true);
+  logicGel->SetVisAttributes(gelAttributes);
+
+  // Seal the bottom with blacksheet
+  G4Tubs *solidBS = new G4Tubs("solidBS",
+                               0 * mm,
+                               vessel_inner_radius,
+                               1. * mm,
+                               0. * deg, 360. * deg);
+
+  G4LogicalVolume *logicBS = new G4LogicalVolume(solidBS,
+                                                 Plastic,
+                                                 "logicBS");
+
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., 1. * mm),
+                    logicBS,
+                    "physInsituMPMTBS",
+                    logicWCMultiPMT,
+                    false,
+                    0,
+                    true);
+  G4VisAttributes *VisAttRed = new G4VisAttributes(G4Colour(1.0, 0., 0.));
+  VisAttRed->SetForceSolid(true);
+  logicBS->SetVisAttributes(VisAttRed);
+
+  G4LogicalVolume *inSituPMTLogic = inSituPMT.ConstructioninSituPMT();
+  // G4LogicalVolume* logicWCPMT = ConstructInSituPMT(PMTName, CollectionName,detectorElement);
+
+  G4double thetaArray[19] = {0. * deg, 18.1345 * deg, 18.1345 * deg, 18.1345 * deg, 18.1345 * deg, 18.1345 * deg, 18.1345 * deg,
+                             35.3149 * deg, 35.3149 * deg, 35.3149 * deg, 35.3149 * deg, 35.3149 * deg, 35.3149 * deg,
+                             35.3149 * deg, 35.3149 * deg, 35.3149 * deg, 35.3149 * deg, 35.3149 * deg, 35.3149 * deg};
+  // G4double phiArray[19] = {0. * deg, 0. * deg, 60. * deg, 120. * deg, 180. * deg, -120. * deg, -60 * deg, 0. * deg, 30. * deg, 60. * deg, 90. * deg, 120. * deg, 150. * deg, 180. * deg, -150. * deg, -120. * deg, -90. * deg, -60. * deg, -30. * deg};
+  G4double phiArray[] = {0. * deg, 0. * deg, -60. * deg, -120. * deg, 180. * deg, 120. * deg, 60 * deg, 0. * deg, -30. * deg, -60. * deg, -90. * deg, -120. * deg, -150. * deg, 180. * deg, 150. * deg, 120. * deg, 90. * deg, 60. * deg, 30. * deg};
+
+  // Place the PMTs inside matrix
+  for (int i = 0; i < numPMTs; i++)
+  {
+
+    std::stringstream ss;
+    ss << "PMTCopy" << i;
+    std::string pmtName = ss.str();
+
+    // G4ThreeVector PMTPosition = {xArray[i], yArray[i], zArray[i]};
+    G4ThreeVector PMTPosition = {0.0, 0.0, 0.0};
+
+    G4RotationMatrix *PMTRotation = new G4RotationMatrix;
+    PMTRotation->rotateZ(-phiArray[i]);
+    PMTRotation->rotateY(-thetaArray[i]);
+
+    // Create and place the PMT copy
+    new G4PVPlacement(PMTRotation,
+                      PMTPosition,
+                      inSituPMTLogic,
+                      pmtName,
+                      logicMatrix,
+                      false,
+                      i,
+                      true);
+  }
+
+  // Finally place the matrix
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., vessel_cylinder_height - domeCut + gelRmin - matrixRmax + matrixUpshift),
+                    logicMatrix,
+                    "Matrix",
+                    logicWCMultiPMT,
+                    false,
+                    0,
+                    true);
+
+  /* Set all visualization here for better overview. */
+  // Gray wireframe visual style
+  G4VisAttributes *VisAttGrey = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
+  // VisAttGrey->SetForceWireframe(true);
+  VisAttGrey->SetForceSolid(true);
+  G4VisAttributes *WCPMTVisAtt5 = new G4VisAttributes(G4Colour(.0, 1., 1.));
+  WCPMTVisAtt5->SetForceSolid(true);
+  G4VisAttributes *VisAttYellow = new G4VisAttributes(G4Colour(1.0, 1., 0.));
+  VisAttYellow->SetForceSolid(true);
 
   G4RunManager::GetRunManager()->DefineWorldVolume(physWorld);
+
   return physWorld;
 }

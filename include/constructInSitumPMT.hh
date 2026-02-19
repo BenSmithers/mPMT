@@ -1,10 +1,9 @@
-/*                                                             
+/*
 Author:    Mohit Gola 5th February 2024
 */
 
 #ifndef CONSTRUCTINSITUMPMT_HH
 #define CONSTRUCTINSITUMPMT_HH
-
 
 #include "G4VUserDetectorConstruction.hh"
 #include "G4LogicalVolume.hh"
@@ -21,28 +20,24 @@ Author:    Mohit Gola 5th February 2024
 #include <string>
 #include <sstream>
 
-
-
 class pmtConstruction;
 class inSituPMTConstruction;
 
-
-class ConstructInSitumPMT : public G4VUserDetectorConstruction {
+class ConstructInSitumPMT : public G4VUserDetectorConstruction
+{
 public:
-  ConstructInSitumPMT(pmtConstruction* subtractionPMT, G4VSolid* PMTSolid);
+  ConstructInSitumPMT();
   virtual ~ConstructInSitumPMT();
 
-  G4VPhysicalVolume* Construct();
+  G4VPhysicalVolume *Construct();
 
 private:
-  pmtConstruction* subtractionPMT;
-  G4LogicalVolume* logicInSituPMT;
-  G4LogicalVolume* PMTLogic;
-  G4VSolid* PMTSolid;
+  pmtConstruction *subtractionPMT;
+  G4LogicalVolume *logicInSituPMT;
+  G4LogicalVolume *PMTLogic;
+  G4VSolid *PMTSolid;
   G4double density;
   G4double a;
-
 };
 
 #endif
-

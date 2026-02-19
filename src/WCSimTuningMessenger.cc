@@ -55,7 +55,7 @@ WCSimTuningMessenger::WCSimTuningMessenger(WCSimTuningParameters *WCTuningPars) 
   CathodePara = new G4UIcmdWithAnInteger("/WCSim/tuning/cathodepara", this);
   CathodePara->SetGuidance("Set the PMT photocathode surface parameters");
   CathodePara->SetParameterName("CathodePara", true);
-  CathodePara->SetDefaultValue(0);
+  CathodePara->SetDefaultValue(1);
 
   // jl145 - for Top Veto
   TVSpacing = new G4UIcmdWithADouble("/WCSim/tuning/tvspacing", this);

@@ -74,28 +74,28 @@ double MySteppingAction::calculateIncidenceAngle(const G4ThreeVector &Momentum, 
 void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Track, G4String vol, bool opAbsorption, G4String postvol)
 {
   // pmtPhysBulb and  pmtInnerPhysBulb
-  if ((vol == "pmtPhysBulb" && postvol == "pmtInnerPhysBulb") || (vol == "pmtInnerPhysBulb" && postvol == "pmtPhysBulb") && !opAbsorption)
+  if ((vol == "glassface" && postvol == "InteriorWCPMT") || (vol == "InteriorWCPMT" && postvol == "glassface") && !opAbsorption)
   {
     fEventAction->IncrementNumDetected();
     EventAction->RecordStep(2, Track->GetPosition(), 1);
   }
   // opAbsorption in phisCath (not at boundary) won't produce a pe, count it as absorbed in glass
-  else if (vol == "totalPMT" || vol == "pmtPhysBulb" || vol == "pmtPhysReflector" || vol == "pmtPhysInnerTube" || vol == "pmtInnerPhysBulb" || vol == "innerReflector")
+  else if (vol == "totalPMT" || vol == "glassface" || vol == "solidReflector" || vol == "InnerReflector" || vol == "InteriorWCPMT" || vol == "innerReflector")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(3, Track->GetPosition(), 1);
   }
-  else if (vol == "pmtAbsorber")
+  else if (vol == "absorber" || vol == "physInsituMPMTBS")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(4, Track->GetPosition(), 1);
   }
-  else if (vol == "physWorld")
+  else if (vol == "physWorld" || vol == "InnerAir")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(5, Track->GetPosition(), 1);
   }
-  else if (vol == "Matrix" || vol == "gelPhys" || vol == "physDome" || vol == "physCylinder")
+  else if (vol == "Matrix" || vol == "gel" || vol == "physInsituDome" || vol == "physInsituCylinder")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(6, Track->GetPosition(), 1);

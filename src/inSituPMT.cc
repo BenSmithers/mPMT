@@ -554,229 +554,12 @@ G4LogicalVolume *inSituPMTConstruction::ConstructioninSituPMT()
   G4double pmtCylHeight = 18.0 * mm;
   G4double pmtConeHeight = 20.0 * mm;
 
-  //  G4Box *solidWorld = new G4Box("solidInSitumPMT", 0.25*m, 0.25*m, .25*m);
-  G4double zPlanesCylinder[4] = {-11., 10., 28., 46.5};
-  G4double rInnerCylinder[4] = {0, 0, 0, 0};
-  G4double rOuterCylinder[4] = {26.1, 40.15, 40.15, 46.};
-  G4Polycone *solidWorld = new G4Polycone("solidWorld",
-                                          0,
-                                          2 * M_PI,
-                                          4,
-                                          zPlanesCylinder,
-                                          rInnerCylinder,
-                                          rOuterCylinder);
+  G4double pmtGlassCut = 34.597 * mm;
 
-  G4LogicalVolume *logicWorld = new G4LogicalVolume(solidWorld,
-                                                    SilGel,
-                                                    // PMTGlass,
-                                                    "logicWorld");
-
-  G4VisAttributes *invisible = new G4VisAttributes(false);
-  logicWorld->SetVisAttributes(invisible);
-  logicWorld->SetSensitiveDetector(NULL);
-
-  G4VPhysicalVolume *pmtWorld = new G4PVPlacement(0,
-                                                  G4ThreeVector(0., 0., 0.),
-                                                  logicWorld,
-                                                  "physWorld",
-                                                  0,
-                                                  false,
-                                                  0,
-                                                  true);
-
-  ///////////////////////////Making Outer PMT/////////////////////
-  G4Cons *coneSolid = new G4Cons("coneSolid",
-                                 pmtTubeRadius - pmtGlassThickness,
-                                 pmtTubeRadius,
-                                 pmtCylRadius - pmtGlassThickness,
-                                 pmtCylRadius,
-                                 pmtConeHeight / 2. * mm,
-                                 0. * deg, 360. * deg);
-
-  G4Tubs *tubeSolid = new G4Tubs("tubeSolid",
-                                 pmtCylRadius - pmtGlassThickness,
-                                 pmtCylRadius,
-                                 pmtCylHeight / 2. * mm,
-                                 0. * deg, 360. * deg);
-
-  G4VSolid *combineSolid1 = new G4UnionSolid("tubeCombined",
-                                             coneSolid,
-                                             tubeSolid,
-                                             0,
-                                             G4ThreeVector(0., 0., 19.0 * mm));
-
-  G4Box *solidCutOff = new G4Box("cutOffBox",
-                                 pmtGlassRadius + 1. * cm,
-                                 pmtGlassRadius + 1. * cm,
-                                 34.597 * mm);
-
-  G4Sphere *pmtGlassSolid = new G4Sphere("pmtGlassSolid",
-                                         pmtGlassRadius - pmtGlassThickness,
-                                         pmtGlassRadius,
-                                         0.0 * deg, 360.0 * deg,
-                                         0.0, 90 * deg);
-
-  G4VSolid *pmtBulb = new G4SubtractionSolid("pmtGlass",
-                                             pmtGlassSolid,
-                                             solidCutOff);
-
-  G4Transform3D transform(G4Translate3D(0.0, 0.0, -6.597 * mm));
-
-  G4LogicalVolume *pmtBulbLogic = new G4LogicalVolume(pmtBulb,
-                                                      PMTGlass,
-                                                      "pmtBulbLogic");
-
-  G4VPhysicalVolume *pmtPhysBulb = new G4PVPlacement(0,
-                                                     G4ThreeVector(0., 0., -6.597 * mm),
-                                                     pmtBulbLogic,
-                                                     "pmtPhysBulb",
-                                                     logicWorld,
-                                                     false,
-                                                     0,
-                                                     true);
-
-  combineSolid2 = new G4UnionSolid("OuterPMT",
-                                   combineSolid1,
-                                   pmtBulb,
-                                   transform);
-  /*
-  G4Tubs *pmtBase = new G4Tubs("pmtBase",
-        0.*mm,
-        pmtTubeRadius,
-        0.5*mm,
-        0.*deg, 360.*deg);
-
-  G4VSolid *combineSolid3 = new G4UnionSolid("CombinedSolid3",
-                                             combineSolid2,
-                                             pmtBase,
-                                             0,
-                                             G4ThreeVector(0.,0.,-9.5*mm));
-  */
-  G4LogicalVolume *pmtBaseLogic = new G4LogicalVolume(combineSolid1,
-                                                      PMTGlass,
-                                                      "pmtBaseLogic");
-
-  G4VPhysicalVolume *totalPMT = new G4PVPlacement(0,
-                                                  G4ThreeVector(0., 0., 0. * mm),
-                                                  pmtBaseLogic,
-                                                  "totalPMT",
-                                                  logicWorld,
-                                                  false,
-                                                  0,
-                                                  true);
-  /////////////////////PMT Absorber//////////////////////////////////////
-
-  G4Cons *absorberSolid = new G4Cons("solidAbsorber",
-                                     0.0,
-                                     pmtTubeRadius,
-                                     0.0,
-                                     pmtTubeRadius,
-                                     0.5 * mm,
-                                     0.0, 360.0 * deg);
-
-  G4LogicalVolume *absorberLogic = new G4LogicalVolume(absorberSolid,
-                                                       absorberMaterial,
-                                                       "absorberLogic");
-
-  // G4LogicalSkinSurface* AbsorberSurfaceProperties = new G4LogicalSkinSurface("AbsorberSurfaceProperties", absorberLogic, AbsorberSkinSurface);
-
-  G4VPhysicalVolume *pmtAbsorber = new G4PVPlacement(0,
-                                                     G4ThreeVector(0., 0., -10.5 * mm),
-                                                     absorberLogic,
-                                                     "pmtAbsorber",
-                                                     logicWorld,
-                                                     false,
-                                                     0,
-                                                     true);
-
-  //////////////////Adding reflector on top of the PMT///////////////////////
-
-  G4Cons *refSolid = new G4Cons("refSolid",
-                                36.96 * mm,
-                                37.76 * mm,
-                                45. * mm,
-                                45.8 * mm,
-                                6.5 * mm,
-                                0. * deg, 360. * deg);
-
-  G4LogicalVolume *pmtReflectorLogic = new G4LogicalVolume(refSolid,
-                                                           Aluminum,
-                                                           "pmtReflectorLogic");
-
-  G4LogicalSkinSurface *outerReflectorLogSkinSurface = new G4LogicalSkinSurface("outerReflectorLogSkinSurface", pmtReflectorLogic, outerReflectorSkinSurface);
-
-  G4VPhysicalVolume *pmtPhysReflector = new G4PVPlacement(0,
-                                                          G4ThreeVector(0., 0., 39.9 * mm),
-                                                          pmtReflectorLogic,
-                                                          "pmtPhysReflector",
-                                                          logicWorld,
-                                                          false,
-                                                          0,
-                                                          true);
-
-  //////////////Adding inner surface to the PMT//////////////////////
-
-  G4Cons *innerSolidCone = new G4Cons("innerPmtCone",
-                                      0.,
-                                      pmtTubeRadius - pmtGlassThickness - 0.1 * mm,
-                                      0.,
-                                      pmtCylRadius - pmtGlassThickness - 0.1 * mm,
-                                      pmtConeHeight / 2. * mm,
-                                      0. * deg, 360. * deg);
-
-  G4Tubs *innerSolidTube = new G4Tubs("innerSolidTube",
-                                      0.,
-                                      pmtCylRadius - pmtGlassThickness - 0.1 * mm,
-                                      pmtCylHeight / 2.,
-                                      0. * deg, 360. * deg);
-
-  G4VSolid *combineSolid5 = new G4UnionSolid("CombinedSolid5",
-                                             innerSolidCone,
-                                             innerSolidTube,
-                                             0,
-                                             G4ThreeVector(0., 0., 19. * mm));
-
-  G4LogicalVolume *pmtInnerTubeLogic = new G4LogicalVolume(combineSolid5,
-                                                           Air1,
-                                                           "pmtInnerTubeLogic");
-
-  G4VPhysicalVolume *pmtPhysInnerTube = new G4PVPlacement(0,
-                                                          G4ThreeVector(0., 0., 0.0 * mm),
-                                                          pmtInnerTubeLogic,
-                                                          "pmtPhysInnerTube",
-                                                          logicWorld,
-                                                          false,
-                                                          0,
-                                                          true);
-
-  G4Sphere *pmtInnerGlassSolid = new G4Sphere("pmtInnerglassSolid",
-                                              0. * mm,
-                                              pmtGlassRadius - pmtGlassThickness,
-                                              0.0 * deg, 360.0 * deg,
-                                              0.0, 90. * deg);
-
-  G4Box *boxCutOff = new G4Box("cutOffTubs",
-                               pmtGlassRadius + 1. * cm,
-                               pmtGlassRadius + 1. * cm,
-                               34.597 * mm);
-
-  G4SubtractionSolid *pmtInnerGlass = new G4SubtractionSolid("pmtInnerglass",
-                                                             pmtInnerGlassSolid,
-                                                             boxCutOff);
-
-  G4LogicalVolume *pmtInnerBulbLogic = new G4LogicalVolume(pmtInnerGlass,
-                                                           // combineSolid4,
-                                                           Air1,
-                                                           "pmtInnerBulbLogic");
-
-  G4VPhysicalVolume *pmtInnerPhysBulb = new G4PVPlacement(0,
-                                                          G4ThreeVector(0., 0., -6.597 * mm),
-                                                          pmtInnerBulbLogic,
-                                                          "pmtInnerPhysBulb",
-                                                          logicWorld,
-                                                          false,
-                                                          0,
-                                                          true);
+  G4double reflectorHeight = 6.5 * mm * 2;
+  G4double reflectorThickness = 0.8 * mm;
+  G4double reflectorR1 = 36.96 * mm;
+  G4double reflectorR2 = 45. * mm;
 
   //////////////////Optical photocathode surface and its properties////////////////////////
 
@@ -923,25 +706,116 @@ G4LogicalVolume *inSituPMTConstruction::ConstructioninSituPMT()
   OpGlassCathodeSurface->SetMaterialPropertiesTable(myST2);
   OpCathodeAirSurface->SetMaterialPropertiesTable(myST2);
 
-  G4LogicalBorderSurface *GlassCathodeSurface = new G4LogicalBorderSurface("GlassCathodeSurface", pmtPhysBulb, pmtInnerPhysBulb, OpGlassCathodeSurface);
+  // G4LogicalBorderSurface *GlassCathodeSurface = new G4LogicalBorderSurface("GlassCathodeSurface", pmtPhysBulb, pmtInnerPhysBulb, OpGlassCathodeSurface);
 
-  G4LogicalBorderSurface *CathodeAirSurface = new G4LogicalBorderSurface("CathodeAirSurface", pmtInnerPhysBulb, pmtPhysBulb, OpCathodeAirSurface);
+  // G4LogicalBorderSurface *CathodeAirSurface = new G4LogicalBorderSurface("CathodeAirSurface", pmtInnerPhysBulb, pmtPhysBulb, OpCathodeAirSurface);
 
-  ///////////////PMT INNER REFLECTOR/////////////////////////
+  G4double matrxiRadius = 325.603 * mm;
+  G4double pmtVolumeHeight = absorberThickness + pmtConeHeight + pmtCylHeight + 23.6 * mm;
+  G4double zoffset = matrxiRadius - pmtConeHeight / 2. - pmtCylHeight - 23.6 * mm;
+  G4double openingAngle = 8.14 * deg;
+  G4Sphere *solidWCPMT = new G4Sphere("WCPMT",
+                                      matrxiRadius - pmtVolumeHeight,
+                                      matrxiRadius,
+                                      0.0 * deg, 360.0 * deg,
+                                      0.0, openingAngle);
 
+  G4LogicalVolume *logicWCPMT = new G4LogicalVolume(solidWCPMT,
+                                                    SilGel,
+                                                    "WCPMT");
+  G4VisAttributes *WCPMTVisAttGrey = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
+  WCPMTVisAttGrey->SetForceSolid(true);
+  WCPMTVisAttGrey->SetVisibility(false);
+  logicWCPMT->SetVisAttributes(WCPMTVisAttGrey);
+
+  // inner glass tube
+  G4double glassTubeZ[3] = {-pmtConeHeight / 2.,
+                            pmtConeHeight / 2.,
+                            pmtConeHeight / 2. + pmtCylHeight};
+  G4double glassTubeRmin[3] = {pmtTubeRadius - pmtGlassThickness,
+                               pmtCylRadius - pmtGlassThickness,
+                               pmtCylRadius - pmtGlassThickness};
+  G4double glassTubeRmax[3] = {pmtTubeRadius,
+                               pmtCylRadius,
+                               pmtCylRadius};
+  G4Polycone *solidGlassTube = new G4Polycone("solidGlassTube",
+                                              0,
+                                              360. * deg,
+                                              3,
+                                              glassTubeZ,
+                                              glassTubeRmin,
+                                              glassTubeRmax);
+
+  G4LogicalVolume *logicGlassTube = new G4LogicalVolume(solidGlassTube,
+                                                        PMTGlass,
+                                                        "logicInnerGlassTube");
+
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., zoffset),
+                    logicGlassTube,
+                    "InnerGlassTube",
+                    logicWCPMT,
+                    false,
+                    0,
+                    true);
+
+  // air inside glass tube
+  G4double airTubeZ[4] = {-pmtConeHeight / 2.,
+                          pmtConeHeight / 2.,
+                          pmtConeHeight / 2.,
+                          pmtConeHeight / 2. + pmtCylHeight};
+  G4double airTubeRmin[4] = {0, 0, 0, 0};
+  G4double airTubeRmax[4] = {
+      pmtTubeRadius - pmtGlassThickness - 0.1 * mm,
+      pmtCylRadius - pmtGlassThickness - 0.1 * mm,
+      pmtCylRadius - pmtGlassThickness,
+      pmtCylRadius - pmtGlassThickness,
+  };
+  G4Polycone *solidAirTube = new G4Polycone("solidAirTube",
+                                            0,
+                                            360. * deg,
+                                            4,
+                                            airTubeZ,
+                                            airTubeRmin,
+                                            airTubeRmax);
+
+  G4LogicalVolume *innerLogicTube = new G4LogicalVolume(solidAirTube,
+                                                        Air1,
+                                                        "logicInnerAir");
+
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., zoffset),
+                    innerLogicTube,
+                    "InnerAir",
+                    logicWCPMT,
+                    false,
+                    0,
+                    true);
+
+  // Reflector material inside the PMT
   G4Cons *solidConeTube = new G4Cons("ConeTube",
                                      pmtTubeRadius - pmtGlassThickness - 0.1 * mm,
                                      pmtTubeRadius - pmtGlassThickness,
                                      pmtCylRadius - pmtGlassThickness - 0.1 * mm,
-                                     pmtCylRadius - pmtGlassThickness - 0.09 * mm,
-                                     10. * mm,
+                                     pmtCylRadius - pmtGlassThickness,
+                                     pmtConeHeight / 2.,
                                      0. * deg, 360. * deg);
 
   G4LogicalVolume *logicLayer = new G4LogicalVolume(solidConeTube,
                                                     Aluminum,
-                                                    "logicLayer");
+                                                    "logicInnerReflector");
 
-  G4LogicalSkinSurface *innerReflectorLogSkinSurface = new G4LogicalSkinSurface("innerReflectorLogSkinSurface", logicLayer, innerReflectorSkinSurface);
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., zoffset),
+                    logicLayer,
+                    "InnerReflector",
+                    logicWCPMT,
+                    false,
+                    0,
+                    true);
+
+  //  G4LogicalSkinSurface *outerReflectorLogSkinSurface = new G4LogicalSkinSurface("outerReflectorLogSkinSurface", pmtReflectorLogic, outerReflectorSkinSurface);
+  new G4LogicalSkinSurface("ReflectorLogSkinSurface", logicLayer, innerReflectorSkinSurface);
 
   G4VisAttributes *layerAttributes = new G4VisAttributes();
   layerAttributes->SetColor(0.85, 0.85, 0.85, 1.0);
@@ -949,16 +823,145 @@ G4LogicalVolume *inSituPMTConstruction::ConstructioninSituPMT()
   layerAttributes->SetForceSolid(true);
   logicLayer->SetVisAttributes(layerAttributes);
 
-  G4VPhysicalVolume *innerReflector = new G4PVPlacement(0,
-                                                        G4ThreeVector(0., 0., 0.),
-                                                        logicLayer,
-                                                        "innerReflector",
-                                                        logicWorld,
-                                                        false,
-                                                        0,
-                                                        true);
+  // artificial absorber at the bottom of glass tube to kill all photons
+  G4Cons *solidAbsorber = new G4Cons("solidAbsorber",
+                                     0.0,
+                                     pmtTubeRadius,
+                                     0.0,
+                                     pmtTubeRadius,
+                                     absorberThickness / 2.,
+                                     0.0, 360.0 * deg);
 
-  return logicWorld;
+  G4LogicalVolume *logicabsorber = new G4LogicalVolume(solidAbsorber,
+                                                       absorberMaterial,
+                                                       "logicabsorber");
+
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., -absorberThickness / 2. - pmtConeHeight / 2. + zoffset),
+                    logicabsorber,
+                    "absorber",
+                    logicWCPMT,
+                    false,
+                    0,
+                    true);
+
+  new G4LogicalSkinSurface("AbsorberSurfaceProperties", logicabsorber, AbsorberSkinSurface);
+
+  G4VisAttributes *visAttributes = new G4VisAttributes();
+  visAttributes->SetColor(G4Color::Gray());
+  visAttributes->SetVisibility(true);
+  visAttributes->SetForceSolid(true);
+  logicabsorber->SetVisAttributes(visAttributes);
+
+  // Photocathode glass
+  G4Box *solidCutOff = new G4Box("cutOffTubs",
+                                 pmtGlassRadius + 1. * cm,
+                                 pmtGlassRadius + 1. * cm,
+                                 pmtGlassCut);
+
+  G4Sphere *pmtGlassSolid = new G4Sphere("pmtglass",
+                                         pmtGlassRadius - pmtGlassThickness,
+                                         pmtGlassRadius,
+                                         0.0 * deg, 360.0 * deg,
+                                         0.0, 90 * deg);
+
+  G4String CollectionName = "InSituPMT";
+  G4SubtractionSolid *solidGlassFaceWCPMT = new G4SubtractionSolid(CollectionName,
+                                                                   pmtGlassSolid,
+                                                                   solidCutOff);
+
+  G4LogicalVolume *logicGlassFaceWCPMT = new G4LogicalVolume(solidGlassFaceWCPMT,
+                                                             PMTGlass,
+                                                             CollectionName);
+
+  G4VPhysicalVolume *physiGlassFaceWCPMT = new G4PVPlacement(0,
+                                                             G4ThreeVector(0., 0., -pmtGlassCut + pmtConeHeight / 2. + pmtCylHeight + zoffset),
+                                                             logicGlassFaceWCPMT,
+                                                             "glassface",
+                                                             logicWCPMT,
+                                                             false,
+                                                             0,
+                                                             true);
+  G4VisAttributes *WCPMTVisAtt = new G4VisAttributes(G4Colour(0.0, 1.0, 0.0)); // better for seeing geometry
+  WCPMTVisAtt->SetForceSolid(true);
+  // logicGlassFaceWCPMT->SetVisAttributes(G4VisAttributes::Invisible);
+  logicGlassFaceWCPMT->SetVisAttributes(WCPMTVisAtt);
+
+  // air below photocathode
+  G4Sphere *pmtInnerGlassSolid =
+      new G4Sphere("pmtInnerglassSolid",
+                   0. * mm,
+                   pmtGlassRadius - pmtGlassThickness,
+                   0.0 * deg, 360.0 * deg,
+                   0.0, 90 * deg);
+  G4Box *boxCutOff =
+      new G4Box("cutOffTubs",
+                pmtGlassRadius + 1. * cm,
+                pmtGlassRadius + 1. * cm,
+                pmtGlassCut);
+
+  G4SubtractionSolid *solidInteriorWCPMT =
+      new G4SubtractionSolid("InteriorWCPMT",
+                             pmtInnerGlassSolid,
+                             boxCutOff);
+
+  G4LogicalVolume *logicInteriorWCPMT =
+      new G4LogicalVolume(solidInteriorWCPMT,
+                          Air1,
+                          "InteriorWCPMT");
+
+  G4VPhysicalVolume *physiInteriorWCPMT =
+      new G4PVPlacement(0,
+                        G4ThreeVector(0., 0., -pmtGlassCut + pmtConeHeight / 2. + pmtCylHeight + zoffset),
+                        logicInteriorWCPMT,
+                        "InteriorWCPMT",
+                        logicWCPMT,
+                        false,
+                        0,
+                        true);
+
+  // Add Logical Border Surface
+  new G4LogicalBorderSurface("GlassCathodeSurface",
+                             physiGlassFaceWCPMT,
+                             physiInteriorWCPMT,
+                             OpGlassCathodeSurface);
+  // now it is possible for photons to travel from air to cathode
+  new G4LogicalBorderSurface("AirCathodeSurface",
+                             physiInteriorWCPMT,
+                             physiGlassFaceWCPMT,
+                             OpGlassCathodeSurface);
+
+  // Top Reflector
+  G4Cons *reflectorSolid = new G4Cons("solidReflector",
+                                      reflectorR1,
+                                      reflectorR1 + reflectorThickness,
+                                      reflectorR2,
+                                      reflectorR2 + reflectorThickness,
+                                      reflectorHeight / 2.,
+                                      0. * deg, 360. * deg);
+
+  G4LogicalVolume *reflectorLogic = new G4LogicalVolume(reflectorSolid,
+                                                        Aluminum,
+                                                        "logicReflector");
+
+  new G4PVPlacement(0,
+                    G4ThreeVector(0., 0., 39.9 * mm + zoffset),
+                    reflectorLogic,
+                    "Reflector",
+                    logicWCPMT,
+                    false,
+                    0,
+                    true);
+
+  new G4LogicalSkinSurface("ReflectorCupSkinSurface", reflectorLogic, outerReflectorSkinSurface);
+
+  G4VisAttributes *refAttributes = new G4VisAttributes();
+  refAttributes->SetColor(0.85, 0.85, 0.85, 1.0);
+  refAttributes->SetVisibility(true);
+  refAttributes->SetForceSolid(true);
+  reflectorLogic->SetVisAttributes(refAttributes);
+
+  return logicWCPMT;
 }
 
 G4VPhysicalVolume *inSituPMTConstruction::Construct()

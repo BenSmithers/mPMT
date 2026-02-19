@@ -23,7 +23,6 @@ Author:   Mohit Gola 10th July 2023
 
 #include "action.hh"
 
-#include "constructMultiPMT.hh"
 #include "constructInSitumPMT.hh"
 #include "constructionPMT.hh"
 #include "inSituPMT.hh"
@@ -59,10 +58,10 @@ int main(int argc, char **argv)
       "output_mPMT");
 
   runManager->SetUserInitialization(actionman);
-  pmtConstruction *subtractionPMT = new pmtConstruction();
-  G4VSolid *PMTSolid = subtractionPMT->ConstructionPMT();
+  // pmtConstruction *subtractionPMT = new pmtConstruction();
+  // G4VSolid *PMTSolid = subtractionPMT->ConstructionPMT();
 
-  ConstructInSitumPMT *InSitumPMT = new ConstructInSitumPMT(subtractionPMT, PMTSolid);
+  ConstructInSitumPMT *InSitumPMT = new ConstructInSitumPMT();
   runManager->SetUserInitialization(InSitumPMT);
 
   runManager->Initialize();
