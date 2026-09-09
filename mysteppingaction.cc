@@ -74,61 +74,46 @@ double MySteppingAction::calculateIncidenceAngle(const G4ThreeVector &Momentum, 
 void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Track, G4String vol, bool opAbsorption, G4String postvol)
 {
   // pmtPhysBulb and  pmtInnerPhysBulb
-  if ((vol == "glassface" && postvol == "InteriorWCPMT") || (vol == "InteriorWCPMT" && postvol == "glassface") && !opAbsorption)
+  if ((vol == "pmtPhysBulb" && postvol == "pmtInnerPhysBulb") || (vol == "pmtInnerPhysBulb" && postvol == "pmtPhysBulb") && !opAbsorption)
   {
     fEventAction->IncrementNumDetected();
     EventAction->RecordStep(2, Track->GetPosition(), 1);
   }
   // opAbsorption in phisCath (not at boundary) won't produce a pe, count it as absorbed in glass
-  else if (vol == "totalPMT" || vol == "glassface" || vol == "solidReflector" || vol == "InteriorWCPMT")
+  else if (vol == "totalPMT" || vol == "pmtPhysBulb" || vol == "pmtPhysReflector" || vol == "pmtPhysInnerTube" || vol == "pmtInnerPhysBulb" || vol == "innerReflector")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(3, Track->GetPosition(), 1);
   }
-  else if(vol == "Reflector")
-  {
-    fEventAction->IncrementNumReflected();
-    fEventAction->RecordStep(4, Track->GetPosition(), 1);
-  }
-    else if(vol == "InnerReflector")
+  else if (vol == "pmtAbsorber")
   {
     fEventAction->IncrementNumAbsorbed();
-    fEventAction->RecordStep(5, Track->GetPosition(), 1);
+    EventAction->RecordStep(4, Track->GetPosition(), 1);
   }
-  else if (vol == "absorber" || vol == "physInsituMPMTBS")
+  else if (vol == "physWorld")
+  {
+    fEventAction->IncrementNumAbsorbed();
+    EventAction->RecordStep(5, Track->GetPosition(), 1);
+  }
+  else if (vol == "Matrix")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(6, Track->GetPosition(), 1);
   }
-  else if (vol == "physWorld" || vol == "InnerAir")
+  else if (vol == "gelPhys")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(7, Track->GetPosition(), 1);
   }
-    else if (vol == "Matrix")
+  else if (vol == "physDome")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(8, Track->GetPosition(), 1);
   }
-  else if (vol == "gel")
+  else if (vol == "physCylinder")
   {
     fEventAction->IncrementNumAbsorbed();
     EventAction->RecordStep(9, Track->GetPosition(), 1);
-  }
-  else if (vol == "physInsituDome")
-  {
-    fEventAction->IncrementNumAbsorbed();
-    EventAction->RecordStep(10, Track->GetPosition(), 1);
-  }
-  else if (vol == "physInsituCylinder")
-  {
-    fEventAction->IncrementNumAbsorbed();
-    EventAction->RecordStep(11, Track->GetPosition(), 1);
-  }
-    else if (vol == "InnerGlassTube")
-  {
-    fEventAction->IncrementNumAbsorbed();
-    EventAction->RecordStep(12, Track->GetPosition(), 1);
   }
   else
   {
@@ -140,7 +125,7 @@ void MySteppingAction::RecordAbsorption(MyEventAction *EventAction, G4Track *Tra
       if (vol == this_name)
       {
         fEventAction->IncrementNumAbsorbed();
-        EventAction->RecordStep(14 + pmtIndex, Track->GetPosition(), 1);
+        EventAction->RecordStep(11 + pmtIndex, Track->GetPosition(), 1);
         found = true;
       }
     }
@@ -290,11 +275,11 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
           {
             if (track->GetTrackStatus() == fStopAndKill)
             {
-              fEventAction->RecordStep(14, track->GetPosition(), 1);
+              fEventAction->RecordStep(11, track->GetPosition(), 1);
             }
             else
             {
-              fEventAction->RecordStep(14, track->GetPosition(), 0);
+              fEventAction->RecordStep(11, track->GetPosition(), 0);
             }
             is_other = true;
           }
@@ -322,7 +307,7 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
     if (!step->GetPostStepPoint()->GetPhysicalVolume())
     {
       // If photon leaves the world volume
-      fEventAction->RecordStep(13, track->GetPosition(), 1);
+      fEventAction->RecordStep(10, track->GetPosition(), 1);
     }
     else if (procname == "OpAbsorption")
     {
